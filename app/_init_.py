@@ -2,7 +2,7 @@ from flask import Flask
 
 app = Flask(__name__)
 
-app.secret_key = 'the first secret key for schwifty'
+app.secret_key = 'the first secret key for ava'
 
 app.config['UPLOAD_FOLDER'] = 'app/static/workshops_images'  # Define where to store the uploaded files
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}  # Allowed upload file extensions
