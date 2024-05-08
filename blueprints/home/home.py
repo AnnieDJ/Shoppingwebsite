@@ -1,11 +1,17 @@
 from app import app
 from flask import Flask, render_template, flash
 from flask import session,request, redirect,url_for
-from app import utils
+
 import re
 from datetime import datetime
 
-
+def some_function():
+    from app import utils      
+@app.route('/')
+@app.route('/home')
+def home():
+    
+    return render_template('home.html')
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     # Check if the message exists in the session
