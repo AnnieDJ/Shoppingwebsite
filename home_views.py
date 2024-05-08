@@ -6,64 +6,6 @@ import re
 from datetime import datetime
 
 
-
-
-## View All Instuctor Images on HomePage##
-def get_all_instructors():
-    cursor = utils.getCursor()
-    
-    # Fetch all instructor details
-    cursor.execute("SELECT user_name, first_name, last_name FROM instructor")
-    instructors = cursor.fetchall()
-    cursor.close()
-    
-    # Append the path to the instructor's image URL
-    for instructor in instructors:
-        first_name = instructor['user_name'].split('_')[0].lower()
-        image_filename = f"instr_{first_name}.jpg"
-        instructor['image_src'] = url_for('static', filename=f'img/instructors/{image_filename}')
-        
-    return instructors
-
-
-
-
-## Subscribe ## 
-@app.route('/subscribe', methods=['POST'])
-def subscribe():
-    email = request.form['email']
-    cursor = utils.getCursor()
-    msg = ""
-
-    cursor.execute("INSERT INTO subscriptions (email) VALUES (%s)", (email,))
-    utils.connection.commit()
-
-    # cursor.rowcount returns the number of rows affected by the last execute() operation
-    if cursor.rowcount > 0:
-        msg = "Subscribed successfully!"
-    else:
-        # This else part will not typically execute for an SQL error, only if no rows are affected
-        msg = "Subscription failed. No changes made."
-
-    cursor.close()
-    return redirect(url_for('home', msg=msg))
-
-
-
-
-## Home Page ##
-@app.route('/')
-@app.route('/home')
-def home():
-    
-    ## Showing the subscribe msg ##
-    msg = request.args.get('msg', '')
-    # Showing instructor images on HomePage ##
-    instructor_data = get_all_instructors()
-    return render_template('index.html', instructors=instructor_data, message=msg)
-
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     # Check if the message exists in the session
@@ -80,7 +22,7 @@ def login():
         user_id = ''
         if user is not None:
             role = user['role']
-            if role == 'Member':
+            if role == 'customer':
                 cursor.execute("SELECT member_id FROM member WHERE user_name = %s", (username,))
                 result = cursor.fetchone()
                 user_id = result['member_id']
@@ -96,10 +38,7 @@ def login():
                 msg = 'Invalid User'
                 return render_template('login.html', msg=msg)
 
-            #user_id = cursor.fetchone()['user_id']
-            #account = user[:4] + (user_id,)
-            #password = account[2]
-
+           
            # user = cursor.fetchone()
             password = user['password']
 
@@ -109,12 +48,16 @@ def login():
                 session['username'] = user['user_name']
                 session['role'] = user['role']
 
-                if role == 'Member':
-                    return redirect(url_for('member_dashboard'))
-                elif role == 'Instructor':
-                    return redirect(url_for('instructor_dashboard'))
-                elif role == 'Manager':
-                    return redirect(url_for('manager_dashboard'))
+                if role == 'customer':
+                    return redirect(url_for('customer_dashboard'))
+                elif role == 'staff':
+                    return redirect(url_for('staff_dashboard'))
+                elif role == 'local_manager':
+                    return redirect(url_for('local_manager_dashboard'))
+                elif role == 'national_manager':
+                    return redirect(url_for('national_manager_dashboard'))
+                elif role == 'admin_manager':
+                    return redirect(url_for('admin_dashboard'))
             else:
                 msg ='Invalid Password!'
         else:
@@ -140,7 +83,7 @@ def register():
         elif not re.match(r'^\d{9,12}$', request.form['phone']):
             msg = 'Invalid phone number!'
         elif utils.register_age_validation(date_of_birth):
-            msg = 'member should be over 16 years old!'
+            msg = 'member should be over 18 years old!'
         # Additional validation checks...
 
         elif not msg:
@@ -171,4 +114,4 @@ def register():
              # Form is empty... (no POST data)
              msg = 'Please fill out the form!'
     # Show registration form with message (if any)
-    return render_template('/register/register.html', msg=msg) 
+    return render_template('/register/home_page.html', msg=msg) 
