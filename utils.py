@@ -45,9 +45,8 @@ def one_year_later():
 
 def register_age_validation(date_of_birth):
     current_date = datetime.now()
-    eightteen_years_ago = timedelta(days=16*365)
-    person_date = current_date - date_of_birth
-    if person_date > eightteen_years_ago:
-        return False
+    eighteen_years_ago = current_date - timedelta(days=18*365 + 18//4)  # accounts for leap years roughly
+    if date_of_birth <= eighteen_years_ago:
+        return True  # Person is 18 years old or older
     else:
-        return True
+        return False  # Person is younger than 18
