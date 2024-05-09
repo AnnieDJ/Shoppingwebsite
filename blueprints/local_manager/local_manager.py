@@ -1,5 +1,3 @@
-from app import app
-from flask import  render_template,flash
-from flask import session,request, redirect,url_for
-def some_function():
-    from app import utils
+from flask import Blueprint
+
+local_manager_bp = Blueprint('local_manager', __name__, template_folder='templates')

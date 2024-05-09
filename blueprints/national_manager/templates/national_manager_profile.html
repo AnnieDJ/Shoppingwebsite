@@ -1,0 +1,179 @@
+{% extends "base.html" %} {% block title %}National Manager Profile{% endblock
+%} {% block content %}
+<!-- message  -->
+<div id="liveAlertPlaceholder"></div>
+
+<div class="container" style="max-width: 800px; margin-top: 60px;">
+    <div class="row p-3">
+        <h2 class="mb-4 text-center"><strong>Manage Your Profile Here : ) <i class="fas fa-user-circle"></i></strong></h2>
+        <div class="row mb-3">
+            <h3 class="mb-3 text-success"><i class="fas fa-user-circle"></i> Account Details</h3>
+            <form method="POST" action="/national_manager_profile" class="needs-validation" novalidate>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                      <span >Username:</span>
+                      <span style="padding-left: 20px">{{data[0]}}</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-2">
+                        <label for="title">Title</label>
+                        <select name="title" id="title" class="form-control" value required>
+                            <option value="Miss" >Miss</option>
+                            <option value="Mr" >Mr</option>
+                            <option value="Mrs" >Mrs</option>
+                            <option value="Other" >Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="first_name">First Name</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" minlength="2" maxlength="20" required>
+                        <div class="invalid-feedback">Please provide a valid first name.</div>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="last_name">Family Name</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" minlength="2" maxlength="20" required>
+                        <div class="invalid-feedback">Please provide a valid last name.</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label for="phone">Phone</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" onkeyup="validatePhone()" onblur="validatePhoneLength()" maxlength="10" required>
+                        <div class="invalid-feedback">Please provide a valid phone number.</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="email">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" onblur="validateEmail()" required>
+                        <div class="invalid-feedback">Please provide a valid email address.</div>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="position">Position</label>
+                        <input type="text" class="form-control" id="position" name="position" maxlength="25">
+                        <div class="invalid-feedback">Please provide a valid position.</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-success">Update Profile <i class="fas fa-edit"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="row mb-3">
+            <h3 class="mb-3 text-success"><i class="fas fa-key"></i> Change Password</h3>
+            <form id="changePasswordForm" method="POST" action="/changePassword" onsubmit="return validatePassword()" class="needs-validation" novalidate>
+                <div class="row mb-3">
+                    <div class="col col-md-4">
+                        <label for="password">New Password</label>
+                        <input type="password" class="form-control" placeholder="New Password" name="password" id="password" minlength="8" maxlength="15" required>
+                        <div class="invalid-feedback">Please provide a valid password (min length: 8).</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col col-md-4">
+                        <label for="confirm_password">Confirm New Password</label>
+                        <input type="password" class="form-control" placeholder="Confirm New Password" id="confirm_password" minlength="8" maxlength="15" required>
+                        <div class="invalid-feedback">Please confirm the password.</div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">Change Password <i class="fas fa-lock"></i></button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+     // prompting message
+    const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
+    const alert = (message, type) => {
+      const wrapper = document.createElement('div')
+      wrapper.innerHTML = [
+        `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+        `   <div>${message}</div>`,
+        '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+        '</div>'
+      ].join('')
+      alertPlaceholder.append(wrapper)
+    }
+    let msg = '{{msg}}'
+    if (msg !==''){
+        alert(msg, 'success')
+    }
+    // Initialization assignment
+    let title = document.getElementById("title")
+    let first_name = document.getElementById("first_name")
+    let last_name = document.getElementById("last_name")
+    let phone = document.getElementById("phone")
+    let email = document.getElementById("email")
+    let position = document.getElementById("position")
+
+
+    title.value = '{{data[4]}}' === 'None' ? '':'{{data[4]}}'
+    first_name.value = '{{ data[5] }}'=== 'None' ? '':'{{data[5]}}'
+    last_name.value = '{{data[6]}}'=== 'None' ? '':'{{data[6]}}'
+    position.value = '{{data[7]}}'=== 'None' ? '':'{{data[7]}}'
+    email.value = '{{data[1]}}'=== 'None' ? '':'{{data[1]}}'
+    phone.value = '{{data[8]}}'=== 'None' ? '':'{{data[8]}}'
+
+    // Gets the form validation style
+    let forms = document.getElementsByClassName('needs-validation');
+    // Loop and prohibit submission
+    let validation = Array.prototype.filter.call(forms, function(form) {
+      form.addEventListener('submit', function(event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault(); // Cancel the default submission effect of submit
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+    // phone verification
+    function validatePhone(){
+        let phone = document.getElementById("phone").value
+        document.getElementById("phone").value = phone.replace(/[^\d]/g,'')
+    }
+    function validatePhoneLength(){
+        let length = document.getElementById("phone").value.length
+        if (length>0 && length<10){
+                alert("The phone number is less than 10 digits!",'warning')
+        }
+    }
+    // email verification
+    function validateEmail() {
+        let email = document.getElementById("email").value;
+        let feedback = document.getElementById("emailFeedback");
+        // Regular expression to test the email format
+        let emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+        if (!emailRegex.test(email)) {
+            feedback.textContent = "Please enter a valid email address.";
+            feedback.style.display = 'block'; // Show the feedback
+            return false;
+        } else {
+            feedback.style.display = 'none'; // Hide the feedback if email is valid
+        }
+        return true;
+    }
+    // Modify password check
+    function validatePassword() {
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("confirm_password").value;
+
+        if (password.search(/[a-z]/i) < 0) {
+            alert("Your password must contain at least one letter.",'warning');
+            return false;
+            }
+        if (password.search(/[0-9]/) < 0) {
+            alert("Your password must contain at least one digit.",'warning');
+            return false;
+            }
+        if (password != confirmPassword) {
+            alert("Passwords do not match.",'warning');
+            return false;
+        }
+        return true;
+    }
+</script>
+
+{% endblock %}

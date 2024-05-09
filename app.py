@@ -1,35 +1,24 @@
+from flask import Flask
+from flask_hashing import Hashing
 
-from flask import Flask, render_template
+from blueprints.home.home import home_bp
+from blueprints.customer.customer import customer_bp
+from blueprints.staff.staff import staff_bp
+from blueprints.local_manager.local_manager import local_manager_bp
+from blueprints.national_manager.national_manager import national_manager_bp
+from blueprints.admin.admin import admin_bp
+
+# Initializing Flask application
 app = Flask(__name__)
-app.secret_key = 'the first secret key for schwifty'
+hashing = Hashing(app)
+app.secret_key = 'AVA'
+app.register_blueprint(home_bp)
+app.register_blueprint(customer_bp)
+app.register_blueprint(staff_bp)
+app.register_blueprint(local_manager_bp)
+app.register_blueprint(national_manager_bp)
+app.register_blueprint(admin_bp)
 
 
-app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}  # Allowed upload file extensions
-
-
-
-from blueprints.home import home
-from blueprints.customers import customers
-from blueprints.staff import staff
-from blueprints.local_manager import local_manager
-from blueprints.national_manager import national_manager
-from blueprints.admin import admin
-
-
-def create_app():
-    app = Flask(__name__)
-    app.register_blueprint(home)
-    app.register_blueprint(customers)
-    app.register_blueprint(staff)
-    app.register_blueprint(local_manager)
-    app.register_blueprint(national_manager)
-    app.register_blueprint(admin)
-    return app
-
-from flask import Blueprint, render_template
-
-home = Blueprint('home', __name__, template_folder='templates')
-
-@home.route('/')
-def home():
-    return render_template('home.html')
+if __name__ == '__main__':
+    app.run(debug=True)
