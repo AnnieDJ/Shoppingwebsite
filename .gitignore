@@ -118,3 +118,5 @@ venv/*
 /.idea/inspectionProfiles/Project_Default.xml
 /.vscode/settings.json
 /.idea/vcs.xml
+
+connect.py
