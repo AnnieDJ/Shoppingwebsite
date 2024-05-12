@@ -1,14 +1,17 @@
 from app import app
-from flask import Flask, render_template, flash
-from flask import session,request, redirect,url_for
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 from app import utils
 import re
 from datetime import datetime
 
+
+
+
 @app.route('/')
 @app.route('/home')
 def home():
-    return render_template('home.html')
+    
+    return render_template('index.html')
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     msg = session.pop('msg', None)
@@ -56,7 +59,7 @@ def register():
              # Form is empty... (no POST data)
              msg = 'Please fill out the form!'
     # Show registration form with message (if any)
-    return render_template('/register/register.html', msg=msg)
+    return render_template('register.html', msg=msg)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -90,12 +93,6 @@ def login():
             else:
                 msg = 'Invalid User'
                 return render_template('login.html', msg=msg)
-
-            #user_id = cursor.fetchone()['user_id']
-            #account = user[:4] + (user_id,)
-            #password = account[2]
-
-           # user = cursor.fetchone()
             password = user['password']
 
             if utils.hashing.check_value(password, user_password, salt='schwifty'):
