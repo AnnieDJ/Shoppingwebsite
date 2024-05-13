@@ -30,7 +30,8 @@
 from flask import Flask
 from flask_hashing import Hashing
 from .home_views import home_bp
-
+from .customer_views import customer_bp
+from .staff_views import staff_bp
 
 def create_app():
     app = Flask(__name__)
@@ -40,7 +41,9 @@ def create_app():
     app.config['DB_HOST'] = 'localhost'
     app.config['DB_NAME'] = 'maevaas$agrihire'
     app.register_blueprint(home_bp, url_prefix='/')
-        # Set the secret key
+    app.register_blueprint(customer_bp, url_prefix='/')
+    app.register_blueprint(staff_bp, url_prefix='/')
+   
     app.secret_key = 'the first secret key for ava'
 
     from . import home_views, customer_views, staff_views, local_manager_views, national_manager_views, admin_views

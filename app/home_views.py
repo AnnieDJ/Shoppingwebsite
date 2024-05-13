@@ -24,23 +24,18 @@ def home():
 def register():
     msg = session.pop('msg', None) if 'msg' in session else None
     if request.method == 'POST':
-        first_name = request.form.get('first_name')
-        family_name = request.form.get('family_name')
-        username = request.form.get('user_name')
-        phone = request.form.get('phone')
+        username = request.form.get('username')
         email = request.form.get('email')
-        address = request.form.get('address')
         date_of_birth = request.form.get('date_of_birth')
-        title = request.form.get('title')
         password = request.form.get('confirm_password')
-
+        role=request.form.get('role')
         if date_of_birth:
             date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d')
 
         today = datetime.now()
         age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
 
-        if not all([username, first_name, family_name, phone, email, address, date_of_birth, title, password]):
+        if not all([username,role, email, date_of_birth, password]):
             msg = 'Please fill out all the fields!'
         elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
             msg = 'Invalid email address!'
@@ -50,7 +45,7 @@ def register():
             try:
                 with utils.db_cursor() as cursor:
                     # Check if user already exists
-                    cursor.execute('SELECT * FROM customer WHERE username = %s', (username,))
+                    cursor.execute('SELECT * FROM user WHERE username = %s', (username,))
                     if cursor.fetchone():
                         flash('Account already exists!', 'error')
                         return redirect(url_for('home.register'))
@@ -58,10 +53,11 @@ def register():
                         # Insert into user table
                         hashed_password = hashing.hash_value(password, salt='ava')  # Assuming a hashing function
 
-                        cursor.execute('INSERT INTO customer (title, first_name, family_name, phone_number, email, address, date_of_birth, username,password_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%s)',
-                                       ( title, first_name, family_name, phone, email, address, date_of_birth, username,hashed_password))
+                        cursor.execute('INSERT INTO user (role, email, date_of_birth, username, password_hash, salt) VALUES (%s, %s, %s, %s, %s, %s)',
+                                       ( role, email, date_of_birth, username,password, hashed_password))
                         
-                        
+                        cursor.connection.commit()  # Make sure to commit the transaction
+
                         flash('Registration successful!', 'success')
                         return redirect(url_for('home.login'))
             except Exception as e:
