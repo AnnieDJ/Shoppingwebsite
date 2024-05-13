@@ -181,45 +181,21 @@
                                             <form id="form2" class="form-group flex-wrap p-3 " action="/register" method="POST" onsubmit="return validateAge()">
                                                 <!-- Title Selection -->
                                                 <div class="form-floating mb-3">
-                                                  <select class="form-control" id="title" name="title" required>
-                                                      <option value="" disabled>Select your title</option>
-                                                        <option value="Mr">Mr</option>
-                                                        <option value="Mrs">Mrs</option>
-                                                        <option value="Miss">Miss</option>
+                                                  <select class="form-control" id="role" name="role" required>
+                                                      <option value="" disabled>Select your role</option>
+                                                        <option value="customer">Customer</option>
                                                     </select>
                                                 </div>
-                                                <!-- First Name Input -->
-                                                <div class="form-floating mb-3">
-                                                  <input type="text" class="form-control" id="last_name" name="first_name" placeholder="first Name" required>
-                                                  <label for="first_name">First Name</label>
-                                              </div>
-                                                  <div class="form-floating mb-3">
-                                                    <input type="text" class="form-control" id="last_name" name="family_name" placeholder="Family Name" required>
-                                                    <label for="family_name">Family Name</label>
-                                                </div>
-                                             
                                               <div class="form-floating mb-3">
                                                 <input type="text" class="form-control" id="username" name="username" placeholder="userame" required>
                                                 <label for="username">Username</label>
                                                 </div>
-                                                <!-- Phone field -->
-                                                <div class="form-floating mb-3">
-                                                    <input type="text" class="form-control" id="phone" name="phone" placeholder="Phone" required>
-                                                    <label for="phone">Phone</label>
-                                                </div>
-                                            
+
                                                 <!-- Email field -->
                                                 <div class="form-floating mb-3">
                                                     <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
                                                     <label for="email">Email</label>
                                                 </div>
-                                            
-                                                <!-- Address field -->
-                                                <div class="form-floating mb-3">
-                                                    <input type="text" class="form-control" id="address" name="address" placeholder="Address" required>
-                                                    <label for="address">Address</label>
-                                                </div>
-                                            
                                                 <!-- Date of Birth field -->
                                                 <div class="form-floating mb-3">
                                                   <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" placeholder="Date of Birth" required>
