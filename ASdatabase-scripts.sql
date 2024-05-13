@@ -1,10 +1,15 @@
 CREATE TABLE IF NOT EXISTS user (
     user_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    username VARCHAR(255) NOT NULL UNIQUE,
-    email VARCHAR(255) NOT NULL UNIQUE,
-    password VARCHAR(255) NOT NULL,
-    role ENUM('customer', 'manager', 'staff', 'admin') NOT NULL,
-    store_id INT
+    title VARCHAR(255),
+    first_name VARCHAR(255),
+    family_name VARCHAR(255),
+    username VARCHAR(225),
+    phone_number VARCHAR(20),
+    address VARCHAR(255),
+    date_of_birth DATE,
+    email VARCHAR(45),
+    password VARCHAR(255),
+    role ENUM('customer', 'local manager', 'national manager', 'admin', 'staff') NOT NULL   
 );
 
 CREATE TABLE IF NOT EXISTS stores (
@@ -15,20 +20,35 @@ CREATE TABLE IF NOT EXISTS stores (
     manager_id INT
 );
 
-CREATE TABLE IF NOT EXISTS manager (
-    manager_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+CREATE TABLE IF NOT EXISTS local_manager (
+    local_manager_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    user_id INT NOT NULL,
+    store_id INT NOT NULL,
+    title VARCHAR(255),
+    first_name VARCHAR(255),
+    family_name VARCHAR(255),
+    username VARCHAR(255),
+    phone_number VARCHAR(20),
+    FOREIGN KEY (user_id) REFERENCES user(user_id),
+    FOREIGN KEY (store_id) REFERENCES stores(store_id)
+);
+CREATE TABLE IF NOT EXISTS admin_national_manager (
+    admin_manager_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     user_id INT NOT NULL,
     title VARCHAR(255),
     first_name VARCHAR(255),
     family_name VARCHAR(255),
-    username VARCHAR(225)
-    position VARCHAR(255),
+    username VARCHAR(255),
     phone_number VARCHAR(20),
     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
 
+
+
 CREATE TABLE IF NOT EXISTS customer (
     customer_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    user_id INT NOT NULL,
+    
     title VARCHAR(255),
     first_name VARCHAR(255),
     family_name VARCHAR(255),
@@ -36,18 +56,22 @@ CREATE TABLE IF NOT EXISTS customer (
     phone_number VARCHAR(20),
     address VARCHAR(255),
     date_of_birth DATE,
-    email VARCH(45),
-    password_hash VARCHAR(255)
+    email VARCHAR(45),  -- Corrected from 'VARCH' to 'VARCHAR'
+    password_hash VARCHAR(255),
+    FOREIGN KEY (user_id) REFERENCES user(user_id)  -- Ensure that 'user' table has 'user_id'
 );
 
 CREATE TABLE IF NOT EXISTS staff (
  staff_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
  user_id INT NOT NULL,
+ store_id INT NOT NULL,
  title VARCHAR(255),
  first_name VARCHAR(255),
  family_name VARCHAR(255),
+ username VARCHAR(225),
  phone_number VARCHAR(20),
- FOREIGN KEY (user_id) REFERENCES user(user_id)
+ FOREIGN KEY (user_id) REFERENCES user(user_id),
+ FOREIGN KEY (store_id) REFERENCES stores(store_id)
 );
 
 CREATE TABLE IF NOT EXISTS rentals (
@@ -131,6 +155,6 @@ CREATE TABLE IF NOT EXISTS messages (
     FOREIGN KEY (receiver_id) REFERENCES user(user_id)
 );
 
-ALTER TABLE user
-ADD CONSTRAINT FK_store_user FOREIGN KEY (store_id) REFERENCES stores(store_id);
+
+
 
