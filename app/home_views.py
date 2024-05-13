@@ -1,115 +1,74 @@
-from app import app
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+
+print ("imported home view")
+
+from flask import current_app as app
+from mysql.connector import Error as MySQLError
+from flask import Blueprint,render_template, request, redirect, url_for, session, flash
 from app import utils
 import re
 from datetime import datetime
+from .utils import db_cursor
+from flask_hashing  import Hashing
 
 
+hashing = Hashing()
 
+home_bp = Blueprint('home', __name__, template_folder='templates')
 
-@app.route('/')
-@app.route('/home')
+@home_bp.route('/')
+@home_bp.route('/home')
 def home():
     
     return render_template('index.html')
-@app.route('/register', methods=['GET', 'POST'])
+@home_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    msg = session.pop('msg', None)
+    msg = session.pop('msg', None) if 'msg' in session else None
     if request.method == 'POST':
-        # Form submitted, process the data
-        username  = request.form['user_name']
-        date_of_birth = datetime.strptime(request.form['date_of_birth'], '%Y-%m-%d')
-    
-        # Validation checks
-        if not all(request.form.values()):
+        first_name = request.form.get('first_name')
+        family_name = request.form.get('family_name')
+        username = request.form.get('user_name')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
+        address = request.form.get('address')
+        date_of_birth = request.form.get('date_of_birth')
+        title = request.form.get('title')
+        password = request.form.get('confirm_password')
+
+        if date_of_birth:
+            date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d')
+
+        today = datetime.now()
+        age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
+
+        if not all([username, first_name, family_name, phone, email, address, date_of_birth, title, password]):
             msg = 'Please fill out all the fields!'
-        elif not re.match(r'[^@]+@[^@]+\.[^@]+', request.form['email']):
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
             msg = 'Invalid email address!'
-        elif not re.match(r'^\d{9,12}$', request.form['phone']):
-            msg = 'Invalid phone number!'
-        elif utils.register_age_validation(date_of_birth):
-            msg = 'member should be over 16 years old!'
-        # Additional validation checks...
-
-        elif not msg:
-            # Data is valid, proceed with registration
-            cursor = utils.getCursor()
-            cursor.execute('SELECT * FROM member WHERE user_name = %s', (username,))
-            account = cursor.fetchone()
-            if account:
-                msg = 'Account already exists!'
-            else:
-                session.clear()
-                session['user_name'] = request.form['user_name']
-                session['title'] = request.form['title']
-                session['firstname'] = request.form['first_name']
-                session['lastname'] = request.form['last_name']
-                session['phone'] = request.form['phone']
-                session['email'] = request.form['email']
-                session['address'] = request.form['address']
-                session['date_of_birth'] = request.form['date_of_birth']
-                
-                password = request.form['confirm_password']
-                hashed = utils.hashing.hash_value(password, salt='schwifty')
-                session['confirm_password'] = hashed
-            
-                return redirect(url_for('bank_info'))
-
-        elif request.method == 'POST':
-             # Form is empty... (no POST data)
-             msg = 'Please fill out the form!'
-    # Show registration form with message (if any)
-    return render_template('register.html', msg=msg)
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    # Check if the message exists in the session
-    msg = session.pop('msg', None)
-
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
-        username = request.form['username']
-        user_password = request.form['password']
-
-        cursor = utils.getCursor()
-        cursor.execute("SELECT * FROM user WHERE user_name = %s", (username,))
-        user = cursor.fetchone()
-
-        user_id = ''
-        if user is not None:
-            role = user['role']
-            if role == 'Member':
-                cursor.execute("SELECT member_id FROM member WHERE user_name = %s", (username,))
-                result = cursor.fetchone()
-                user_id = result['member_id']
-            elif role == 'Manager':
-                cursor.execute("SELECT manager_id FROM manager WHERE user_name = %s", (username,))
-                result = cursor.fetchone()
-                user_id = result['manager_id']
-            elif role == 'Instructor':
-                cursor.execute("SELECT instructor_id FROM instructor WHERE user_name = %s", (username,))
-                result = cursor.fetchone()
-                user_id = result['instructor_id']
-            else:
-                msg = 'Invalid User'
-                return render_template('login.html', msg=msg)
-            password = user['password']
-
-            if utils.hashing.check_value(password, user_password, salt='schwifty'):
-                session['loggedin'] = True
-                session['id'] = user_id
-                session['username'] = user['user_name']
-                session['role'] = user['role']
-
-                if role == 'Member':
-                    return redirect(url_for('member_dashboard'))
-                elif role == 'Instructor':
-                    return redirect(url_for('instructor_dashboard'))
-                elif role == 'Manager':
-                    return redirect(url_for('manager_dashboard'))
-            else:
-                msg ='Invalid Password!'
+        elif not age > 18:  # Assume this function exists and is correct
+            msg = 'Customer should be over 18 years old!'
         else:
-            msg ='Invalid Username!'
-    
-    return render_template('login.html', msg=msg)
+            try:
+                with utils.db_cursor() as cursor:
+                    # Check if user already exists
+                    cursor.execute('SELECT * FROM customer WHERE username = %s', (username,))
+                    if cursor.fetchone():
+                        flash('Account already exists!', 'error')
+                        return redirect(url_for('home.register'))
+                    else:
+                        # Insert into user table
+                        hashed_password = hashing.hash_value(password, salt='ava')  # Assuming a hashing function
+
+                        cursor.execute('INSERT INTO customer (title, first_name, family_name, phone_number, email, address, date_of_birth, username,password_hash) VALUES (%s, %s, %s, %s, %s, %s, %s, %s,%s)',
+                                       ( title, first_name, family_name, phone, email, address, date_of_birth, username,hashed_password))
+                        
+                        
+                        flash('Registration successful!', 'success')
+                        return redirect(url_for('home.login'))
+            except Exception as e:
+                msg = f"Registration failed: {str(e)}"
+                flash('Registration failed!', 'error')
+
+    return render_template('index.html', msg=msg)
+
+
+
