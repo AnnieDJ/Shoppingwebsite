@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS user (
  email VARCHAR(255) NOT NULL UNIQUE,
  password_hash VARCHAR(255) NOT NULL,
  salt VARCHAR(255) NOT NULL,
- role ENUM('customer', 'manager', 'staff', 'admin') NOT NULL,
+ role VARCHAR(50) NOT NULL,
 );
 CREATE TABLE IF NOT EXISTS customer (
  customer_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
