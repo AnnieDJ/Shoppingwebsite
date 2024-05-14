@@ -1,1196 +1,209 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GoCar - Free Bootstrap Website Template for Car Rental</title>
-
-    <!--vendor css ================================================== -->
-    <link rel="stylesheet" type="text/css" href="css/vendor.css" />
-
-    <!-- Link Swiper's CSS -->
-    <link
-      rel="stylesheet"
-      href="https://cdn.bootcdn.net/ajax/libs/Swiper/9.4.1/swiper-bundle.min.css"
-    />
-
-    <!--Bootstrap ================================================== -->
-    <link
-      href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0-alpha3/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.bootcdn.net/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css"
-    />
-
-    <!-- Style Sheet ================================================== -->
-    <link rel="stylesheet" type="text/css" href="style.css" />
-
-    <!-- Google Fonts ================================================== -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Kalam:wght@700&family=Raleway:wght@400;700&display=swap"
-      rel="stylesheet"
-    />
-
-    <!-- script ================================================== -->
-    <script src="js/modernizr.js"></script>
-  </head>
-
-  <body data-bs-spy="scroll" data-bs-target="#header-nav" tabindex="0">
-    <nav
-      class="navbar navbar-expand-lg navbar-light container-fluid py-3 position-fixed"
-    >
-      <div class="container">
-        <a class="navbar-brand" href="index.html"
-          ><img src="images/logo.png" alt="logo"
-        /></a>
+{% extends "base.html" %} {% block title %}Customer Dashboard{% endblock %} {%
+block content %}
+<div class="container mt-4">
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="dropdown">
         <button
-          class="navbar-toggler"
+          class="btn btn-secondary dropdown-toggle"
           type="button"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasNavbar"
-          aria-controls="offcanvasNavbar"
+          id="storeDropdown"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
         >
-          <span class="navbar-toggler-icon"></span>
+          Select Store
         </button>
-        <div
-          class="offcanvas offcanvas-end"
-          tabindex="-1"
-          id="offcanvasNavbar"
-          aria-labelledby="offcanvasNavbarLabel"
-        >
-          <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
-            <button
-              type="button"
-              class="btn-close text-reset"
-              data-bs-dismiss="offcanvas"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="offcanvas-body">
-            <ul
-              class="navbar-nav align-items-center justify-content-end flex-grow-1 pe-3"
-            >
-              <li class="nav-item">
-                <a class="nav-link px-3" aria-current="page" href="index.html"
-                  >Home</a
-                >
-              </li>
-              <li class="nav-item">
-                <a class="nav-link px-3" href="#rental">Cars</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link px-3" href="#pricing">Pricing</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link px-3" href="#services">Services</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link px-3" href="#blog">Blog</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link px-3" href="#action">Contact</a>
-              </li>
-              <li class="nav-item dropdown text-center">
-                <a
-                  class="nav-link px-3 dropdown-toggle"
-                  data-bs-toggle="dropdown"
-                  href="#"
-                  role="button"
-                  aria-expanded="false"
-                  href="#"
-                  >Pages
-                  <iconify-icon
-                    icon="material-symbols:arrow-drop-down"
-                  ></iconify-icon
-                ></a>
-                <ul class="dropdown-menu">
-                  <li>
-                    <a href="about.html" class="dropdown-item text-uppercase"
-                      >About <span class="badge bg-secondary">Pro</span></a
-                    >
-                  </li>
-                  <li>
-                    <a href="blog.html" class="dropdown-item text-uppercase"
-                      >Blog <span class="badge bg-secondary">Pro</span></a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="single-post.html"
-                      class="dropdown-item text-uppercase"
-                      >Single-Post
-                      <span class="badge bg-secondary">Pro</span></a
-                    >
-                  </li>
-                  <li>
-                    <a href="cars.html" class="dropdown-item text-uppercase"
-                      >Cars <span class="badge bg-secondary">Pro</span></a
-                    >
-                  </li>
-                  <li>
-                    <a
-                      href="car-single.html"
-                      class="dropdown-item text-uppercase"
-                      >Car-Single <span class="badge bg-secondary">Pro</span></a
-                    >
-                  </li>
-                  <li>
-                    <a href="booking.html" class="dropdown-item text-uppercase"
-                      >Booking <span class="badge bg-secondary">Pro</span></a
-                    >
-                  </li>
-                  <li>
-                    <a href="services.html" class="dropdown-item text-uppercase"
-                      >Services <span class="badge bg-secondary">Pro</span></a
-                    >
-                  </li>
-                  <li>
-                    <a href="pricing.html" class="dropdown-item text-uppercase"
-                      >Pricing <span class="badge bg-secondary">Pro</span></a
-                    >
-                  </li>
-                  <li>
-                    <a href="contact.html" class="dropdown-item text-uppercase"
-                      >Contact <span class="badge bg-secondary">Pro</span></a
-                    >
-                  </li>
-                  <li>
-                    <a href="team.html" class="dropdown-item text-uppercase"
-                      >Our Team <span class="badge bg-secondary">Pro</span></a
-                    >
-                  </li>
-                  <li>
-                    <a href="review.html" class="dropdown-item text-uppercase"
-                      >Reviews <span class="badge bg-secondary">Pro</span></a
-                    >
-                  </li>
-                  <li>
-                    <a href="faq.html" class="dropdown-item text-uppercase"
-                      >FAQs <span class="badge bg-secondary">Pro</span></a
-                    >
-                  </li>
-                </ul>
-              </li>
-            </ul>
-
-            <div
-              class="d-flex mt-5 mt-lg-0 ps-xl-5 align-items-center justify-content-center"
-            >
-              <ul class="navbar-nav justify-content-end align-items-center">
-                <li class="nav-item">
-                  <a
-                    class="nav-link px-3"
-                    href="#"
-                    data-bs-toggle="modal"
-                    data-bs-target="#exampleModal"
-                  >
-                    Login
-                  </a>
-                </li>
-                <!-- Modal -->
-                <div
-                  class="modal fade"
-                  id="exampleModal"
-                  tabindex="-1"
-                  aria-labelledby="exampleModalLabel"
-                  aria-hidden="true"
-                >
-                  <div class="modal-dialog">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button
-                          type="button"
-                          class="btn-close"
-                          data-bs-dismiss="modal"
-                          aria-label="Close"
-                        ></button>
-                      </div>
-                      <div class="modal-body">
-                        <div class="tabs-listing">
-                          <nav>
-                            <div
-                              class="nav nav-tabs d-flex justify-content-center border-0"
-                              id="nav-tab"
-                              role="tablist"
-                            >
-                              <button
-                                class="btn btn-outline-primary text-uppercase me-3 active"
-                                id="nav-sign-in-tab"
-                                data-bs-toggle="tab"
-                                data-bs-target="#nav-sign-in"
-                                type="button"
-                                role="tab"
-                                aria-controls="nav-sign-in"
-                                aria-selected="true"
-                              >
-                                Log In
-                              </button>
-                              <button
-                                class="btn btn-outline-primary text-uppercase"
-                                id="nav-register-tab"
-                                data-bs-toggle="tab"
-                                data-bs-target="#nav-register"
-                                type="button"
-                                role="tab"
-                                aria-controls="nav-register"
-                                aria-selected="false"
-                              >
-                                Sign Up
-                              </button>
-                            </div>
-                          </nav>
-                          <div class="tab-content" id="nav-tabContent">
-                            <div
-                              class="tab-pane fade active show"
-                              id="nav-sign-in"
-                              role="tabpanel"
-                              aria-labelledby="nav-sign-in-tab"
-                            >
-                              <form id="form1" class="form-group flex-wrap p-3">
-                                <div class="form-input col-lg-12 my-4">
-                                  <label
-                                    for="exampleInputEmail1"
-                                    class="form-label fs-6 text-uppercase fw-bold text-black"
-                                    >Email Address</label
-                                  >
-                                  <input
-                                    type="text"
-                                    id="exampleInputEmail1"
-                                    name="email"
-                                    placeholder="Email"
-                                    class="form-control ps-3"
-                                  />
-                                </div>
-                                <div class="form-input col-lg-12 my-4">
-                                  <label
-                                    for="inputPassword1"
-                                    class="form-label fs-6 text-uppercase fw-bold text-black"
-                                    >Password</label
-                                  >
-                                  <input
-                                    type="password"
-                                    id="inputPassword1"
-                                    placeholder="Password"
-                                    class="form-control ps-3"
-                                    aria-describedby="passwordHelpBlock"
-                                  />
-                                  <div
-                                    id="passwordHelpBlock"
-                                    class="form-text text-center"
-                                  >
-                                    <a href="#" class="password"
-                                      >Forgot Password ?</a
-                                    >
-                                  </div>
-                                </div>
-                                <label class="py-3">
-                                  <input
-                                    type="checkbox"
-                                    required=""
-                                    class="d-inline"
-                                  />
-                                  <span class="label-body text-black"
-                                    >Remember Me</span
-                                  >
-                                </label>
-                                <div class="d-grid my-3">
-                                  <button
-                                    class="btn btn-primary btn-lg btn-dark text-uppercase btn-rounded-none fs-6"
-                                  >
-                                    Log In
-                                  </button>
-                                </div>
-                              </form>
-                            </div>
-                            <div
-                              class="tab-pane fade"
-                              id="nav-register"
-                              role="tabpanel"
-                              aria-labelledby="nav-register-tab"
-                            >
-                              <form id="form2" class="form-group flex-wrap p-3">
-                                <div class="form-input col-lg-12 my-4">
-                                  <label
-                                    for="exampleInputEmail2"
-                                    class="form-label fs-6 text-uppercase fw-bold text-black"
-                                    >Email Address</label
-                                  >
-                                  <input
-                                    type="text"
-                                    id="exampleInputEmail2"
-                                    name="email"
-                                    placeholder="Email"
-                                    class="form-control ps-3"
-                                  />
-                                </div>
-                                <div class="form-input col-lg-12 my-4">
-                                  <label
-                                    for="inputPassword2"
-                                    class="form-label fs-6 text-uppercase fw-bold text-black"
-                                    >Password</label
-                                  >
-                                  <input
-                                    type="password"
-                                    id="inputPassword2"
-                                    placeholder="Password"
-                                    class="form-control ps-3"
-                                    aria-describedby="passwordHelpBlock"
-                                  />
-                                </div>
-                                <label class="py-3">
-                                  <input
-                                    type="checkbox"
-                                    required=""
-                                    class="d-inline"
-                                  />
-                                  <span class="label-body text-black"
-                                    >I agree to the
-                                    <a
-                                      href="#"
-                                      class="text-black password border-bottom"
-                                      >Privacy Policy</a
-                                    >
-                                  </span>
-                                </label>
-                                <div class="d-grid my-3">
-                                  <button
-                                    class="btn btn-primary btn-lg btn-dark text-uppercase btn-rounded-none fs-6"
-                                  >
-                                    Sign Up
-                                  </button>
-                                </div>
-                              </form>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </ul>
-              <button
-                type="button"
-                class="btn btn-outline-primary nav-button mx-3"
-                data-bs-toggle="modal"
-                data-bs-target="#exampleModal2"
-              >
-                Sign in
-              </button>
-              <!-- Modal -->
-              <div
-                class="modal fade"
-                id="exampleModal2"
-                tabindex="-1"
-                aria-labelledby="exampleModalLabel"
-                aria-hidden="true"
-              >
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                      ></button>
-                    </div>
-                    <div class="modal-body">
-                      <div class="tabs-listing">
-                        <nav>
-                          <div
-                            class="nav nav-tabs d-flex justify-content-center border-0"
-                            id="nav-tab2"
-                            role="tablist"
-                          >
-                            <button
-                              class="btn btn-outline-primary text-uppercase me-4"
-                              id="nav-sign-in-tab2"
-                              data-bs-toggle="tab"
-                              data-bs-target="#nav-sign-in2"
-                              type="button"
-                              role="tab"
-                              aria-controls="nav-sign-in2"
-                              aria-selected="false"
-                            >
-                              Log In
-                            </button>
-                            <button
-                              class="btn btn-outline-primary text-uppercase active"
-                              id="nav-register-tab2"
-                              data-bs-toggle="tab"
-                              data-bs-target="#nav-register2"
-                              type="button"
-                              role="tab"
-                              aria-controls="nav-register2"
-                              aria-selected="true"
-                            >
-                              Sign Up
-                            </button>
-                          </div>
-                        </nav>
-                        <div class="tab-content" id="nav-tabContent1">
-                          <div
-                            class="tab-pane fade"
-                            id="nav-sign-in2"
-                            role="tabpanel"
-                            aria-labelledby="nav-sign-in-tab2"
-                          >
-                            <form id="form3" class="form-group flex-wrap p-3">
-                              <div class="form-input col-lg-12 my-4">
-                                <label
-                                  for="exampleInputEmail3"
-                                  class="form-label fs-6 text-uppercase fw-bold text-black"
-                                  >Email Address</label
-                                >
-                                <input
-                                  type="text"
-                                  id="exampleInputEmail3"
-                                  name="email"
-                                  placeholder="Email"
-                                  class="form-control ps-3"
-                                />
-                              </div>
-                              <div class="form-input col-lg-12 my-4">
-                                <label
-                                  for="inputPassword3"
-                                  class="form-label fs-6 text-uppercase fw-bold text-black"
-                                  >Password</label
-                                >
-                                <input
-                                  type="password"
-                                  id="inputPassword3"
-                                  placeholder="Password"
-                                  class="form-control ps-3"
-                                  aria-describedby="passwordHelpBlock"
-                                />
-                                <div
-                                  id="passwordHelpBlock2"
-                                  class="form-text text-center"
-                                >
-                                  <a href="#" class="password"
-                                    >Forgot Password ?</a
-                                  >
-                                </div>
-                              </div>
-                              <label class="py-3">
-                                <input
-                                  type="checkbox"
-                                  required=""
-                                  class="d-inline"
-                                />
-                                <span class="label-body text-black"
-                                  >Remember Me</span
-                                >
-                              </label>
-                              <div class="d-grid my-3">
-                                <button
-                                  class="btn btn-primary btn-lg btn-dark text-uppercase btn-rounded-none fs-6"
-                                >
-                                  Log In
-                                </button>
-                              </div>
-                            </form>
-                          </div>
-                          <div
-                            class="tab-pane fade active show"
-                            id="nav-register2"
-                            role="tabpanel"
-                            aria-labelledby="nav-register-tab2"
-                          >
-                            <form id="form4" class="form-group flex-wrap p-3">
-                              <div class="form-input col-lg-12 my-4">
-                                <label
-                                  for="exampleInputEmail4"
-                                  class="form-label fs-6 text-uppercase fw-bold text-black"
-                                  >Email Address</label
-                                >
-                                <input
-                                  type="text"
-                                  id="exampleInputEmail4"
-                                  name="email"
-                                  placeholder="Email"
-                                  class="form-control ps-3"
-                                />
-                              </div>
-                              <div class="form-input col-lg-12 my-4">
-                                <label
-                                  for="inputPassword4"
-                                  class="form-label fs-6 text-uppercase fw-bold text-black"
-                                  >Password</label
-                                >
-                                <input
-                                  type="password"
-                                  id="inputPassword4"
-                                  placeholder="Password"
-                                  class="form-control ps-3"
-                                  aria-describedby="passwordHelpBlock"
-                                />
-                              </div>
-                              <label class="py-3">
-                                <input
-                                  type="checkbox"
-                                  required=""
-                                  class="d-inline"
-                                />
-                                <span class="label-body text-black"
-                                  >I agree to the
-                                  <a
-                                    href="#"
-                                    class="text-black password border-bottom"
-                                    >Privacy Policy</a
-                                  >
-                                </span>
-                              </label>
-                              <div class="d-grid my-3">
-                                <button
-                                  class="btn btn-primary btn-lg btn-dark text-uppercase btn-rounded-none fs-6"
-                                >
-                                  Sign Up
-                                </button>
-                              </div>
-                            </form>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ul class="dropdown-menu" aria-labelledby="storeDropdown">
+          <li>
+            <a class="dropdown-item" href="#" data-store="store1">Ashburton</a>
+          </li>
+          <li>
+            <a class="dropdown-item" href="#" data-store="store2">Lincoln</a>
+          </li>
+          <li>
+            <a class="dropdown-item" href="#" data-store="store3">Rolleston</a>
+          </li>
+        </ul>
       </div>
-    </nav>
+    </div>
+    <div class="col-md-6">
+      <form class="d-flex">
+        <input
+          class="form-control me-2"
+          type="search"
+          placeholder="Search"
+          aria-label="Search"
+        />
+        <button class="btn btn-outline-success" type="submit">Search</button>
+      </form>
+    </div>
+  </div>
+  <div class="row" id="productList">
+    <!-- Products will be loaded here dynamically -->
+  </div>
+</div>
 
-    <!-- hero section start  -->
-    <section id="hero" class="position-relative overflow-hidden">
-      <div class="pattern-overlay pattern-right position-absolute">
-        <img src="images/hero-pattern-right.png" alt="pattern" />
+<!-- Modal for product details -->
+<div
+  class="modal fade"
+  id="productModal"
+  tabindex="-1"
+  aria-labelledby="productModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="productModalLabel">Product Details</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
       </div>
-      <div class="pattern-overlay pattern-left position-absolute">
-        <img src="images/hero-pattern-left.png" alt="pattern" />
+      <div class="modal-body">
+        <!-- Product details will be loaded here dynamically -->
       </div>
-      <div class="container text-center py-5 mt-5">
-        <div class="row my-5">
-          <div
-            class="d-flex flex-wrap flex-column justify-content-center align-items-center"
-          >
-            <h2 class="page-title display-3 mt-5">Customers Reviews</h2>
-            <nav class="breadcrumb">
-              <a class="breadcrumb-item" href="index.html">Home</a>
-              <span class="breadcrumb-item active" aria-current="page"
-                >Reviews</span
-              >
-            </nav>
-          </div>
-        </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
       </div>
-    </section>
+    </div>
+  </div>
+</div>
 
-    <section id="review">
-      <div class="services-sub container my-5 py-5">
-        <h2 class="text-center">
-          What our <span class="text-primary"> Customers Says </span>
-        </h2>
+<script>
+  var products = {
+    store1: [
+      { image: "static/tractor1.jpg", name: "Deutz Fahr/Tractor", description: "This 2019 Deutz Fahr 6185 RC shift professional series tractor has only done 2,670 hours and is in great condition and ready to go to work . 50kph front suspension, front linkage and pto, this tractor is a serious contracting machine and with the loader would add incredible versitility to any fleet.", price: "$369" },
+      { image: "static/roller1.jpg", name: "3M Tyre/Roller", description: "Sakai SW250 Roller, hydrostatic transmission, vibrating smoother front, and rear drive rollers, 4 cylinder diesel engine. the SW250 offer the same features as SAKAI's larger size models:Single lever operated, fully hydrostatic, all drum drive. Both drums vibrate (with off/manual/auto mode selector)Centre-articulated steering mechanism; Rust-free and pressurized water sprinkler system; Neutral engine start and fail-safe brake system; Vibration free operator platform and low operating noise; Easy-to-monitor instruments (gauges and warning lamps); The hydraulic pump and motors are connected in series to offer the maximum traction and smooth rolling as well as excellent gradeability.", price: "$119" },
+      { image: "static/sprayer1.jpg", name: "Amazone/Sprayer", description: "Amazone UX5201 Super with 30 mtr boom , as new , 5200ltr tank with 580ltr fresh water , twin pumps 520ltrs/min , axle suspension , 9 sections with auto shut off , ISOBUS with Amazone joystick , DUS- Boom recirculation , comfort package , boom auto height control , LED lighting package.", price: "$289" },
+      { image: "static/wrapper1.jpg", name: "McHale/Fusion/Bale Wrapper", description: "2020 model. 22,000 bales. 1,000 speed gear box. 6 bar camless pickup. 650 tyres. ", price: "$159" },
+      { image: "static/spreader1.jpg", name: "Manure Spreader", description: "Description 5", price: "$159" },
+      { image: "static/sprayer2.jpg", name: "Manure Spreader", description: "*6 tonne super capacity;*4 tonne Urea capacity;*Wide belt to handle organic matter (poultry waste, etc) with ease;*E spreader in cab rate control;*Electronic door actuator", price: "$359" },
 
-        <div class="row">
-          <div class="mt-5 col-md-4">
-            <div class="reviews-components p-5">
-              <iconify-icon
-                icon="gridicons:quote"
-                class="quote my-2"
-              ></iconify-icon>
-              <p>
-                “A pellen tesque pretium feugiat vel mobi sagittis lorem habi
-                tasse cursus ipsum quis nec eget facilisis. Quis nibh ut bindum
-                nisl quis placerat proin tortor mattis.”
-              </p>
-              <div class="row mt-4">
-                <div class="col-md-3">
-                  <img
-                    src="images/commentor-item1.jpg"
-                    alt="image"
-                    class="img-fluid"
-                  />
-                </div>
-                <div class="col-md-9">
-                  <h5>Kelly Garcia</h5>
-                  <div class="d-flex">
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                  </div>
-                </div>
+      { image: "static/good1.png", name: "JS130/Tracked-Excav", description: "13.7 tonne operating weight, Long carriage - providing excellent breakout force, 600mm steel tracks, Large air conditioned cabin, Heated seat with air suspension, Hydraulic hitch, High flow hydraulics, 900mm general purpose bucket, Heavy duty X undercarriage, JCB 74kw Tier 3 diesel engine ", price: "$189" },
+      { image: "static/good2.png", name: "CASE IH/Maxxum 125/FWA/4WD", description: "This Case Maxxum 125 Multi Controller Tractor has a Case LR2100 Self Levelling Loader and Bucket, 125HP Boost to 155HP, Active Drive 8 Speed Power Shift Transmission, Electronic Remotes, Integrated Loader Joystick Control, ", price: "$255" },
+      { image: "static/good3.png", name: "Taege/4.8m Triple Box Air Seeder/Seed Drills", description: "Taege 4.8m Air Seeder - triple box drill, 2 x 850L hoppers & 1 x 200L hopper, all three hoppers are electrically driven, all three are very easy to calibrate, Monitor shows fan speed and seeding rate of all hoppers, 4.8m working width and folds to 3.1m for road transport, covering harrows, 121mm tine spacing. Tilth grows seed.", price: "$200" },
+      { image: "static/good4.png", name: "Merlo/P72.10/Telescopic Handler", description: "With a max of 10 metre reach and 7.2 ton lift it is well suited to construction. The frame levelling and side shift make it ideal for accurate placement of goods on an uneven site and the single joystick makes it easy to control.", price: "$260" },
+      { image: "static/good5.png", name: "Fendt/Rotana 160V/Round Baler", description: "SOBUS, Also has monitor, bale size 0.9m to 1.60m, workshop checked, finance package available, happy to on farm.", price: "$290" },
+      { image: "static/good6.png", name: "PIUMA/Horticulture Harvester", description: "Only 1400mm wide, 4 Wheel Steering so great turning circle for tight headlands;Cruise Control for steering, 4 Conveyor belts, holds two bins while filling one;Gentle delivery from conveyor to bin, very quiet and economical 25 HP Diesel engine;Four Adjustable Height Platforms while two harvest in front at ground level.", price: "$200" },
+      { image: "static/good7.png", name: "Uni drill/Disc Seeder", description: "24 row, 3 metre trailing disc drill.NZs most cost effective disc direct drill.Ideal for over sowing, into stubble or cultivated ground.Fewer moving parts; low ongoing repair and maintenance.Narrow row spacing but staggered design allows good trash clearance.Long life Tungsten carbide tipped coulters;Mounted on rubber Duratorque suspension for easy maintenance;Self clean design Guttler roller.;700L capacity hopper for high speed drilling, quick and easy calibration, convenient emptying, and individual row accuracy, with the ability to sow to the last quantity of seed, with all seed types.", price: "$180" },
+      { image: "static/good8.png", name: "Antonio Carraro/Trx 10900/FWA/4WD", description: "Gearing 16F x 16R;98 hp Kubota engine;R series steering isodiametric tractor;With reversible driving position;Powerful and streamlined;Extremely versatile and ideally suited to a wide range of applications.", price: "$300" },
+      { image: "static/good9.png", name: "Taege/300AS121D/Seed Drills", description: "Brand New Taege 3.1m air seeder, 25 run 121mm row spacing, plastic seed & fert hoppers, both 850L so easy half ton of seed & fert, Taege electric drive, oil cooler for hydraulic fan, Wide tyres, safety rail, small seed inserts, covering harrows, roll top hopper covers, very smart and easy to use. We can add a third hopper for another $13000 + gst which is 200L and set up to broadcast small seeds or slug bait.", price: "$340" },
+    ],
+    store2: [
+    { image: "static/tractor1.jpg", name: "Deutz Fahr/Tractor", description: "This 2019 Deutz Fahr 6185 RC shift professional series tractor has only done 2,670 hours and is in great condition and ready to go to work . 50kph front suspension, front linkage and pto, this tractor is a serious contracting machine and with the loader would add incredible versitility to any fleet.", price: "$369" },
+      { image: "static/roller1.jpg", name: "3M Tyre/Roller", description: "Sakai SW250 Roller, hydrostatic transmission, vibrating smoother front, and rear drive rollers, 4 cylinder diesel engine. the SW250 offer the same features as SAKAI's larger size models:Single lever operated, fully hydrostatic, all drum drive. Both drums vibrate (with off/manual/auto mode selector)Centre-articulated steering mechanism; Rust-free and pressurized water sprinkler system; Neutral engine start and fail-safe brake system; Vibration free operator platform and low operating noise; Easy-to-monitor instruments (gauges and warning lamps); The hydraulic pump and motors are connected in series to offer the maximum traction and smooth rolling as well as excellent gradeability.", price: "$119" },
+      { image: "static/sprayer1.jpg", name: "Amazone/Sprayer", description: "Amazone UX5201 Super with 30 mtr boom , as new , 5200ltr tank with 580ltr fresh water , twin pumps 520ltrs/min , axle suspension , 9 sections with auto shut off , ISOBUS with Amazone joystick , DUS- Boom recirculation , comfort package , boom auto height control , LED lighting package.", price: "$289" },
+      { image: "static/wrapper1.jpg", name: "McHale/Fusion/Bale Wrapper", description: "2020 model. 22,000 bales. 1,000 speed gear box. 6 bar camless pickup. 650 tyres. ", price: "$159" },
+      { image: "static/spreader1.jpg", name: "Manure Spreader", description: "Description 5", price: "$159" },
+      { image: "static/sprayer2.jpg", name: "Manure Spreader", description: "*6 tonne super capacity;*4 tonne Urea capacity;*Wide belt to handle organic matter (poultry waste, etc) with ease;*E spreader in cab rate control;*Electronic door actuator", price: "$359" },
+
+      { image: "static/good1.png", name: "JS130/Tracked-Excav", description: "13.7 tonne operating weight, Long carriage - providing excellent breakout force, 600mm steel tracks, Large air conditioned cabin, Heated seat with air suspension, Hydraulic hitch, High flow hydraulics, 900mm general purpose bucket, Heavy duty X undercarriage, JCB 74kw Tier 3 diesel engine ", price: "$189" },
+      { image: "static/good2.png", name: "CASE IH/Maxxum 125/FWA/4WD", description: "This Case Maxxum 125 Multi Controller Tractor has a Case LR2100 Self Levelling Loader and Bucket, 125HP Boost to 155HP, Active Drive 8 Speed Power Shift Transmission, Electronic Remotes, Integrated Loader Joystick Control, ", price: "$255" },
+      { image: "static/good3.png", name: "Taege/4.8m Triple Box Air Seeder/Seed Drills", description: "Taege 4.8m Air Seeder - triple box drill, 2 x 850L hoppers & 1 x 200L hopper, all three hoppers are electrically driven, all three are very easy to calibrate, Monitor shows fan speed and seeding rate of all hoppers, 4.8m working width and folds to 3.1m for road transport, covering harrows, 121mm tine spacing. Tilth grows seed.", price: "$200" },
+      { image: "static/good4.png", name: "Merlo/P72.10/Telescopic Handler", description: "With a max of 10 metre reach and 7.2 ton lift it is well suited to construction. The frame levelling and side shift make it ideal for accurate placement of goods on an uneven site and the single joystick makes it easy to control.", price: "$260" },
+      { image: "static/good5.png", name: "Fendt/Rotana 160V/Round Baler", description: "SOBUS, Also has monitor, bale size 0.9m to 1.60m, workshop checked, finance package available, happy to on farm.", price: "$290" },
+      { image: "static/good6.png", name: "PIUMA/Horticulture Harvester", description: "Only 1400mm wide, 4 Wheel Steering so great turning circle for tight headlands;Cruise Control for steering, 4 Conveyor belts, holds two bins while filling one;Gentle delivery from conveyor to bin, very quiet and economical 25 HP Diesel engine;Four Adjustable Height Platforms while two harvest in front at ground level.", price: "$200" },
+      { image: "static/good10.png", name: "Moore/Unidrill/Seed Drills", description: "The most straight forward, easy to use, and functional pasture based drill on the market;* Single discs;*90mm row spacing;*Rear guttler roller - very effective in pugged conditions and consolidating cultivated soil;*Accord metering system and pneumatic hopper is easy to set up and can handle any seed type.", price: "$270" },
+      { image: "static/good11.png", name: "Maschio Jumbo 8.0mtr/Power Harrows", description: "Maschio Jumbo 8.0mtr Power Harrow , Farmer owned , very tidy , as new Quickfit Tungsten tines , hydraulic depth control of tooth packer roller and leveling board , contour control , awesome efficient cultivation too", price: "$290" },
+      { image: "static/good12.png", name: "Kverneland/95130C/Rakes/Tedder", description: "The Kverneland 94125 C and 95130 C are targeted at making lighter work of tough and demanding operations. With an impressive capacity of 12.50m working width, straightforward design and the possibility to adjust both work and swath width, they are designed to boost the complete process of collection and pick-up, altering to the changing crop intensity during the season. The Kverneland 12.5m 4-rotor rake is offered with a choice of either ProLine or CompactLine gearbox. Both machines are similar in construction.", price: "$260" },
+    ],
+    store3: [
+    { image: "static/tractor1.jpg", name: "Deutz Fahr/Tractor", description: "This 2019 Deutz Fahr 6185 RC shift professional series tractor has only done 2,670 hours and is in great condition and ready to go to work . 50kph front suspension, front linkage and pto, this tractor is a serious contracting machine and with the loader would add incredible versitility to any fleet.", price: "$369" },
+      { image: "static/roller1.jpg", name: "3M Tyre/Roller", description: "Sakai SW250 Roller, hydrostatic transmission, vibrating smoother front, and rear drive rollers, 4 cylinder diesel engine. the SW250 offer the same features as SAKAI's larger size models:Single lever operated, fully hydrostatic, all drum drive. Both drums vibrate (with off/manual/auto mode selector)Centre-articulated steering mechanism; Rust-free and pressurized water sprinkler system; Neutral engine start and fail-safe brake system; Vibration free operator platform and low operating noise; Easy-to-monitor instruments (gauges and warning lamps); The hydraulic pump and motors are connected in series to offer the maximum traction and smooth rolling as well as excellent gradeability.", price: "$119" },
+      { image: "static/sprayer1.jpg", name: "Amazone/Sprayer", description: "Amazone UX5201 Super with 30 mtr boom , as new , 5200ltr tank with 580ltr fresh water , twin pumps 520ltrs/min , axle suspension , 9 sections with auto shut off , ISOBUS with Amazone joystick , DUS- Boom recirculation , comfort package , boom auto height control , LED lighting package.", price: "$289" },
+      { image: "static/wrapper1.jpg", name: "McHale/Fusion/Bale Wrapper", description: "2020 model. 22,000 bales. 1,000 speed gear box. 6 bar camless pickup. 650 tyres. ", price: "$159" },
+      { image: "static/spreader1.jpg", name: "Manure Spreader", description: "Description 5", price: "$159" },
+      { image: "static/sprayer2.jpg", name: "Manure Spreader", description: "*6 tonne super capacity;*4 tonne Urea capacity;*Wide belt to handle organic matter (poultry waste, etc) with ease;*E spreader in cab rate control;*Electronic door actuator", price: "$359" },
+
+      { image: "static/good1.png", name: "JS130/Tracked-Excav", description: "13.7 tonne operating weight, Long carriage - providing excellent breakout force, 600mm steel tracks, Large air conditioned cabin, Heated seat with air suspension, Hydraulic hitch, High flow hydraulics, 900mm general purpose bucket, Heavy duty X undercarriage, JCB 74kw Tier 3 diesel engine ", price: "$189" },
+      { image: "static/good2.png", name: "CASE IH/Maxxum 125/FWA/4WD", description: "This Case Maxxum 125 Multi Controller Tractor has a Case LR2100 Self Levelling Loader and Bucket, 125HP Boost to 155HP, Active Drive 8 Speed Power Shift Transmission, Electronic Remotes, Integrated Loader Joystick Control, ", price: "$255" },
+      { image: "static/good3.png", name: "Taege/4.8m Triple Box Air Seeder/Seed Drills", description: "Taege 4.8m Air Seeder - triple box drill, 2 x 850L hoppers & 1 x 200L hopper, all three hoppers are electrically driven, all three are very easy to calibrate, Monitor shows fan speed and seeding rate of all hoppers, 4.8m working width and folds to 3.1m for road transport, covering harrows, 121mm tine spacing. Tilth grows seed.", price: "$200" },
+      { image: "static/good4.png", name: "Merlo/P72.10/Telescopic Handler", description: "With a max of 10 metre reach and 7.2 ton lift it is well suited to construction. The frame levelling and side shift make it ideal for accurate placement of goods on an uneven site and the single joystick makes it easy to control.", price: "$260" },
+      { image: "static/good5.png", name: "Fendt/Rotana 160V/Round Baler", description: "SOBUS, Also has monitor, bale size 0.9m to 1.60m, workshop checked, finance package available, happy to on farm.", price: "$290" },
+      { image: "static/good6.png", name: "PIUMA/Horticulture Harvester", description: "Only 1400mm wide, 4 Wheel Steering so great turning circle for tight headlands;Cruise Control for steering, 4 Conveyor belts, holds two bins while filling one;Gentle delivery from conveyor to bin, very quiet and economical 25 HP Diesel engine;Four Adjustable Height Platforms while two harvest in front at ground level.", price: "$200" },
+      { image: "static/good13.png", name: "McHale/V660/Round Baler", description: "Single belt;Rotor feed with 15 knives;2m pick up;bale size upto 1.68m", price: "$340" },
+      { image: "static/good14.png", name: "Combi RX148 Multi-feeder/Bale Wagon/Feedout", description: " Hustler Chainless Rear Floor Combi RX148 Multi-feeder with Brakes. 14.2 cube (17 cube heaped). Can handle all bale types and shapes and has awesome stability in rolling country. Can add other spec including scales", price: "$310" },
+      { image: "static/good15.png", name: "300EDBT121SS/Seed Drills", description: "TAEGE 300EDBT 121 3M DRILL, twin box, Stainless steel fert box, 121mm tine spacing, electronic rate control, small seed inserts, Broadcasting system, covering harrows, safety chain, LED tratier lights,Hazard panels, 2.8m drilling width", price: "$300" },
+
+    ],
+
+  };
+
+  $("#productList").html(productHtml);
+
+    $(".view-details").on("click", function () {
+      var product = $(this).data("product");
+      $(".modal-body").html(`
+        <img src="${product.image}" class="img-fluid mb-3" alt="${product.name}">
+        <h5>${product.name}</h5>
+        <p>${product.description}</p>
+        <p>${product.price}</p>
+      `);
+      $("#productModal").modal("show");
+    });
+
+    $(".add-to-cart").on("click", function () {
+      var product = $(this).data("product");
+      alert(`${product.name} added to cart!`);
+    });
+   }
+
+  $(document).ready(function () {
+    $(".dropdown-item").on("click", function () {
+      var store = $(this).data("store");
+      loadProducts(store);
+    });
+
+    $("#searchButton").on("click", function () {
+      var searchTerm = $("#searchInput").val().toLowerCase();
+      var store = $("#storeDropdown").text().toLowerCase().replace("select store", "").trim();
+      var filteredProducts = products[store].filter(function (product) {
+        return (
+          product.name.toLowerCase().includes(searchTerm) ||
+          product.description.toLowerCase().includes(searchTerm)
+        );
+      });
+
+      var productHtml = "";
+      filteredProducts.forEach(function (product) {
+        productHtml += `
+          <div class="col-md-4 mb-4">
+            <div class="card">
+              <img src="${product.image}" class="card-img-top" alt="${product.name}">
+              <div class="card-body">
+                <h5 class="card-title">${product.name}</h5>
+                <p class="card-text">${product.description}</p>
+                <p class="card-text">${product.price}</p>
+                <button class="btn btn-primary add-to-cart" data-product='${JSON.stringify(product)}'>Add to Cart</button>
+                <button class="btn btn-info view-details" data-product='${JSON.stringify(product)}'>View Details</button>
               </div>
             </div>
           </div>
-          <div class="mt-5 col-md-4">
-            <div class="reviews-components p-5">
-              <iconify-icon
-                icon="gridicons:quote"
-                class="quote my-2"
-              ></iconify-icon>
-              <p>
-                “A pellen tesque pretium feugiat vel mobi sagittis lorem habi
-                tasse cursus ipsum quis nec eget facilisis. Quis nibh ut bindum
-                nisl quis placerat proin tortor mattis.”
-              </p>
-              <div class="row mt-4">
-                <div class="col-md-3">
-                  <img
-                    src="images/commentor-item2.jpg"
-                    alt="image"
-                    class="img-fluid"
-                  />
-                </div>
-                <div class="col-md-9">
-                  <h5>Anna Evans</h5>
-                  <div class="d-flex">
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star-half"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mt-5 col-md-4">
-            <div class="reviews-components p-5">
-              <iconify-icon
-                icon="gridicons:quote"
-                class="quote my-2"
-              ></iconify-icon>
-              <p>
-                “A pellen tesque pretium feugiat vel mobi sagittis lorem habi
-                tasse cursus ipsum quis nec eget facilisis. Quis nibh ut bindum
-                nisl quis placerat proin tortor mattis.”
-              </p>
-              <div class="row mt-4">
-                <div class="col-md-3">
-                  <img
-                    src="images/commentor-item3.jpg"
-                    alt="image"
-                    class="img-fluid"
-                  />
-                </div>
-                <div class="col-md-9">
-                  <h5>Georgiea Millre</h5>
-                  <div class="d-flex">
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star-half"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mt-5 col-md-4">
-            <div class="reviews-components p-5">
-              <iconify-icon
-                icon="gridicons:quote"
-                class="quote my-2"
-              ></iconify-icon>
-              <p>
-                “A pellen tesque pretium feugiat vel mobi sagittis lorem habi
-                tasse cursus ipsum quis nec eget facilisis. Quis nibh ut bindum
-                nisl quis placerat proin tortor mattis.”
-              </p>
-              <div class="row mt-4">
-                <div class="col-md-3">
-                  <img
-                    src="images/commentor-item1.jpg"
-                    alt="image"
-                    class="img-fluid"
-                  />
-                </div>
-                <div class="col-md-9">
-                  <h5>Kelly Garcia</h5>
-                  <div class="d-flex">
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mt-5 col-md-4">
-            <div class="reviews-components p-5">
-              <iconify-icon
-                icon="gridicons:quote"
-                class="quote my-2"
-              ></iconify-icon>
-              <p>
-                “A pellen tesque pretium feugiat vel mobi sagittis lorem habi
-                tasse cursus ipsum quis nec eget facilisis. Quis nibh ut bindum
-                nisl quis placerat proin tortor mattis.”
-              </p>
-              <div class="row mt-4">
-                <div class="col-md-3">
-                  <img
-                    src="images/commentor-item2.jpg"
-                    alt="image"
-                    class="img-fluid"
-                  />
-                </div>
-                <div class="col-md-9">
-                  <h5>Anna Evans</h5>
-                  <div class="d-flex">
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mt-5 col-md-4">
-            <div class="reviews-components p-5">
-              <iconify-icon
-                icon="gridicons:quote"
-                class="quote my-2"
-              ></iconify-icon>
-              <p>
-                “A pellen tesque pretium feugiat vel mobi sagittis lorem habi
-                tasse cursus ipsum quis nec eget facilisis. Quis nibh ut bindum
-                nisl quis placerat proin tortor mattis.”
-              </p>
-              <div class="row mt-4">
-                <div class="col-md-3">
-                  <img
-                    src="images/commentor-item3.jpg"
-                    alt="image"
-                    class="img-fluid"
-                  />
-                </div>
-                <div class="col-md-9">
-                  <h5>Georgiea Millre</h5>
-                  <div class="d-flex">
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mt-5 col-md-4">
-            <div class="reviews-components p-5">
-              <iconify-icon
-                icon="gridicons:quote"
-                class="quote my-2"
-              ></iconify-icon>
-              <p>
-                “A pellen tesque pretium feugiat vel mobi sagittis lorem habi
-                tasse cursus ipsum quis nec eget facilisis. Quis nibh ut bindum
-                nisl quis placerat proin tortor mattis.”
-              </p>
-              <div class="row mt-4">
-                <div class="col-md-3">
-                  <img
-                    src="images/commentor-item1.jpg"
-                    alt="image"
-                    class="img-fluid"
-                  />
-                </div>
-                <div class="col-md-9">
-                  <h5>Kelly Garcia</h5>
-                  <div class="d-flex">
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mt-5 col-md-4">
-            <div class="reviews-components p-5">
-              <iconify-icon
-                icon="gridicons:quote"
-                class="quote my-2"
-              ></iconify-icon>
-              <p>
-                “A pellen tesque pretium feugiat vel mobi sagittis lorem habi
-                tasse cursus ipsum quis nec eget facilisis. Quis nibh ut bindum
-                nisl quis placerat proin tortor mattis.”
-              </p>
-              <div class="row mt-4">
-                <div class="col-md-3">
-                  <img
-                    src="images/commentor-item2.jpg"
-                    alt="image"
-                    class="img-fluid"
-                  />
-                </div>
-                <div class="col-md-9">
-                  <h5>Anna Evans</h5>
-                  <div class="d-flex">
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="mt-5 col-md-4">
-            <div class="reviews-components p-5">
-              <iconify-icon
-                icon="gridicons:quote"
-                class="quote my-2"
-              ></iconify-icon>
-              <p>
-                “A pellen tesque pretium feugiat vel mobi sagittis lorem habi
-                tasse cursus ipsum quis nec eget facilisis. Quis nibh ut bindum
-                nisl quis placerat proin tortor mattis.”
-              </p>
-              <div class="row mt-4">
-                <div class="col-md-3">
-                  <img
-                    src="images/commentor-item3.jpg"
-                    alt="image"
-                    class="img-fluid"
-                  />
-                </div>
-                <div class="col-md-9">
-                  <h5>Georgiea Millre</h5>
-                  <div class="d-flex">
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                    <iconify-icon
-                      icon="ion:star"
-                      class="rate pe-1"
-                    ></iconify-icon>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+        `;
+      });
+      $("#productList").html(productHtml);
 
-          <nav
-            aria-label="Page navigation"
-            class="d-flex justify-content-center mt-5"
-          >
-            <ul class="pagination">
-              <li class="page-item">
-                <a class="page-link" href="#" aria-label="Previous">
-                  <iconify-icon
-                    icon="solar:arrow-left-linear"
-                    class="pagination-arrow"
-                  ></iconify-icon>
-                </a>
-              </li>
-              <li class="page-item active" aria-current="page">
-                <a class="page-link" href="#">1</a>
-              </li>
-              <li class="page-item"><a class="page-link" href="#">2</a></li>
-              <li class="page-item"><a class="page-link" href="#">3</a></li>
-              <li class="page-item"><a class="page-link" href="#">4</a></li>
-              <li class="page-item"><a class="page-link" href="#">5</a></li>
-              <li class="page-item">
-                <a class="page-link" href="#" aria-label="Next">
-                  <iconify-icon
-                    icon="solar:arrow-right-linear"
-                    class="pagination-arrow"
-                  ></iconify-icon>
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-      </div>
-    </section>
+      $(".view-details").on("click", function () {
+        var product = $(this).data("product");
+        $(".modal-body").html(`
+          <img src="${product.image}" class="img-fluid mb-3" alt="${product.name}">
+          <h5>${product.name}</h5>
+          <p>${product.description}</p>
+          <p>${product.price}</p>
+        `);
+        $("#productModal").modal("show");
+      });
 
-    <!-- call-to-action section start  -->
-    <section id="action" class="position-relative">
-      <div class="pattern-overlay pattern-right position-absolute">
-        <img src="images/call-to-action-pattern.png" alt="pattern" />
-      </div>
-
-      <div class="container py-5 my-5">
-        <div class="row py-5">
-          <div class="col-10 col-sm-8 col-lg-6">
-            <h2 class="">
-              Let’s begin with <span class="text-primary">GoCar rental.</span>
-            </h2>
-          </div>
-          <div class="col-lg-6">
-            <p>
-              Neque, vestibulum sed varius magna et at. Eu, adipiscing morbi
-              augue justo. Nibh laoreet volutpat quis velit. Blandit aliquam
-              donec sed morbi congue eget lorem viverra porta id lobortis.
-            </p>
-            <a href="contact.html" class="btn btn-primary mt-2">Contact us </a>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Footer Section Starts -->
-    <section id="footer">
-      <div class="container footer-container mt-5">
-        <footer class="row row-cols-1 row-cols-sm-2 row-cols-md-5 my-5 py-5">
-          <div class="col-md-4 mt-5 mt-md-0">
-            <img src="images/logo.png" alt="image" />
-            <p class="py-3">
-              Vel non nibh vestibulum massa ullam corper bib endum ultrices
-              venenatis, id id sed mass.
-            </p>
-            <div class="d-flex align-items-center">
-              <a href="#" target="_blank"
-                ><iconify-icon
-                  class="social-link-icon pe-4"
-                  icon="mdi:facebook"
-                ></iconify-icon
-              ></a>
-              <a href="#" target="_blank"
-                ><iconify-icon
-                  class="social-link-icon pe-4"
-                  icon="mdi:twitter"
-                ></iconify-icon
-              ></a>
-              <a href="#" target="_blank"
-                ><iconify-icon
-                  class="social-link-icon pe-4"
-                  icon="mdi:instagram"
-                ></iconify-icon
-              ></a>
-              <a href="#" target="_blank"
-                ><iconify-icon
-                  class="social-link-icon pe-4"
-                  icon="mdi:linkedin"
-                ></iconify-icon
-              ></a>
-              <a href="#" target="_blank"
-                ><iconify-icon
-                  class="social-link-icon pe-4"
-                  icon="mdi:youtube"
-                ></iconify-icon
-              ></a>
-            </div>
-          </div>
-
-          <div class="col-md-7 offset-md-1 mt-5">
-            <ul class="footer-nav list-unstyled">
-              <li class="nav-item me-2 mb-3">
-                <a class="nav-link px-4" aria-current="page" href="#">Home</a>
-              </li>
-              <li class="nav-item me-2 mb-3">
-                <a class="nav-link px-4" href="#">Booking</a>
-              </li>
-              <li class="nav-item me-2 mb-3">
-                <a class="nav-link px-4" href="#">About</a>
-              </li>
-              <li class="nav-item me-2 mb-3">
-                <a class="nav-link px-4" href="#">Cars</a>
-              </li>
-              <li class="nav-item me-2 mb-3">
-                <a class="nav-link px-4" href="#">Services</a>
-              </li>
-              <li class="nav-item me-2 mb-3">
-                <a class="nav-link px-4" href="#">Contact</a>
-              </li>
-            </ul>
-          </div>
-        </footer>
-      </div>
-
-      <footer
-        class="d-flex flex-wrap justify-content-between align-items-center border-top"
-      ></footer>
-
-      <div class="container">
-        <footer
-          class="d-flex flex-wrap justify-content-between align-items-center py-2 pt-4"
-        >
-          <div class="col-md-6 d-flex align-items-center">
-            <p>© 2023 GoCar - All rights reserved</p>
-          </div>
-          <div class="col-md-6 d-flex align-items-center justify-content-end">
-            <p class="">
-              © 2023 Free Template
-              <a
-                target="_blank"
-                href="http://www.mobanwang.com/"
-                title="网页模板"
-                class="website-link"
-                >网页模板</a
-              >
-            </p>
-          </div>
-        </footer>
-      </div>
-    </section>
-
-    <!-- script ================================================== -->
-    <script src="js/jquery-1.11.0.min.js"></script>
-    <script src="js/plugins.js"></script>
-    <script src="js/script.js"></script>
-    <script
-      src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0-alpha3/js/bootstrap.bundle.min.js"
-      integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
-      crossorigin="anonymous"
-    ></script>
-    <script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
-
-    <script src="https://cdn.bootcdn.net/ajax/libs/Swiper/9.4.1/swiper-bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.7/dist/iconify-icon.min.js"></script>
-  </body>
-</html>
+      $(".add-to-cart").on("click", function () {
+        var product = $(this).data("product");
+        alert(`${product.name} added to cart!`);
+      });
+    });
+  });
+</script>
+{% endblock %}
