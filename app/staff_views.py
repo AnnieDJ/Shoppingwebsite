@@ -17,6 +17,3 @@ def dashboard():
     return redirect(url_for('home.login'))
 
 
-@staff_bp.route('/staff_dashboard', methods=['GET', 'POST'])
-def satff_dashboard():
-    return render_template('staff_dashboard.html')
