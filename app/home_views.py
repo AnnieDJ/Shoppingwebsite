@@ -1,9 +1,10 @@
 # home_views.py
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, json
 import re
 from datetime import datetime
 from .utils import db_cursor
 from . import hashing
+from app import utils
 
 home_bp = Blueprint('home', __name__, template_folder='templates')
 
@@ -102,3 +103,22 @@ def login():
             msg = f"Login failed: {str(e)}"
     
     return render_template('index.html', msg=msg)
+
+@home_bp.route('/logout')
+def logout():
+    # Remove session data, this will log the user out
+   session.pop('loggedin', None)
+   session.pop('id', None)
+   session.pop('username', None)
+   session.pop('role', None)
+   # Redirect to login page
+   return render_template('index.html')
+
+@utils.login_required
+@home_bp.route("/browse", methods=["GET", "POST"])
+def get_store():
+    cursor = utils.get_cursor()
+    stores = cursor.execute("SELECT * FROM stores")
+    stores = stores.fetchall()
+    stores = json.dumps(stores)
+    return render_template("chose.html", stores=stores)

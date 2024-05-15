@@ -15,3 +15,4 @@ def dashboard():
     if 'loggedin' in session and session['role'] == 'national_manager':
         return render_template('national_manager_dashboard.html')
     return redirect(url_for('home.login'))
+

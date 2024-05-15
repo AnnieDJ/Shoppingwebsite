@@ -2,8 +2,8 @@ import mysql.connector
 from flask import current_app
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
-
-
+from functools import wraps
+from flask import redirect, session
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 def get_db_connection():
@@ -49,3 +49,16 @@ def register_age_validation(date_of_birth):
     current_date = datetime.now()
     eighteen_years_ago = current_date - timedelta(days=16*365)
     return current_date - date_of_birth > eighteen_years_ago
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if isAuthenticated() == False:
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return decorated_function
+
+    
+def isAuthenticated():
+    return "username" in session
