@@ -27,8 +27,8 @@
         <h1 class="h4">Profile</h1>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb m-0 fs-7">
-            <li class="breadcrumb-item"><a class="link-primary text-decoration-none" href="{{ url_for('national_manager.dashboard') }}">Home</a></li>
-            <li class="breadcrumb-item">Profile Management</li>
+            <li class="breadcrumb-item"><a class="link-primary text-decoration-none" href="{{ url_for('admin.dashboard') }}">Home</a></li>
+            <li class="breadcrumb-item"><a class="link-primary text-decoration-none" href="{{ url_for('admin.admin_profile') }}">Profile Management</a></li>
             <li class="breadcrumb-item active" aria-current="page">Your Profile</li>
           </ol>
         </nav>
@@ -45,16 +45,16 @@
         <div class="card widget-card border-light shadow-sm">
           <div class="card-header text-bg-primary">Welcome</div>
           <div class="card-body">
-            <h5 class="text-center mb-1">{{ national_manager_profile.first_name }} {{ national_manager_profile.family_name }}</h5>
+            <h5 class="text-center mb-1">{{ admin_profile.first_name }} {{ admin_profile.family_name }}</h5>
             <p class="text-center text-secondary mb-4">Admin</p>
             <ul class="list-group list-group-flush mb-4">
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 <h6 class="m-0">ID</h6>
-                <span>{{ national_manager_profile.user_id }}</span>
+                <span>{{ admin_profile.user_id }}</span>
               </li>
               <li class="list-group-item d-flex justify-content-between align-items-center">
                 <h6 class="m-0">Position</h6>
-                <span>{{ national_manager_profile.username }}</span>
+                <span>{{ admin_profile.username }}</span>
               </li>
             </ul>
           </div>
@@ -78,42 +78,42 @@
                           <div class="card mb-3">
                               <div class="card-body">
                                   <h5 class="card-title">General Information</h5>
-                                  <p class="card-text"><strong>Staff ID:</strong> {{ national_manager_profile.user_id }}</p>
-                                  <p class="card-text"><strong>Username:</strong> {{ national_manager_profile.username }}</p>
-                                  <p class="card-text"><strong>Name:</strong> {{ national_manager_profile.first_name }} {{ admin_profile.family_name }}</p>
-                                  <p class="card-text"><strong>Phone Number:</strong> {{ national_manager_profile.phone_number }}</p>
-                                  <p class="card-text"><strong>Email:</strong> {{ national_manager_profile.email }}</p>
+                                  <p class="card-text"><strong>Staff ID:</strong> {{ admin_profile.user_id }}</p>
+                                  <p class="card-text"><strong>Username:</strong> {{ admin_profile.username }}</p>
+                                  <p class="card-text"><strong>Name:</strong> {{ admin_profile.first_name }} {{ admin_profile.family_name }}</p>
+                                  <p class="card-text"><strong>Phone Number:</strong> {{ admin_profile.phone_number }}</p>
+                                  <p class="card-text"><strong>Email:</strong> {{ admin_profile.email }}</p>
                               </div>
                           </div>
                       </div>
                   </div>
               </div>
               <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                  <form action="{{ url_for('national_manager_edit_profile') }}" method="post" class="row gy-3 gy-xxl-4">
+                  <form action="{{ url_for('admin_edit_profile') }}" method="post" class="row gy-3 gy-xxl-4">
                       <div class="col-md-6">
                           <label for="title" class="form-label">Title</label>
                           <select class="form-control" id="title" name="title" required>
-                              <option value="Mr" {% if national_manager_profile[0][2] == 'Mr' %}selected{% endif %}>Mr.</option>
-                              <option value="Mrs" {% if national_manager_profile[0][2] == 'Mrs' %}selected{% endif %}>Mrs.</option>
-                              <option value="Miss" {% if national_manager_profile[0][2] == 'Miss' %}selected{% endif %}>Miss</option>
-                              <option value="Dr" {% if national_manager_profile[0][2] == 'Dr' %}selected{% endif %}>Dr.</option>
+                              <option value="Mr" {% if admin_profile[0][2] == 'Mr' %}selected{% endif %}>Mr.</option>
+                              <option value="Mrs" {% if admin_profile[0][2] == 'Mrs' %}selected{% endif %}>Mrs.</option>
+                              <option value="Miss" {% if admin_profile[0][2] == 'Miss' %}selected{% endif %}>Miss</option>
+                              <option value="Dr" {% if admin_profile[0][2] == 'Dr' %}selected{% endif %}>Dr.</option>
                           </select>
                       </div>
                       <div class="col-md-6">
                           <label for="first_name" class="form-label">First Name</label>
-                          <input type="text" class="form-control" id="first_name" name="first_name" value="{{ national_manager_profile.first_name }}" required>
+                          <input type="text" class="form-control" id="first_name" name="first_name" value="{{ admin_profile.first_name }}" required>
                       </div>
                       <div class="col-md-6">
                           <label for="last_name" class="form-label">Last Name</label>
-                          <input type="text" class="form-control" id="last_name" name="last_name" value="{{ national_manager_profile.family_name }}" required>
+                          <input type="text" class="form-control" id="last_name" name="last_name" value="{{ admin_profile.family_name }}" required>
                       </div>
                       <div class="col-md-6">
                           <label for="phone_number" class="form-label">Phone Number</label>
-                          <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ national_manager_profile.phone_number }}" pattern="\d*" maxlength="10">
+                          <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ admin_profile.phone_number }}" pattern="\d*" maxlength="10">
                       </div>
                       <div class="col-md-6">
                           <label for="email" class="form-label">Email</label>
-                          <input type="email" class="form-control" id="email" name="email" value="{{ national_manager_profile.email }}" required>
+                          <input type="email" class="form-control" id="email" name="email" value="{{ admin_profile.email }}" required>
                       </div>
                       <div class="col-12">
                           <button type="submit" class="btn btn-primary">Update & Save</button>
