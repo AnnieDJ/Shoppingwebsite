@@ -120,3 +120,5 @@ venv/*
 /.idea/vcs.xml
 
 connect.py
+
+__pycach__/

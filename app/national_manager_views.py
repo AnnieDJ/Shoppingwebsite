@@ -16,12 +16,6 @@ def dashboard():
         return render_template('national_manager_dashboard.html')
     return redirect(url_for('home.login'))
 
-@national_manager_bp.route('/dashboard')
-def dashboard():
-    if 'loggedin' in session and session['role'] == 'national_manager':
-        return render_template('national_manager_dashboard.html')
-    return redirect(url_for('home.login'))
-
 @national_manager_bp.route('/national_manager_profile')
 def national_manager_profile():
     if 'loggedin' in session and session['loggedin']:
