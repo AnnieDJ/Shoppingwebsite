@@ -10,6 +10,7 @@ from flask_hashing  import Hashing
 staff_bp = Blueprint('staff', __name__, template_folder='templates/staff')
 
 
+# staff dashboard
 @staff_bp.route('/dashboard')
 def dashboard():
     if 'loggedin' in session and session['role'] == 'staff':
@@ -17,6 +18,3 @@ def dashboard():
     return redirect(url_for('home.login'))
 
 
-@staff_bp.route('/staff_dashboard', methods=['GET', 'POST'])
-def satff_dashboard():
-    return render_template('staff_dashboard.html')

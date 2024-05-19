@@ -1,17 +1,22 @@
 # home_views.py
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, json
 import re
 from datetime import datetime
 from .utils import db_cursor
 from . import hashing
+from app import utils
 
 home_bp = Blueprint('home', __name__, template_folder='templates')
 
+
+# home page
 @home_bp.route('/')
 @home_bp.route('/home')
 def home():
     return render_template('index.html')
 
+
+# allow users to register
 @home_bp.route('/register', methods=['GET', 'POST'])
 def register():
     msg = session.pop('msg', None) if 'msg' in session else None
@@ -34,71 +39,92 @@ def register():
         elif not age > 18:  # Assume this function exists and is correct
             msg = 'Customer should be over 18 years old!'
         else:
-            try:
-                with db_cursor() as cursor:
-                    # Check if user already exists
-                    cursor.execute('SELECT * FROM user WHERE username = %s', (username,))
-                    if cursor.fetchone():
-                        flash('Account already exists!', 'error')
-                        return redirect(url_for('home.register'))
-                    else:
-                        # Insert into user table
-                        from . import hashing
-                        hashed_password = hashing.hash_value(password, salt='ava')  # Assuming a hashing function
+            conn, cursor = db_cursor()
 
-                        cursor.execute('INSERT INTO user (role, email, date_of_birth, username, password_hash, salt) VALUES (%s, %s, %s, %s, %s, %s)',
-                                       (role, email, date_of_birth, username, password, hashed_password))
-                        
-                        cursor.connection.commit()  # Make sure to commit the transaction
+            cursor.execute('SELECT * FROM user WHERE username = %s', (username,))
+            if cursor.fetchone():
+                flash('Account already exists!', 'error')
+                return redirect(url_for('home.register'))
+            else:
+                # Insert into user table
+                from . import hashing
+                hashed_password = hashing.hash_value(password, salt='ava')  # Assuming a hashing function
 
-                        flash('Registration successful!', 'success')
-                        return redirect(url_for('home.login'))
-            except Exception as e:
-                msg = f"Registration failed: {str(e)}"
-                flash('Registration failed!', 'error')
+                cursor.execute(
+                    'INSERT INTO user (role, email, date_of_birth, username, password_hash, salt) VALUES (%s, %s, %s, %s, %s, %s)',
+                    (role, email, date_of_birth, username, password, hashed_password))
+
+                conn.commit()  # Make sure to commit the transaction
+
+                flash('Registration successful!', 'success')
+                return redirect(url_for('home.login'))
 
     return render_template('index.html', msg=msg)
 
+
+# allow users to login
 @home_bp.route('/login', methods=['GET', 'POST'])
 def login():
     msg = session.pop('msg', None)
 
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         username = request.form['username']
-        user_originpassword= request.form['password']
+        user_originpassword = request.form['password']
 
-        try:
-            with db_cursor() as cursor:
-                cursor.execute("SELECT * FROM user WHERE username = %s", (username,))
-                user = cursor.fetchone()
+        # try:
+        conn, cursor = db_cursor()
 
-                if user is not None:
-                    role = user['role']
-                    user_id = user['user_id']
-                    password_salt = user['salt']
-                    
-                    from . import hashing
-                    if hashing.check_value(password_salt, user_originpassword, salt='ava'):
-                        session['loggedin'] = True
-                        session['userid'] = user_id
-                        session['username'] = user['username']
-                        session['role'] = user['role']
+        cursor.execute("SELECT * FROM user WHERE username = %s", (username,))
+        user = cursor.fetchone()
 
-                        if role == 'customer':
-                            return redirect(url_for('customer.dashboard'))
-                        elif role == 'staff':
-                            return redirect(url_for('staff.dashboard'))
-                        elif role == 'local_manager':
-                            return redirect(url_for('local_manager.dashboard'))
-                        elif role == 'national_manager':
-                            return redirect(url_for('national_manager.dashboard'))
-                        elif role == 'admin':
-                            return redirect(url_for('admin.dashboard'))
-                    else:
-                        msg = 'Invalid Password!'
-                else:
-                    msg = 'Invalid Username!'
-        except Exception as e:
-            msg = f"Login failed: {str(e)}"
-    
+        if user is not None:
+            role = user['role']
+            user_id = user['user_id']
+            password_salt = user['password_hash']
+
+            from . import hashing
+            if hashing.check_value(password_salt, user_originpassword, salt='ava'):
+                session['loggedin'] = True
+                session['userid'] = user_id
+                session['username'] = user['username']
+                session['role'] = user['role']
+
+                if role == 'customer':
+                    return redirect(url_for('customer.dashboard'))
+                elif role == 'staff':
+                    return redirect(url_for('staff.dashboard'))
+                elif role == 'local_manager':
+                    return redirect(url_for('local_manager.dashboard'))
+                elif role == 'national_manager':
+                    return redirect(url_for('national_manager.dashboard'))
+                elif role == 'admin':
+                    return redirect(url_for('admin.dashboard'))
+            else:
+                msg = 'Invalid Password!'
+        else:
+            msg = 'Invalid Username!'
+
     return render_template('index.html', msg=msg)
+
+
+# allow users to log out
+@home_bp.route('/logout')
+def logout():
+    # Remove session data, this will log the user out
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
+    session.pop('role', None)
+    # Redirect to login page
+    return render_template('index.html')
+
+
+# users are required to login before using other features on the web app
+@utils.login_required
+@home_bp.route("/browse", methods=["GET", "POST"])
+def get_store():
+    cursor = utils.get_cursor()
+    stores = cursor.execute("SELECT * FROM stores")
+    stores = stores.fetchall()
+    stores = json.dumps(stores)
+    return render_template("chose.html", stores=stores)

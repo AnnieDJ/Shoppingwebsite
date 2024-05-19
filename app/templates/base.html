@@ -80,9 +80,6 @@
           <ul class="navbar-nav">
             {% if session.get('role') == 'customer' %}
             <li class="nav-item">
-              <a class="nav-link" href="/dashboard">Dashboard</a>
-            </li>
-            <li class="nav-item">
               <a class="nav-link" href="/order-list">Order List</a>
             </li>
             <li class="nav-item dropdown">
@@ -131,22 +128,20 @@
               <a class="nav-link" href="/logout">Logout</a>
             </li>
             {% elif session.get('role') == 'staff' %}
+
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Logout</a>
+            </li>
+            {% elif session.get('role') == 'local_manager' %}
             <li class="nav-item">
               <a class="nav-link" href="/dashboard">Dashboard</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
             </li>
-            {% elif session.get('role') == 'local manager' %}
+            {% elif session.get('role') == 'national_manager' %}
             <li class="nav-item">
-              <a class="nav-link" href="/dashboard">Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/logout">Logout</a>
-            </li>
-            {% elif session.get('role') == 'national manager' %}
-            <li class="nav-item">
-              <a class="nav-link" href="/dashboard">Dashboard</a>
+              <a class="nav-link" href="/profile">Profile</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
