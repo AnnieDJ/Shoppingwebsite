@@ -1,79 +1,88 @@
 from flask import current_app as app
 from mysql.connector import Error as MySQLError
 from flask import Blueprint,render_template, request, redirect, url_for, session, flash
-from app import utils
 import re
-from datetime import datetime
-from .utils import db_cursor
-from flask_hashing  import Hashing
+from . import hashing
+from .utils import db_cursor, login_required
+
 
 national_manager_bp = Blueprint('national_manager', __name__, template_folder='templates/national_manager')
 
 
+# national manager dashboard
 @national_manager_bp.route('/dashboard')
+@login_required
 def dashboard():
     if 'loggedin' in session and session['role'] == 'national_manager':
         return render_template('national_manager_dashboard.html')
     return redirect(url_for('home.login'))
 
-@national_manager_bp.route('/national_manager_profile')
+
+# allow national manager to view and edit profile
+@national_manager_bp.route('/national_manager_profile', methods=['GET', 'POST'])
+@login_required
 def national_manager_profile():
-    if 'loggedin' in session and session['loggedin']:
-        with db_cursor() as cursor:
-            cursor.execute("SELECT * FROM admin_national_manager WHERE user_name = %s", (session['username'],))
-        national_manager_profile = cursor.fetchone()
-
-        if national_manager_profile:
-            encoded_national_manager_profile = [(national_manager_profile['admin_national_manager_id'], national_manager_profile['user_name'],
-                                        national_manager_profile['title'], national_manager_profile['first_name'],
-                                        national_manager_profile['family_name'], national_manager_profile['phone_number'], national_manager_profile['email'])]
-
-            return render_template('/national_manager_profile.html', national_manager_profile=encoded_national_manager_profile,
-                                   role=session['role'])
-        else:
-            flash('Manager profile not found', 'error')
-            return redirect(url_for('login'))
-    else:
+    conn, cursor = db_cursor()
+    if 'userid' not in session:
+        flash("User ID not found in session. Please log in again.", 'danger')
         return redirect(url_for('login'))
 
-@national_manager_bp.route('/national_manager_edit_profile', methods=['GET', 'POST'])
-def national_manager_edit_profile():
-    if 'loggedin' in session and session['loggedin']:
-        if request.method == 'POST':
-            title = request.form.get('title')
-            first_name = request.form.get('first_name')
-            family_name = request.form.get('family_name')
-            phone_number = request.form.get('phone_number')
-            email = request.form.get('email')
+    if request.method == 'POST':
+        title = request.form.get('title')
+        first_name = request.form.get('first_name')
+        family_name = request.form.get('last_name')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
 
-            redirect_route = {
-                'customer': 'customer_profile',
-                'staff': 'staff_profile',
-                'local_manager': 'local_manager_profile',
-                'national_manager': 'national_manager_profile',
-                'admin': 'admin_profile'
-            }.get(session.get('role'), 'login')
+        try:
+            cursor.execute(
+                'UPDATE admin_national_manager SET title = %s, first_name = %s, family_name = %s, phone_number = %s WHERE user_id = %s',
+                (title, first_name, family_name, phone, session['userid'])
+            )
+            cursor.execute(
+                'UPDATE user SET email = %s WHERE user_id = %s',
+                (email, session['userid'])
+            )
+            flash('Your profile has been successfully updated!', 'success')
+        except MySQLError as e:
+            flash(f"An error occurred: {e}", 'danger')
 
-            # Input validation is maintained
-            if len(phone_number) != 10 or not phone_number.isdigit():
-                flash('Phone number must be 10 digits', 'danger')
-                return redirect(url_for(redirect_route))
+    cursor.execute(
+        'SELECT u.username, u.email, u.password_hash, u.role, a.title, a.first_name, a.family_name, a.phone_number '
+        'FROM user u '
+        'JOIN admin_national_manager a ON u.user_id = a.user_id '
+        'WHERE u.user_id = %s',
+        (session['userid'],)
+    )
+    data = cursor.fetchone()
 
-            if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
-                flash('Invalid email address', 'danger')
-                return redirect(url_for(redirect_route))
+    return render_template('national_manager_profile.html', data=data)
 
-            with db_cursor() as cursor:
-                cursor.execute("UPDATE admin_national_manager SET title = %s, first_name = %s, last_name = %s, phone_number = %s, email = %s \
-                    WHERE user_name = %s", (
-            title, first_name, family_name, phone_number, email, session['username'],))
 
-            flash('Profile updated successfully!')
-            return redirect(url_for('national_manager_profile'))
-        else:
-            with db_cursor() as cursor:
-                cursor.execute("SELECT * FROM admin_national_manager WHERE user_name = %s", (session['username'],))
-                national_manager_profile = cursor.fetchone()
-                return render_template('/national_manager_profile.html', national_manager_profile=national_manager_profile, role=session['role'])
-    else:
+# allow national manager to change password
+@national_manager_bp.route('/change_password', methods=['POST'])
+@login_required
+def change_password():
+    if 'userid' not in session:
+        flash("User ID not found in session. Please log in again.", 'danger')
         return redirect(url_for('login'))
+
+    password = request.form['password']
+
+    if re.search('[a-zA-Z]', password) is None or re.search('[0-9]', password) is None:
+        flash("Password must contain at least one letter and one digit.", 'warning')
+        return redirect(url_for('national_manager.national_manager_profile'))
+
+    hashed_password = hashing.hash_value(password, salt='ava')
+    conn, cursor = db_cursor()
+
+    try:
+        cursor.execute(
+            'UPDATE user SET password_hash = %s WHERE user_id = %s',
+            (hashed_password, session['userid'])
+        )
+        flash("Your password has been successfully updated.", 'success')
+    except MySQLError as e:
+        flash(f"An error occurred: {e}", 'danger')
+
+    return redirect(url_for('national_manager.national_manager_profile'))

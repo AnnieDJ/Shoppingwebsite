@@ -10,6 +10,8 @@ from flask_hashing  import Hashing
 
 customer_bp = Blueprint('customer', __name__, template_folder='templates/customer')
 
+
+# customer dashboard
 @customer_bp.route('/dashboard')
 def dashboard():
     if 'loggedin' in session and session['role'] == 'customer':
