@@ -86,6 +86,3 @@ def change_password():
         flash(f"An error occurred: {e}", 'danger')
 
     return redirect(url_for('national_manager.national_manager_profile'))
-
-
-

@@ -36,7 +36,6 @@ CREATE TABLE IF NOT EXISTS staff (
     phone_number VARCHAR(20),
     FOREIGN KEY (store_id) REFERENCES stores(store_id),
     FOREIGN KEY (user_id) REFERENCES user(user_id)
-);
 
 CREATE TABLE IF NOT EXISTS local_manager (
     local_manager_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,

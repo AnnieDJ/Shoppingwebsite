@@ -119,7 +119,6 @@ def logout():
     return render_template('index.html')
 
 
-# users are required to login before using other features on the web app
 @utils.login_required
 @home_bp.route("/browse", methods=["GET", "POST"])
 def get_store():
