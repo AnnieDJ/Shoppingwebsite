@@ -80,7 +80,7 @@ def login():
         if user is not None:
             role = user['role']
             user_id = user['user_id']
-            password_salt = user['password_hash']
+            password_salt = user['salt']
 
             from . import hashing
             if hashing.check_value(password_salt, user_originpassword, salt='ava'):

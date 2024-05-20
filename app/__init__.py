@@ -10,9 +10,9 @@ def create_app():
     app = Flask(__name__)
     app.config['UPLOAD_FOLDER'] = 'app/static'
     app.config['DB_USER'] = 'root'
-    app.config['DB_PASSWORD'] = '12345'
+    app.config['DB_PASSWORD'] = 'root1234'
     app.config['DB_HOST'] = 'localhost'
-    app.config['DB_NAME'] = 'maevaas$agrihire'
+    app.config['DB_NAME'] = 'agrihire'
     app.register_blueprint(home_bp, url_prefix='/')
     app.register_blueprint(customer_bp, url_prefix='/customer')
     app.register_blueprint(staff_bp, url_prefix='/staff')
