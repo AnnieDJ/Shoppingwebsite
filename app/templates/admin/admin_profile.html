@@ -2,7 +2,105 @@
 
 {% block title %}Admin Profile{% endblock %}
 
+{% block title %}Admin Profile{% endblock %}
+
 {% block content %}
+<!-- message  -->
+<div id="liveAlertPlaceholder"></div>
+
+<div class="container">
+    <div class="row p-3">
+        <div class="col-md-6">
+            <h2 style="margin-top: 30px; margin-bottom:30px">Your Account Details</h2>
+            <form method="POST" action="/admin/admin_profile" class="needs-validation" novalidate>
+                <div class="row mb-3">
+                    <div class="col-md-8" style="font-size: 20px">
+                        <span>Username: {{ data['username'] }}</span>
+                        <span style="padding-left: 20px"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="title">Title</label>
+                        <select name="title" id="title" class="form-control" required>
+                            {% if data.title=='Miss' %}
+                                <option selected value="Miss">Miss</option>
+                            {% else %}
+                                <option value="Miss">Miss</option>
+                            {% endif %}
+
+                            {% if data.title=='Mr' %}
+                                <option selected value="Mr">Mr</option>
+                            {% else %}
+                                <option value="Mr">Mr</option>
+                            {% endif %}
+
+                            {% if data.title=='Mrs' %}
+                                <option selected value="Mrs">Mrs</option>
+                            {% else %}
+                                <option value="Mrs">Mrs</option>
+                            {% endif %}
+
+                            {% if data.title=='Other' %}
+                                <option selected value="Other">Other</option>
+                            {% else %}
+                                <option value="Miss">Other</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="first_name">First Name</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ data.first_name }}" minlength="2" maxlength="20" required>
+                        <div class="invalid-feedback">Please provide a valid first name.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="last_name">Family Name</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" value="{{ data.family_name }}" minlength="2" maxlength="20" required>
+                        <div class="invalid-feedback">Please provide a valid last name.</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="phone">Phone</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" value="{{ data.phone_number }}" onkeyup="validatePhone()" onblur="validatePhoneLength()" maxlength="10" required>
+                        <div class="invalid-feedback">Please provide a valid phone number.</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="email">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ data.email }}" onblur="validateEmail()" required>
+                        <div class="invalid-feedback">Please provide a valid email address.</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary text-white">Update Profile</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-1"></div>
+        <div class="col-md-4">
+            <h2 style="margin-bottom: 20px; margin-top: 30px; border-radius: 5px; padding: 5px">Change Password</h2>
+            <form id="changePasswordForm" method="POST" action="/national_manager/change_password" onsubmit="return validatePassword()" class="needs-validation" novalidate>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="password">New Password</label>
+                        <input type="password" class="form-control" placeholder="New Password" name="password" id="password" minlength="8" maxlength="15" required>
+                        <div class="invalid-feedback">Please provide a valid password (min length: 8).</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="confirm_password">Confirm New Password</label>
+                        <input type="password" class="form-control" placeholder="Confirm New Password" id="confirm_password" minlength="8" maxlength="15" required>
+                        <div class="invalid-feedback">Please confirm the password.</div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary text-white">Change Password</button>
+            </form>
+        </div>
 <!-- message  -->
 <div id="liveAlertPlaceholder"></div>
 
@@ -182,3 +280,4 @@
         return true;
     }
 </script>
+{% endblock %}
