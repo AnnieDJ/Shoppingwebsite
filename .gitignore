@@ -122,3 +122,4 @@ venv/*
 connect.py
 
 __pycach__/
+*.pyc
