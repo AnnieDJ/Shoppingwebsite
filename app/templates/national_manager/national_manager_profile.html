@@ -1,131 +1,184 @@
 {% extends 'base.html' %}
 
+{% block title %}National Manager Profile{% endblock %}
+
 {% block content %}
-<!-- Toast Container for Flash Messages -->
-<div aria-live="polite" aria-atomic="true" style="position: relative; z-index: 1050;">
-  <div style="position: absolute; top: 1rem; right: 1rem;">
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% for category, message in messages %}
-        <div class="toast show align-items-center text-white {{ 'bg-' + category if category in ['success', 'danger', 'warning', 'info'] else 'bg-primary' }} border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
-          <div class="d-flex">
-            <div class="toast-body">
-              {{ message }}
-            </div>
-            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-          </div>
+<!-- message  -->
+<div id="liveAlertPlaceholder"></div>
+
+<div class="container">
+    <div class="row p-3">
+        <div class="col-md-6">
+            <h2 style="margin-top: 30px; margin-bottom:30px">Your Account Details</h2>
+            <form method="POST" action="/national_manager/national_manager_profile" class="needs-validation" novalidate>
+                <div class="row mb-3">
+                    <div class="col-md-8" style="font-size: 20px">
+                        <span>Username: {{ data['username'] }}</span>
+                        <span style="padding-left: 20px"></span>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="title">Title</label>
+                        <select name="title" id="title" class="form-control" required>
+                            {% if data.title=='Miss' %}
+                                <option selected value="Miss">Miss</option>
+                            {% else %}
+                                <option value="Miss">Miss</option>
+                            {% endif %}
+                            
+                            {% if data.title=='Mr' %}
+                                <option selected value="Mr">Mr</option>
+                            {% else %}
+                                <option value="Mr">Mr</option>
+                            {% endif %}
+
+                            {% if data.title=='Mrs' %}
+                                <option selected value="Mrs">Mrs</option>
+                            {% else %}
+                                <option value="Mrs">Mrs</option>
+                            {% endif %}
+
+                            {% if data.title=='Other' %}
+                                <option selected value="Other">Other</option>
+                            {% else %}
+                                <option value="Miss">Other</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="first_name">First Name</label>
+                        <input type="text" class="form-control" id="first_name" name="first_name" value="{{ data.first_name }}" minlength="2" maxlength="20" required>
+                        <div class="invalid-feedback">Please provide a valid first name.</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="last_name">Family Name</label>
+                        <input type="text" class="form-control" id="last_name" name="last_name" value="{{ data.family_name }}" minlength="2" maxlength="20" required>
+                        <div class="invalid-feedback">Please provide a valid last name.</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="phone">Phone</label>
+                        <input type="tel" class="form-control" id="phone" name="phone" value="{{ data.phone_number }}" onkeyup="validatePhone()" onblur="validatePhoneLength()" maxlength="10" required>
+                        <div class="invalid-feedback">Please provide a valid phone number.</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="email">Email Address</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ data.email }}" onblur="validateEmail()" required>
+                        <div class="invalid-feedback">Please provide a valid email address.</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <button type="submit" class="btn btn-primary text-white">Update Profile</button>
+                    </div>
+                </div>
+            </form>
         </div>
-      {% endfor %}
-    {% endwith %}
-  </div>
+        <div class="col-md-1"></div>
+        <div class="col-md-4">
+            <h2 style="margin-bottom: 20px; margin-top: 30px; border-radius: 5px; padding: 5px">Change Password</h2>
+            <form id="changePasswordForm" method="POST" action="/national_manager/change_password" onsubmit="return validatePassword()" class="needs-validation" novalidate>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="password">New Password</label>
+                        <input type="password" class="form-control" placeholder="New Password" name="password" id="password" minlength="8" maxlength="15" required>
+                        <div class="invalid-feedback">Please provide a valid password (min length: 8).</div>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="confirm_password">Confirm New Password</label>
+                        <input type="password" class="form-control" placeholder="Confirm New Password" id="confirm_password" minlength="8" maxlength="15" required>
+                        <div class="invalid-feedback">Please confirm the password.</div>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary text-white">Change Password</button>
+            </form>
+        </div>
+    </div>
 </div>
 
-<!-- Breadcrumb -->
-<section class="py-3 py-md-4 py-xl-5 bg-light">
-  <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <h1 class="h4">Profile</h1>
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb m-0 fs-7">
-            <li class="breadcrumb-item"><a class="link-primary text-decoration-none" href="{{ url_for('national_manager.dashboard') }}">Home</a></li>
-            <li class="breadcrumb-item">Profile Management</li>
-            <li class="breadcrumb-item active" aria-current="page">Your Profile</li>
-          </ol>
-        </nav>
-      </div>
-    </div>
-  </div>
-</section>
+<script>
+    // Prompting message
+    const alertPlaceholder = document.getElementById('liveAlertPlaceholder')
+    const alert = (message, type) => {
+        const wrapper = document.createElement('div')
+        wrapper.innerHTML = [
+            `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+            `   <div>${message}</div>`,
+            '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+            '</div>'
+        ].join('')
+        alertPlaceholder.append(wrapper)
+    }
+    let msg = '{{ msg }}'
+    if (msg !== '') {
+        alert(msg, 'success')
+    }
 
-<!-- Profile Section -->
-<section class="pb-3 pb-md-4 pb-xl-5 bg-light">
-  <div class="container">
-    <div class="row gy-4 gy-lg-0">
-      <div class="col-12 col-lg-4 col-xl-3">
-        <div class="card widget-card border-light shadow-sm">
-          <div class="card-header text-bg-primary">Welcome</div>
-          <div class="card-body">
-            <h5 class="text-center mb-1">{{ national_manager_profile.first_name }} {{ national_manager_profile.family_name }}</h5>
-            <p class="text-center text-secondary mb-4">Admin</p>
-            <ul class="list-group list-group-flush mb-4">
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <h6 class="m-0">ID</h6>
-                <span>{{ national_manager_profile.user_id }}</span>
-              </li>
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <h6 class="m-0">Position</h6>
-                <span>{{ national_manager_profile.username }}</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-      <div class="col-12 col-lg-8 col-xl-9">
-        <div class="card widget-card border-light shadow-sm">
-          <div class="card-body p-4">
-            <ul class="nav nav-tabs" id="profileTab" role="tablist">
-              <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-tab-pane" type="button" role="tab" aria-controls="overview-tab-pane" aria-selected="true">Overview</button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Profile</button>
-              </li>
-            </ul>
-            <div class="tab-content pt-4" id="profileTabContent">
-              <div class="tab-pane fade show active" id="overview-tab-pane" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
-                  <div class="row">
-                      <div class="col-12">
-                          <div class="card mb-3">
-                              <div class="card-body">
-                                  <h5 class="card-title">General Information</h5>
-                                  <p class="card-text"><strong>Staff ID:</strong> {{ national_manager_profile.user_id }}</p>
-                                  <p class="card-text"><strong>Username:</strong> {{ national_manager_profile.username }}</p>
-                                  <p class="card-text"><strong>Name:</strong> {{ national_manager_profile.first_name }} {{ admin_profile.family_name }}</p>
-                                  <p class="card-text"><strong>Phone Number:</strong> {{ national_manager_profile.phone_number }}</p>
-                                  <p class="card-text"><strong>Email:</strong> {{ national_manager_profile.email }}</p>
-                              </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
-              <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
-                  <form action="{{ url_for('national_manager_edit_profile') }}" method="post" class="row gy-3 gy-xxl-4">
-                      <div class="col-md-6">
-                          <label for="title" class="form-label">Title</label>
-                          <select class="form-control" id="title" name="title" required>
-                              <option value="Mr" {% if national_manager_profile[0][2] == 'Mr' %}selected{% endif %}>Mr.</option>
-                              <option value="Mrs" {% if national_manager_profile[0][2] == 'Mrs' %}selected{% endif %}>Mrs.</option>
-                              <option value="Miss" {% if national_manager_profile[0][2] == 'Miss' %}selected{% endif %}>Miss</option>
-                              <option value="Dr" {% if national_manager_profile[0][2] == 'Dr' %}selected{% endif %}>Dr.</option>
-                          </select>
-                      </div>
-                      <div class="col-md-6">
-                          <label for="first_name" class="form-label">First Name</label>
-                          <input type="text" class="form-control" id="first_name" name="first_name" value="{{ national_manager_profile.first_name }}" required>
-                      </div>
-                      <div class="col-md-6">
-                          <label for="last_name" class="form-label">Last Name</label>
-                          <input type="text" class="form-control" id="last_name" name="last_name" value="{{ national_manager_profile.family_name }}" required>
-                      </div>
-                      <div class="col-md-6">
-                          <label for="phone_number" class="form-label">Phone Number</label>
-                          <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ national_manager_profile.phone_number }}" pattern="\d*" maxlength="10">
-                      </div>
-                      <div class="col-md-6">
-                          <label for="email" class="form-label">Email</label>
-                          <input type="email" class="form-control" id="email" name="email" value="{{ national_manager_profile.email }}" required>
-                      </div>
-                      <div class="col-12">
-                          <button type="submit" class="btn btn-primary">Update & Save</button>
-                      </div>
-                  </form>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+    let forms = document.getElementsByClassName('needs-validation');
 
+    let validation = Array.prototype.filter.call(forms, function(form) {
+        form.addEventListener('submit', function(event) {
+            if (form.checkValidity() === false) {
+                event.preventDefault(); // Cancel the default submission effect of submit
+                event.stopPropagation();
+            }
+            form.classList.add('was-validated');
+        }, false);
+    });
+
+    // phone validation
+    function validatePhone() {
+        let phone = document.getElementById("phone").value
+        document.getElementById("phone").value = phone.replace(/[^\d]/g, '')
+    }
+
+    function validatePhoneLength() {
+        let length = document.getElementById("phone").value.length
+        if (length > 0 && length < 10) {
+            alert("The phone number is less than 10 digits!", 'warning')
+        }
+    }
+
+    // email validation
+    function validateEmail() {
+        let email = document.getElementById("email").value;
+        let feedback = document.getElementById("emailFeedback");
+        let emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+        if (!emailRegex.test(email)) {
+            feedback.textContent = "Please enter a valid email address.";
+            feedback.style.display = 'block';
+            return false;
+        } else {
+            feedback.style.display = 'none';
+        }
+        return true;
+    }
+
+    // password validation
+    function validatePassword() {
+        var password = document.getElementById("password").value;
+        var confirmPassword = document.getElementById("confirm_password").value;
+
+        if (password.search(/[a-z]/i) < 0) {
+            alert("Your password must contain at least one letter.", 'warning');
+            return false;
+        }
+        if (password.search(/[0-9]/) < 0) {
+            alert("Your password must contain at least one digit.", 'warning');
+            return false;
+        }
+        if (password != confirmPassword) {
+            alert("Passwords do not match.", 'warning');
+            return false;
+        }
+        return true;
+    }
+</script>
 {% endblock %}
