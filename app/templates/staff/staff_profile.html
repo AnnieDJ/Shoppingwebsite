@@ -1,0 +1,185 @@
+{% extends "sidebar_layout.html" %} {% block title %}Staff Profile{% endblock %}
+{% block main_content %}
+<div
+  class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+>
+  <h1 class="h2">Your Profile</h1>
+</div>
+
+<!-- Breadcrumb -->
+<section class="py-3 py-md-4 py-xl-5 bg-light">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb m-0 fs-7">
+            <li class="breadcrumb-item"><a class="link-primary text-decoration-none" href="{{ url_for('staff.dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Your Profile</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Section - Bootstrap Brain Component -->
+                  
+<div class="col-12 col-lg-8 col-xl-9">
+    <div class="card widget-card border-light shadow-sm">
+        <div class="card-body p-4">
+                              <ul class="nav nav-tabs" id="profileTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                  <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-tab-pane" type="button" role="tab" aria-controls="overview-tab-pane" aria-selected="true">Overview</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                  <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Profile</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                  <button class="nav-link" id="password-tab" data-bs-toggle="tab" data-bs-target="#password-tab-pane" type="button" role="tab" aria-controls="password-tab-pane" aria-selected="false">Password</button>
+                                </li>
+                              </ul>
+                              <div class="tab-content pt-4" id="profileTabContent">
+                                <div class="tab-pane fade show active" id="overview-tab-pane" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
+                                  <h5 class="mb-3">Profile</h5>
+                                  <div class="row g-0">
+                                    <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                                      <div class="p-2">Staff ID</div>
+                                    </div>
+                                    <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                                      <div class="p-2">{{ staff_profile['staff_id'] }}</div>
+                                    </div>
+                                    <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                                      <div class="p-2">Username</div>
+                                    </div>
+                                    <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                                      <div class="p-2">{{ staff_profile['username'] }}</div>
+                                    </div>
+                                    <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                                      <div class="p-2">Title</div>
+                                    </div>
+                                    <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                                      <div class="p-2">{{ staff_profile['title'] }}</div>
+                                    </div>
+                                    <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                                      <div class="p-2">First Name</div>
+                                    </div>
+                                    <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                                      <div class="p-2">{{ staff_profile['first_name'] }}</div>
+                                    </div>
+                                    <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                                      <div class="p-2">Last Name</div>
+                                    </div>
+                                    <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                                      <div class="p-2">{{ staff_profile['family_name'] }}</div>
+                                    </div>
+                                    
+                                    <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                                      <div class="p-2">Phone Number</div>
+                                    </div>
+                                    <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                                      <div class="p-2">{{ staff_profile['phone_number'] }}</div>
+                                    </div>
+                                    <div class="col-5 col-md-3 bg-light border-bottom border-white border-3">
+                                      <div class="p-2">Store ID</div>
+                                    </div>
+                                    <div class="col-7 col-md-9 bg-light border-start border-bottom border-white border-3">
+                                      <div class="p-2">{{ staff_profile['store_id'] }}</div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                                  <form action="#" method="post" enctype="multipart/form-data" class="row gy-3 gy-xxl-4">
+                                    <div class="col-12">
+                                      
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                      <label class="form-label">Staff ID (view only)</label>
+                                      <input type="text" class="form-control" name="user_id" placeholder="user_id" value="#"readonly>
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                      <label class="form-label">Username (view only)</label>
+                                      <input type="text" class="form-control" name="username" placeholder="username" value="#"readonly>
+                                    </div>
+                                    
+                                    <div class="col-12 col-md-6">
+                                    </div>
+                                    <div class="col-md-6">
+                                      <label class="labels">First Name</label>
+                                      <input type="text" class="form-control" name="first_name" placeholder="first_name" value="#" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                      <label class="labels">Surname</label>
+                                      <input type="text" class="form-control" name="last_name" placeholder="surname" value="#" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                      <label class="labels">Position</label>
+                                      <input type="text" class="form-control" name="position" placeholder="position" value="#">
+                                    </div>
+                                    <div class="col-md-6">
+                                      <label class="labels">Phone Number</label>
+                                      <input type="text" class="form-control" name="phone_number" placeholder="phone_number" value="#">
+                                    </div>
+                                    <div class="col-md-6">
+                                      <label class="labels">Email</label>
+                                      <input type="email" class="form-control" name="email" placeholder="email" value="#" required>
+                                    </div>
+                                    <div class="col-md-12">
+                                      <label class="labels">Gardening Experience</label>
+                                      <input type="text" class="form-control" name="gardening_experience" placeholder="gardening_experience" value="#">
+                                    </div>
+                                    <div class="col-12">
+                                      <button type="submit" class="btn btn-primary">Update & Save</button>
+                                    </div>
+                                  </form>
+                                </div>
+                                <div class="tab-pane fade" id="password-tab-pane" role="tabpanel" aria-labelledby="password-tab" tabindex="0">
+                                  <form action="#" method="post">
+                                    <div class="row gy-3 gy-xxl-4">
+                                      <div class="col-12">
+                                        <label for="currentPassword" class="form-label">Current Password</label>
+                                        <input type="password" class="form-control" id="currentPassword" name="currentpassword" required>
+                                      </div>
+                                      <div class="col-12">
+                                        <label for="newPassword" class="form-label">New Password</label>
+                                        <input type="password" class="form-control" id="newPassword" name="newpassword" required>
+                                      </div>
+                                      <div class="col-12">
+                                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                                        <input type="password" class="form-control" id="confirmPassword" name="confirmpassword" required>
+                                      </div>
+                                      <div class="col-12">
+                                        <button type="submit" class="btn btn-primary">Change Password</button>
+                                      </div>
+                                    </div>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+
+{% endblock %}
+
+  {% block extra_js %}
+  <!-- Include if Bootstrap JS is not already being loaded in the base template -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Script to initialize the toasts -->
+  <script>
+    var toastElList = [].slice.call(document.querySelectorAll('.toast'));
+    var toastList = toastElList.map(function(toastEl) {
+      return new bootstrap.Toast(toastEl);
+    });
+    toastList.forEach(function(toast) {
+      toast.show();
+    });
+  </script>
+
+
+{% endblock %}
