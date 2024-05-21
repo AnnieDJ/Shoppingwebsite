@@ -14,7 +14,7 @@ block main_content %}
   <div class="row p-3">
     <div class="col-md-8">
       <h2 style="margin-top: 30px; margin-bottom: 30px">Your Account Details</h2>
-      <form method="POST" action="/customer/customer_profile" class="needs-validation" novalidate>
+      <form method="POST" action="/staff/staff_profile" class="needs-validation" novalidate>
         <div class="mb-3">
           <label for="username" class="form-label" style="font-size: 20px">Username: {{ data['username'] }}</label>
         </div>
@@ -24,7 +24,9 @@ block main_content %}
             <option value="Miss" {% if data.title=='Miss' %}selected{% endif %}>Miss</option>
             <option value="Mr" {% if data.title=='Mr' %}selected{% endif %}>Mr</option>
             <option value="Mrs" {% if data.title=='Mrs' %}selected{% endif %}>Mrs</option>
-            <option value="Other" {% if data.title=='Other' %}selected{% endif %}>Other</option>
+            <option value="Other" {% if data.title=='Dr' %}selected{% endif %}>Dr</option>
+            <option value="Other" {% if data.title=='Prof' %}selected{% endif %}>Prof</option>
+            <option value="Other" {% if data.title=='Others' %}selected{% endif %}>Others</option>
           </select>
         </div>
         <div class="mb-3">
@@ -48,7 +50,7 @@ block main_content %}
           <div class="invalid-feedback">Please provide a valid email address.</div>
         </div>
         <div class="mb-3">
-          <label for="address" class="form-label">Store ID</label>
+          <label for="store_id" class="form-label">Store ID</label>
           <input type="text" class="form-control" id="store_id" name="store_id" value="{{ data.store_id }}" onblur="validateAddress()" required />
         </div>
         <div class="mb-3">
