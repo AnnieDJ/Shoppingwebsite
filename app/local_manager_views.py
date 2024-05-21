@@ -17,3 +17,10 @@ def dashboard():
         return render_template('local_manager_dashboard.html')
     return redirect(url_for('home.login'))
 
+
+@local_manager_bp.route('/profile')
+def view_profile():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        return render_template('local_manager_profile.html')
+    else:
+        return redirect(url_for('local_manager_dashboard'))
