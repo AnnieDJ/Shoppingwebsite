@@ -15,7 +15,7 @@ staff_bp = Blueprint('staff', __name__, template_folder='templates/staff')
 # staff dashboard
 @staff_bp.route('/dashboard')
 def dashboard():
-    if 'loggedin' in session and session['role'] == 'staff':
+    if 'loggedin' in session and session['role'] in ['staff', 'local_manager']:
         conn, cursor = db_cursor()
         try:
                    
@@ -85,12 +85,12 @@ def view_profile():
         family_name = request.form.get('last_name')
         phone = request.form.get('phone')
         email = request.form.get('email')
-        address = request.form.get('address')
+        store_id = request.form.get('store_id')
 
         try:
             cursor.execute(
-                'UPDATE staff SET title = %s, first_name = %s, family_name = %s, phone_number = %s, address = %s WHERE user_id = %s',
-                (title, first_name, family_name, phone, address, session['userid'])
+                'UPDATE staff SET title = %s, first_name = %s, family_name = %s, phone_number = %s, store_id = %s WHERE user_id = %s',
+                (title, first_name, family_name, phone, store_id, session['userid'])
             )
             cursor.execute(
                 'UPDATE user SET email = %s WHERE user_id = %s',
