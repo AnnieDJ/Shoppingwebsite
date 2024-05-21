@@ -6,41 +6,74 @@
   <h1 class="h2">Payment List</h1>
 </div>
 
-<section class="py-3 py-md-4 py-xl-5 bg-light">
-  <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb m-0 fs-7">
-            <li class="breadcrumb-item">
-              <a
-                class="link-primary text-decoration-none"
-                href="{{ url_for('staff.dashboard') }}"
-                >Dashboard</a
-              >
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">Payments</li>
-          </ol>
-        </nav>
-      </div>
-    </div>
-  </div>
-</section>
-
 <div class="table-responsive">
   <table class="table table-striped">
     <thead>
       <tr>
-        <th>Payment ID</th>
-        <th>Order ID</th>
-        <th>User ID</th>
-        <th>Payment Type</th>
-        <th>Payment Status</th>
-        <th>Amount</th>
-        <th>Payment Date</th>
+        <th scope="col">
+          Payment ID<input
+            type="text"
+            id="filterPaymentID"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Order ID<input
+            type="text"
+            id="filterOrderID"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          User ID<input
+            type="text"
+            id="filterUserID"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Payment Type<input
+            type="text"
+            id="filterPaymentType"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Payment Status<select
+            id="filterStatus"
+            class="form-control form-control-sm"
+          >
+            <option value="">All</option>
+            <option value="processed">Processed</option>
+            <option value="pending">Pending</option>
+            <option value="failed">Failed</option>
+            <option value="refunded">Refunded</option>
+          </select>
+        </th>
+        <th scope="col">
+          Amount<input
+            type="text"
+            id="filterAmount"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Payment Date<input
+            type="date"
+            id="filterPaymentDate"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
       </tr>
     </thead>
-    <tbody>
+    <tbody></tbody>
+    <tbody id="ordersTableBody">
       {% for payment in payments %}
       <tr>
         <td>{{ payment.payment_id }}</td>
@@ -55,5 +88,35 @@
     </tbody>
   </table>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const filterInputs = document.querySelectorAll("thead input, thead select");
+    const tableBody = document.getElementById("ordersTableBody");
+    const rows = tableBody.getElementsByTagName("tr");
+
+    filterInputs.forEach((input) => {
+      input.addEventListener("input", filterTable);
+      input.addEventListener("change", filterTable);
+    });
+
+    function filterTable() {
+      for (let row of rows) {
+        let showRow = true;
+        filterInputs.forEach((input) => {
+          const column = input.parentElement.cellIndex;
+          const filter = input.value.toLowerCase();
+          const cell = row.getElementsByTagName("td")[column];
+          const text = cell.textContent.toLowerCase();
+
+          if (filter && text.indexOf(filter) === -1) {
+            showRow = false;
+          }
+        });
+        row.style.display = showRow ? "" : "none";
+      }
+    }
+  });
+</script>
 
 {% endblock %}
