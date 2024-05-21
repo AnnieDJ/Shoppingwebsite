@@ -1,11 +1,13 @@
 from flask import current_app as app
 from mysql.connector import Error as MySQLError
-from flask import Blueprint,render_template, request, redirect, url_for, session, flash
+from flask import Blueprint,render_template, request, redirect, url_for, session, flash,jsonify,Flask
 from app import utils
 import re
 from datetime import datetime
 from .utils import db_cursor
 from flask_hashing  import Hashing
+from . import hashing
+from .utils import db_cursor, login_required
 
 staff_bp = Blueprint('staff', __name__, template_folder='templates/staff')
 
@@ -68,36 +70,80 @@ def dashboard():
         return redirect(url_for('home.login'))
 
 
-## Staff Profile ## - still working in progress
-@staff_bp.route('/profile')
+## Staff Profile ## 
+@staff_bp.route('/staff_profile', methods=['GET', 'POST'])
+@login_required
 def view_profile():
-    if 'loggedin' in session and session['role'] == 'staff':
-        conn, cursor = db_cursor()
-        try:
-            cursor.execute("""
-                SELECT s.*, u.username 
-                FROM staff s 
-                JOIN user u ON s.user_id = u.user_id 
-                WHERE u.username = %s
-            """, (session['username'],))
-            staff_profile = cursor.fetchone()
-        
-        except Exception as e:
-            print("An error occurred:", e)
-            flash("A database error occurred. Please try again.")
-            return redirect(url_for('home.login'))
-        finally:
-            cursor.close()
-            conn.close()
+    conn, cursor = db_cursor()
+    if 'userid' not in session:
+        flash("User ID not found in session. Please log in again.", 'danger')
+        return redirect(url_for('login'))
 
-        if staff_profile:
-            return render_template('staff_profile.html', staff_profile=staff_profile, role=session['role'])
-        else:
-            flash('Profile not found', 'error')
-            return redirect(url_for('staff.dashboard'))
-        
-    else:
-        return redirect(url_for('home'))
+    if request.method == 'POST':
+        title = request.form.get('title')
+        first_name = request.form.get('first_name')
+        family_name = request.form.get('last_name')
+        phone = request.form.get('phone')
+        email = request.form.get('email')
+        address = request.form.get('address')
+
+        try:
+            cursor.execute(
+                'UPDATE staff SET title = %s, first_name = %s, family_name = %s, phone_number = %s, address = %s WHERE user_id = %s',
+                (title, first_name, family_name, phone, address, session['userid'])
+            )
+            cursor.execute(
+                'UPDATE user SET email = %s WHERE user_id = %s',
+                (email, session['userid'])
+            )
+            flash('Your profile has been successfully updated!', 'success')
+        except MySQLError as e:
+            flash(f"An error occurred: {e}", 'danger')
+
+    cursor.execute(
+        'SELECT u.username, u.email, u.password_hash, u.role, s.title, s.first_name, s.family_name, s.phone_number, s.store_id '
+        'FROM user u '
+        'JOIN staff s ON u.user_id = s.user_id '
+        'WHERE u.user_id = %s',
+        (session['userid'],)
+    )
+    data = cursor.fetchone()
+
+    return render_template('staff_profile.html', data=data)    
+
+
+
+
+## Staff Change Password ##
+@staff_bp.route('/change_password', methods=['POST'])
+@login_required
+def change_password():
+    if 'userid' not in session:
+        flash("User ID not found in session. Please log in again.", 'danger')
+        return redirect(url_for('login'))
+
+    password = request.form['password']
+
+    if re.search('[a-zA-Z]', password) is None or re.search('[0-9]', password) is None:
+        flash("Password must contain at least one letter and one digit.", 'warning')
+        return redirect(url_for('staff.staff_profile'))
+
+    hashed_password = hashing.hash_value(password, salt='ava')
+    conn, cursor = db_cursor()
+
+    try:
+        cursor.execute(
+            'UPDATE user SET password_hash = %s WHERE user_id = %s',
+            (hashed_password, session['userid'])
+        )
+        conn.commit()
+        flash("Your password has been successfully updated.", 'success')
+    except MySQLError as e:
+        flash(f"An error occurred: {e}", 'danger')
+
+    return redirect(url_for('staff.staff_profile'))
+
+
 
 ## view Rentals ##
 @staff_bp.route('/rentals')

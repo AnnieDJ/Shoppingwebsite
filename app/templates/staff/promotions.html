@@ -1,45 +1,67 @@
-{% extends "sidebar_layout.html" %} {% block title %}Promotion_News List{% endblock %}
-{% block main_content %}
+{% extends "sidebar_layout.html" %} {% block title %}Promotion_News List{%
+endblock %} {% block main_content %}
 <div
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
   <h1 class="h2">Promotions</h1>
 </div>
 
-<section class="py-3 py-md-4 py-xl-5 bg-light">
-  <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb m-0 fs-7">
-            <li class="breadcrumb-item">
-              <a
-                class="link-primary text-decoration-none"
-                href="{{ url_for('staff.dashboard') }}"
-                >Dashboard</a
-              >
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">Promotions</li>
-          </ol>
-        </nav>
-      </div>
-    </div>
-  </div>
-</section>
-
 <div class="table-responsive">
   <table class="table table-striped">
     <thead>
       <tr>
-        <th>News ID</th>
-        <th>Title</th>
-        <th>Content</th>
-        <th>Publish Date</th>
-        <th>Creator ID</th>
-        <th>Store ID</th>
+        <th scope="col">
+          News ID<input
+            type="text"
+            id="filterNewsID"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Title<input
+            type="text"
+            id="filterTitle"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Content<input
+            type="text"
+            id="filterContent"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Publish Date<input
+            type="date"
+            id="filterPublishDate"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Creator ID<input
+            type="text"
+            id="filterCreatorID"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Store ID<input
+            type="text"
+            id="filterStoreID"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
       </tr>
     </thead>
-    <tbody>
+    <tbody></tbody>
+    <tbody id="ordersTableBody">
       {% for promotion in promotions %}
       <tr>
         <td>{{ promotion.news_id }}</td>
@@ -53,5 +75,35 @@
     </tbody>
   </table>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const filterInputs = document.querySelectorAll("thead input, thead select");
+    const tableBody = document.getElementById("ordersTableBody");
+    const rows = tableBody.getElementsByTagName("tr");
+
+    filterInputs.forEach((input) => {
+      input.addEventListener("input", filterTable);
+      input.addEventListener("change", filterTable);
+    });
+
+    function filterTable() {
+      for (let row of rows) {
+        let showRow = true;
+        filterInputs.forEach((input) => {
+          const column = input.parentElement.cellIndex;
+          const filter = input.value.toLowerCase();
+          const cell = row.getElementsByTagName("td")[column];
+          const text = cell.textContent.toLowerCase();
+
+          if (filter && text.indexOf(filter) === -1) {
+            showRow = false;
+          }
+        });
+        row.style.display = showRow ? "" : "none";
+      }
+    }
+  });
+</script>
 
 {% endblock %}
