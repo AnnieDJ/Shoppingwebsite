@@ -16,8 +16,14 @@ customer_bp = Blueprint('customer', __name__, template_folder='templates/custome
 @customer_bp.route('/dashboard')
 def dashboard():
     if 'loggedin' in session and session['role'] == 'customer':
-        return render_template('customer_dashboard.html')
+        conn, cursor = db_cursor()
+        cursor.execute("SELECT * FROM stores")
+        stores = cursor.fetchall()
+        cursor.close()
+        return render_template('customer_dashboard.html', stores=stores)
     return redirect(url_for('home.login'))
+
+
 
 @customer_bp.route('/customer_profile', methods=['GET', 'POST'])
 @login_required
@@ -88,3 +94,20 @@ def change_password():
         flash(f"An error occurred: {e}", 'danger')
 
     return redirect(url_for('customer.customer_profile'))
+
+@customer_bp.route('/store/<name>')
+def store(name):
+    if 'loggedin' in session and session['role'] == 'customer':
+        conn, cursor = db_cursor()
+        cursor.execute("SELECT * FROM equipment JOIN stores ON equipment.store_id = stores.store_id WHERE stores.store_name = %s", (name,))
+        equipments = cursor.fetchall()
+        cursor.close()
+        return jsonify({
+            'code': 200,
+            'message': 'Success',
+            'data': equipments
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })

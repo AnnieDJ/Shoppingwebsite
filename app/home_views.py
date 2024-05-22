@@ -43,8 +43,10 @@ def register():
 
             cursor.execute('SELECT * FROM user WHERE username = %s', (username,))
             if cursor.fetchone():
-                flash('Account already exists!', 'error')
-                return redirect(url_for('home.register'))
+                flash('Account already exists!', 'danger')#这个出现的地方不对
+                #return redirect(url_for('home.register'))
+                return render_template('index.html', msg=msg, modal='modal')  # Render the same registration page with a flash message
+
             else:
                 # Insert into user table
                 from . import hashing
@@ -56,8 +58,8 @@ def register():
 
                 conn.commit()  # Make sure to commit the transaction
 
-                flash('Registration successful!', 'success')
-                return redirect(url_for('home.login'))
+                flash('Registration successful!', 'success')#这个没有
+                return redirect(url_for('home.home',msg=msg, modal='none'))  # modal='none' indicates not to open any modal
 
     return render_template('index.html', msg=msg)
 
@@ -100,11 +102,11 @@ def login():
                 elif role == 'admin':
                     return redirect(url_for('admin.dashboard'))
             else:
-                msg = 'Invalid Password!'
+                flash('Invalid password!', 'error')
         else:
-            msg = 'Invalid Username!'
+            flash('Invalid username!', 'error')
 
-    return render_template('index.html', msg=msg)
+    return redirect(url_for('home.home'))  # Redirect back to home or appropriate page with modal
 
 
 # allow users to log out
