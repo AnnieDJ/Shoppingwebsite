@@ -1,5 +1,6 @@
 import mysql.connector
 from flask import current_app
+from contextlib import contextmanager
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from functools import wraps
@@ -23,16 +24,16 @@ def get_cursor():
 # Usage of get_cursor with context manager for safer resource handling
 from contextlib import contextmanager
 
-# @contextmanager
+#@contextmanager
 def db_cursor():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
     return conn, cursor
-    # try:
-    #     yield cursor
-    # finally:
-    #     cursor.close()
-    #     conn.close()
+    #try:
+     #   yield cursor
+    #finally:
+     #   cursor.close()
+      #  conn.close()
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS

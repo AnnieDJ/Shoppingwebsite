@@ -1,0 +1,122 @@
+{% extends "sidebar_layout.html" %} {% block title %}Payment List{% endblock %}
+{% block main_content %}
+<div
+  class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+>
+  <h1 class="h2">Payment List</h1>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th scope="col">
+          Payment ID<input
+            type="text"
+            id="filterPaymentID"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Order ID<input
+            type="text"
+            id="filterOrderID"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          User ID<input
+            type="text"
+            id="filterUserID"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Payment Type<input
+            type="text"
+            id="filterPaymentType"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Payment Status<select
+            id="filterStatus"
+            class="form-control form-control-sm"
+          >
+            <option value="">All</option>
+            <option value="processed">Processed</option>
+            <option value="pending">Pending</option>
+            <option value="failed">Failed</option>
+            <option value="refunded">Refunded</option>
+          </select>
+        </th>
+        <th scope="col">
+          Amount<input
+            type="text"
+            id="filterAmount"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Payment Date<input
+            type="date"
+            id="filterPaymentDate"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tbody id="ordersTableBody">
+      {% for payment in payments %}
+      <tr>
+        <td>{{ payment.payment_id }}</td>
+        <td>{{ payment.order_id }}</td>
+        <td>{{ payment.user_id }}</td>
+        <td>{{ payment.payment_type }}</td>
+        <td>{{ payment.payment_status }}</td>
+        <td>{{ payment.amount }}</td>
+        <td>{{ payment.payment_date }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const filterInputs = document.querySelectorAll("thead input, thead select");
+    const tableBody = document.getElementById("ordersTableBody");
+    const rows = tableBody.getElementsByTagName("tr");
+
+    filterInputs.forEach((input) => {
+      input.addEventListener("input", filterTable);
+      input.addEventListener("change", filterTable);
+    });
+
+    function filterTable() {
+      for (let row of rows) {
+        let showRow = true;
+        filterInputs.forEach((input) => {
+          const column = input.parentElement.cellIndex;
+          const filter = input.value.toLowerCase();
+          const cell = row.getElementsByTagName("td")[column];
+          const text = cell.textContent.toLowerCase();
+
+          if (filter && text.indexOf(filter) === -1) {
+            showRow = false;
+          }
+        });
+        row.style.display = showRow ? "" : "none";
+      }
+    }
+  });
+</script>
+
+{% endblock %}

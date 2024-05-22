@@ -1,0 +1,109 @@
+{% extends "sidebar_layout.html" %} {% block title %}Rental List{% endblock %}
+{% block main_content %}
+<div
+  class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+>
+  <h1 class="h2">Rental List</h1>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>
+          Rental ID<input
+            type="text"
+            id="filterRentalID"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th>
+          User<input
+            type="text"
+            id="filterUserID"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th>
+          Equipment<input
+            type="text"
+            id="filterEquipmentID"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th>
+          Start Date<input
+            type="date"
+            id="filterStartDate"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th>
+          End Date<input
+            type="date"
+            id="filterEndDate"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th>
+          Status<select id="filterStatus" class="form-control form-control-sm">
+            <option value="">All</option>
+            <option value="completed">Completed</option>
+            <option value="pending">Pending</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+    <tbody id="ordersTableBody">
+      {% for rental in rentals %}
+      <tr>
+        <td>{{ rental.rental_id }}</td>
+        <td>{{ rental.username }}</td>
+        <td>{{ rental.equipment_name }}</td>
+        <td>{{ rental.start_date }}</td>
+        <td>{{ rental.end_date }}</td>
+        <td>{{ rental.status }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const filterInputs = document.querySelectorAll("thead input, thead select");
+    const tableBody = document.getElementById("ordersTableBody");
+    const rows = tableBody.getElementsByTagName("tr");
+
+    filterInputs.forEach((input) => {
+      input.addEventListener("input", filterTable);
+      input.addEventListener("change", filterTable);
+    });
+
+    function filterTable() {
+      for (let row of rows) {
+        let showRow = true;
+        filterInputs.forEach((input) => {
+          const column = input.parentElement.cellIndex;
+          const filter = input.value.toLowerCase();
+          const cell = row.getElementsByTagName("td")[column];
+          const text = cell.textContent.toLowerCase();
+
+          if (filter && text.indexOf(filter) === -1) {
+            showRow = false;
+          }
+        });
+        row.style.display = showRow ? "" : "none";
+      }
+    }
+  });
+</script>
+
+{% endblock %}

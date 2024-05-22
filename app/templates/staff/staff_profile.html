@@ -1,0 +1,166 @@
+{% extends "sidebar_layout.html" %} {% block title %}Staff Profile{% endblock %} {%
+block main_content %}
+
+<div
+  class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+>
+  <h1 class="h2"></h1>
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped">
+
+<div class="container">
+  <div class="row p-3">
+    <div class="col-md-8">
+      <h2 style="margin-top: 30px; margin-bottom: 30px">Your Account Details</h2>
+      <form method="POST" action="/staff/staff_profile" class="needs-validation" novalidate>
+        <div class="mb-3">
+          <label for="username" class="form-label" style="font-size: 20px">Username: {{ data['username'] }}</label>
+        </div>
+        <div class="mb-3">
+          <label for="title" class="form-label">Title</label>
+          <select name="title" id="title" class="form-control" required>
+            <option value="Miss" {% if data.title=='Miss' %}selected{% endif %}>Miss</option>
+            <option value="Mr" {% if data.title=='Mr' %}selected{% endif %}>Mr</option>
+            <option value="Mrs" {% if data.title=='Mrs' %}selected{% endif %}>Mrs</option>
+            <option value="Other" {% if data.title=='Dr' %}selected{% endif %}>Dr</option>
+            <option value="Other" {% if data.title=='Prof' %}selected{% endif %}>Prof</option>
+            <option value="Other" {% if data.title=='Others' %}selected{% endif %}>Others</option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="first_name" class="form-label">First Name</label>
+          <input type="text" class="form-control" id="first_name" name="first_name" value="{{ data.first_name }}" minlength="2" maxlength="20" required />
+          <div class="invalid-feedback">Please provide a valid first name.</div>
+        </div>
+        <div class="mb-3">
+          <label for="last_name" class="form-label">Family Name</label>
+          <input type="text" class="form-control" id="last_name" name="last_name" value="{{ data.family_name }}" minlength="2" maxlength="20" required />
+          <div class="invalid-feedback">Please provide a valid last name.</div>
+        </div>
+        <div class="mb-3">
+          <label for="phone" class="form-label">Phone</label>
+          <input type="tel" class="form-control" id="phone" name="phone" value="{{ data.phone_number }}" onkeyup="validatePhone()" onblur="validatePhoneLength()" maxlength="10" required />
+          <div class="invalid-feedback">Please provide a valid phone number.</div>
+        </div>
+        <div class="mb-3">
+          <label for="email" class="form-label">Email Address</label>
+          <input type="email" class="form-control" id="email" name="email" value="{{ data.email }}" onblur="validateEmail()" required />
+          <div class="invalid-feedback">Please provide a valid email address.</div>
+        </div>
+        <div class="mb-3">
+          <label for="store_id" class="form-label">Store ID</label>
+          <input type="text" class="form-control" id="store_id" name="store_id" value="{{ data.store_id }}" onblur="validateAddress()" required />
+        </div>
+        <div class="mb-3">
+          <button type="submit" class="btn btn-success text-white">Update Profile</button>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-1"></div>
+    <div class="col-md-3">
+      <h2 style="margin-bottom: 20px; margin-top: 30px; border-radius: 5px; padding: 5px;">Change Password</h2>
+      <form id="changePasswordForm" method="POST" action="/customer/change_password" onsubmit="return validatePassword()" class="needs-validation" novalidate>
+        <div class="mb-3">
+          <label for="password" class="form-label">New Password</label>
+          <input type="password" class="form-control" placeholder="New Password" name="password" id="password" minlength="8" maxlength="15" required />
+          <div class="invalid-feedback">Please provide a valid password (min length: 8).</div>
+        </div>
+        <div class="mb-3">
+          <label for="confirm_password" class="form-label">Confirm New Password</label>
+          <input type="password" class="form-control" placeholder="Confirm New Password" id="confirm_password" minlength="8" maxlength="15" required />
+          <div class="invalid-feedback">Please confirm the password.</div>
+        </div>
+        <button type="submit" class="btn btn-success text-white">Change Password</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Prompting message
+  const alertPlaceholder = document.getElementById("liveAlertPlaceholder");
+  const alert = (message, type) => {
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = [
+      `<div class="alert alert-${type} alert-dismissible" role="alert">`,
+      `   <div>${message}</div>`,
+      '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
+      "</div>",
+    ].join("");
+    alertPlaceholder.append(wrapper);
+  };
+  let msg = "{{ msg }}";
+  if (msg !== "") {
+    alert(msg, "success");
+  }
+
+  // Gets the form validation style
+  let forms = document.getElementsByClassName("needs-validation");
+  // Loop and prohibit submission
+  let validation = Array.prototype.filter.call(forms, function (form) {
+    form.addEventListener(
+      "submit",
+      function (event) {
+        if (form.checkValidity() === false) {
+          event.preventDefault(); // Cancel the default submission effect of submit
+          event.stopPropagation();
+        }
+        form.classList.add("was-validated");
+      },
+      false
+    );
+  });
+
+  // Phone verification
+  function validatePhone() {
+    let phone = document.getElementById("phone").value;
+    document.getElementById("phone").value = phone.replace(/[^\d]/g, "");
+  }
+
+  function validatePhoneLength() {
+    let length = document.getElementById("phone").value.length;
+    if (length > 0 && length < 10) {
+      alert("The phone number is less than 10 digits!", "warning");
+    }
+  }
+
+  // Email verification
+  function validateEmail() {
+    let email = document.getElementById("email").value;
+    let feedback = document.getElementById("emailFeedback");
+    // Regular expression to test the email format
+    let emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+
+    if (!emailRegex.test(email)) {
+      feedback.textContent = "Please enter a valid email address.";
+      feedback.style.display = "block"; // Show the feedback
+      return false;
+    } else {
+      feedback.style.display = "none"; // Hide the feedback if email is valid
+    }
+    return true;
+  }
+
+  // Modify password check
+  function validatePassword() {
+    var password = document.getElementById("password").value;
+    var confirmPassword = document.getElementById("confirm_password").value;
+
+    if (password.search(/[a-z]/i) < 0) {
+      alert("Your password must contain at least one letter.", "warning");
+      return false;
+    }
+    if (password.search(/[0-9]/) < 0) {
+      alert("Your password must contain at least one digit.", "warning");
+      return false;
+    }
+    if (password != confirmPassword) {
+      alert("Passwords do not match.", "warning");
+      return false;
+    }
+    return true;
+  }
+</script>
+{% endblock %}

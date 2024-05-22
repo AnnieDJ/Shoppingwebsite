@@ -1,4 +1,194 @@
-{% extends "base.html" %} {% block title %}Staff Dashboard{% endblock %} {%
-block content %}
-<h1>Welcome to the Staff Dashboard</h1>
+{% extends "sidebar_layout.html" %} {% block title %}Staff Dashboard{% endblock
+%} {% block main_content %}
+
+<h2>Staff Dashboard</h2>
+
+<section class="pb-3 pb-md-4 pb-xl-5 bg-light">
+  <div class="container">
+    <div class="row gy-3 gy-md-4">
+      <div class="col-12">
+        <div class="card widget-card border-light shadow-sm">
+          <div class="card-header bg-transparent p-4 border-light-subtle">
+            <h5 class="card-title widget-card-title m-0">Order List</h5>
+          </div>
+          <div class="card-body p-4">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Order ID</th>
+                  <th scope="col">User ID</th>
+                  <th scope="col">Store ID</th>
+                  <th scope="col">Total Cost</th>
+                  <th scope="col">Discount</th>
+                  <th scope="col">Final Price</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Creation Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for order in orders %}
+                <tr>
+                  <td>{{ order.order_id }}</td>
+                  <td>{{ order.user_id }}</td>
+                  <td>{{ order.store_id }}</td>
+                  <td>{{ order.total_cost }}</td>
+                  <td>{{ order.discount }}</td>
+                  <td>{{ order.final_price }}</td>
+                  <td>{{ order.status }}</td>
+                  <td>{{ order.creation_date }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <div class="col-12">
+              <a
+                href="{{ url_for('staff.view_orders') }}"
+                class="btn btn-success my-2"
+                >Read More</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Add margin between the sections -->
+<div class="mb-4"></div>
+
+<!-- Table Card - Rental List -->
+<section class="pb-3 pb-md-4 pb-xl-5 bg-light">
+  <div class="container">
+    <div class="row gy-3 gy-md-4">
+      <div class="col-12">
+        <div class="card widget-card border-light shadow-sm">
+          <div class="card-header bg-transparent p-4 border-light-subtle">
+            <h5 class="card-title widget-card-title m-0">Rental List</h5>
+          </div>
+          <div class="card-body p-4">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Rental ID</th>
+                  <th scope="col">User ID</th>
+                  <th scope="col">Equipment ID</th>
+                  <th scope="col">Start Date</th>
+                  <th scope="col">End Date</th>
+                  <th scope="col">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for rental in rentals %}
+                <tr>
+                  <td>{{ rental.rental_id }}</td>
+                  <td>{{ rental.username }}</td>
+                  <td>{{ rental.equipment_name }}</td>
+                  <td>{{ rental.start_date }}</td>
+                  <td>{{ rental.end_date }}</td>
+                  <td>{{ rental.status }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+            <div class="col-12">
+              <a
+                href="{{ url_for('staff.view_rentals') }}"
+                class="btn btn-success my-2"
+                >Read More</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Table Card - Inventory List -->
+<section class="pb-3 pb-md-4 pb-xl-5 bg-light">
+  <div class="container">
+    <div class="row gy-3 gy-md-4">
+      <div class="col-12">
+        <div class="card widget-card border-light shadow-sm">
+          <div class="card-header bg-transparent p-4 border-light-subtle">
+            <h5 class="card-title widget-card-title m-0">Payment List</h5>
+          </div>
+          <div class="card-body p-4">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">Payment ID</th>
+                  <th scope="col">Order ID</th>
+                  <th scope="col">User ID</th>
+                  <th scope="col">Payment Type</th>
+                  <th scope="col">Payment Status</th>
+                  <th scope="col">Amount</th>
+                  <th scope="col">Payment Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for payment in payments %}
+                <tr>
+                  <td>{{ payment.payment_id }}</td>
+                  <td>{{ payment.order_id }}</td>
+                  <td>{{ payment.user_id }}</td>
+                  <td>{{ payment.payment_type }}</td>
+                  <td>{{ payment.amount }}</td>
+                  <td>{{ payment.payment_date }}</td>
+                </tr>
+                {% endfor %}
+                </tr>
+              </tbody>
+            </table>
+            <div class="col-12">
+              <a href="{{ url_for('staff.view_payments') }}" class="btn btn-success my-2">Read More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Table Card - Promotions -->
+<section class="pb-3 pb-md-4 pb-xl-5 bg-light">
+  <div class="container">
+    <div class="row gy-3 gy-md-4">
+      <div class="col-12">
+        <div class="card widget-card border-light shadow-sm">
+          <div class="card-header bg-transparent p-4 border-light-subtle">
+            <h5 class="card-title widget-card-title m-0">Promotions</h5>
+          </div>
+          <div class="card-body p-4">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">News ID</th>
+                  <th scope="col">Title</th>
+                  <th scope="col">Publish Date</th>
+                  <th scope="col">Store ID</th>
+                </tr>
+              </thead>
+              {% for promotion in promotions %}
+                <tr>
+                  <td>{{ promotion.news_id }}</td>
+                  <td>{{ promotion.title }}</td>
+                  <td>{{ promotion.publish_date }}</td>
+                  <td>{{ promotion.store_id }}</td>
+                </tr>
+                {% endfor %}
+                </tr>
+              </tbody>
+            </table>
+            <div class="col-12">
+              <a href="{{ url_for('staff.view_promotions') }}" class="btn btn-success my-2">Read More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 {% endblock %}
