@@ -1,5 +1,10 @@
 {% extends "base.html" %} {% block title %}Customer Dashboard{% endblock %} {%
 block content %}
+{% if session.get('loggedin') %}
+      <div class="custom-welcome">
+        Welcome back, {{ session.get('username') }}! Please select a store to start browsing available machinery
+      </div>
+      {% endif %}
 <div class="container mt-4">
   <div class="row mb-4">
     <div class="col-md-6">
@@ -15,14 +20,9 @@ block content %}
         </button>
         <ul class="dropdown-menu" aria-labelledby="storeDropdown">
           {% for store in stores %}
-          <li>
-            <a
-              class="dropdown-item"
-              href="#"
-              data-store="{{ store.store_name }}"
-              >{{ store.store_name }}</a
-            >
-          </li>
+              <li>
+                <a class="dropdown-item" href="#" data-store="{{ store.store_name }}">{{ store.store_name }}</a>
+              </li>
           {% endfor %}
         </ul>
       </div>
@@ -79,364 +79,38 @@ block content %}
 </div>
 
 <script>
-  var products = {
-    store1: [
-      {
-        image: "tractor1.jpg",
-        name: "Deutz Fahr/Tractor",
-        description:
-          "This 2019 Deutz Fahr 6185 RC shift professional series tractor has only done 2,670 hours and is in great condition and ready to go to work . 50kph front suspension, front linkage and pto, this tractor is a serious contracting machine and with the loader would add incredible versitility to any fleet.",
-        price: "$369",
-      },
-      {
-        image: "roller1.jpg",
-        name: "3M Tyre/Roller",
-        description:
-          "Sakai SW250 Roller, hydrostatic transmission, vibrating smoother front, and rear drive rollers, 4 cylinder diesel engine. the SW250 offer the same features as SAKAI's larger size models:Single lever operated, fully hydrostatic, all drum drive. Both drums vibrate (with off/manual/auto mode selector)Centre-articulated steering mechanism; Rust-free and pressurized water sprinkler system; Neutral engine start and fail-safe brake system; Vibration free operator platform and low operating noise; Easy-to-monitor instruments (gauges and warning lamps); The hydraulic pump and motors are connected in series to offer the maximum traction and smooth rolling as well as excellent gradeability.",
-        price: "$119",
-      },
-      {
-        image: "sprayer1.jpg",
-        name: "Amazone/Sprayer",
-        description:
-          "Amazone UX5201 Super with 30 mtr boom , as new , 5200ltr tank with 580ltr fresh water , twin pumps 520ltrs/min , axle suspension , 9 sections with auto shut off , ISOBUS with Amazone joystick , DUS- Boom recirculation , comfort package , boom auto height control , LED lighting package.",
-        price: "$289",
-      },
-      {
-        image: "wrapper1.jpg",
-        name: "McHale/Fusion/Bale Wrapper",
-        description:
-          "2020 model. 22,000 bales. 1,000 speed gear box. 6 bar camless pickup. 650 tyres. ",
-        price: "$159",
-      },
-      {
-        image: "spreader1.jpg",
-        name: "Manure Spreader",
-        description: "Description 5",
-        price: "$159",
-      },
-      {
-        image: "sprayer2.jpg",
-        name: "Manure Spreader",
-        description:
-          "*6 tonne super capacity;*4 tonne Urea capacity;*Wide belt to handle organic matter (poultry waste, etc) with ease;*E spreader in cab rate control;*Electronic door actuator",
-        price: "$359",
-      },
-      {
-        image: "good1.png",
-        name: "JS130/Tracked-Excav",
-        description:
-          "13.7 tonne operating weight, Long carriage - providing excellent breakout force, 600mm steel tracks, Large air conditioned cabin, Heated seat with air suspension, Hydraulic hitch, High flow hydraulics, 900mm general purpose bucket, Heavy duty X undercarriage, JCB 74kw Tier 3 diesel engine ",
-        price: "$189",
-      },
-      {
-        image: "good2.png",
-        name: "CASE IH/Maxxum 125/FWA/4WD",
-        description:
-          "This Case Maxxum 125 Multi Controller Tractor has a Case LR2100 Self Levelling Loader and Bucket, 125HP Boost to 155HP, Active Drive 8 Speed Power Shift Transmission, Electronic Remotes, Integrated Loader Joystick Control, ",
-        price: "$255",
-      },
-      {
-        image: "good3.png",
-        name: "Taege/4.8m Triple Box Air Seeder/Seed Drills",
-        description:
-          "Taege 4.8m Air Seeder - triple box drill, 2 x 850L hoppers & 1 x 200L hopper, all three hoppers are electrically driven, all three are very easy to calibrate, Monitor shows fan speed and seeding rate of all hoppers, 4.8m working width and folds to 3.1m for road transport, covering harrows, 121mm tine spacing. Tilth grows seed.",
-        price: "$200",
-      },
-      {
-        image: "good4.png",
-        name: "Merlo/P72.10/Telescopic Handler",
-        description:
-          "With a max of 10 metre reach and 7.2 ton lift it is well suited to construction. The frame levelling and side shift make it ideal for accurate placement of goods on an uneven site and the single joystick makes it easy to control.",
-        price: "$260",
-      },
-      {
-        image: "good5.png",
-        name: "Fendt/Rotana 160V/Round Baler",
-        description:
-          "SOBUS, Also has monitor, bale size 0.9m to 1.60m, workshop checked, finance package available, happy to on farm.",
-        price: "$290",
-      },
-      {
-        image: "good6.png",
-        name: "PIUMA/Horticulture Harvester",
-        description:
-          "Only 1400mm wide, 4 Wheel Steering so great turning circle for tight headlands;Cruise Control for steering, 4 Conveyor belts, holds two bins while filling one;Gentle delivery from conveyor to bin, very quiet and economical 25 HP Diesel engine;Four Adjustable Height Platforms while two harvest in front at ground level.",
-        price: "$200",
-      },
-      {
-        image: "good7.png",
-        name: "Uni drill/Disc Seeder",
-        description:
-          "24 row, 3 metre trailing disc drill.NZs most cost effective disc direct drill.Ideal for over sowing, into stubble or cultivated ground.Fewer moving parts; low ongoing repair and maintenance.Narrow row spacing but staggered design allows good trash clearance.Long life Tungsten carbide tipped coulters;Mounted on rubber Duratorque suspension for easy maintenance;Self clean design Guttler roller.;700L capacity hopper for high speed drilling, quick and easy calibration, convenient emptying, and individual row accuracy, with the ability to sow to the last quantity of seed, with all seed types.",
-        price: "$180",
-      },
-      {
-        image: "good8.png",
-        name: "Antonio Carraro/Trx 10900/FWA/4WD",
-        description:
-          "Gearing 16F x 16R;98 hp Kubota engine;R series steering isodiametric tractor;With reversible driving position;Powerful and streamlined;Extremely versatile and ideally suited to a wide range of applications.",
-        price: "$300",
-      },
-      {
-        image: "good9.png",
-        name: "Taege/300AS121D/Seed Drills",
-        description:
-          "Brand New Taege 3.1m air seeder, 25 run 121mm row spacing, plastic seed & fert hoppers, both 850L so easy half ton of seed & fert, Taege electric drive, oil cooler for hydraulic fan, Wide tyres, safety rail, small seed inserts, covering harrows, roll top hopper covers, very smart and easy to use. We can add a third hopper for another $13000 + gst which is 200L and set up to broadcast small seeds or slug bait.",
-        price: "$340",
-      },
-    ],
-    store2: [
-      {
-        image: "tractor1.jpg",
-        name: "Deutz Fahr/Tractor",
-        description:
-          "This 2019 Deutz Fahr 6185 RC shift professional series tractor has only done 2,670 hours and is in great condition and ready to go to work . 50kph front suspension, front linkage and pto, this tractor is a serious contracting machine and with the loader would add incredible versitility to any fleet.",
-        price: "$369",
-      },
-      {
-        image: "roller1.jpg",
-        name: "3M Tyre/Roller",
-        description:
-          "Sakai SW250 Roller, hydrostatic transmission, vibrating smoother front, and rear drive rollers, 4 cylinder diesel engine. the SW250 offer the same features as SAKAI's larger size models:Single lever operated, fully hydrostatic, all drum drive. Both drums vibrate (with off/manual/auto mode selector)Centre-articulated steering mechanism; Rust-free and pressurized water sprinkler system; Neutral engine start and fail-safe brake system; Vibration free operator platform and low operating noise; Easy-to-monitor instruments (gauges and warning lamps); The hydraulic pump and motors are connected in series to offer the maximum traction and smooth rolling as well as excellent gradeability.",
-        price: "$119",
-      },
-      {
-        image: "sprayer1.jpg",
-        name: "Amazone/Sprayer",
-        description:
-          "Amazone UX5201 Super with 30 mtr boom , as new , 5200ltr tank with 580ltr fresh water , twin pumps 520ltrs/min , axle suspension , 9 sections with auto shut off , ISOBUS with Amazone joystick , DUS- Boom recirculation , comfort package , boom auto height control , LED lighting package.",
-        price: "$289",
-      },
-      {
-        image: "wrapper1.jpg",
-        name: "McHale/Fusion/Bale Wrapper",
-        description:
-          "2020 model. 22,000 bales. 1,000 speed gear box. 6 bar camless pickup. 650 tyres. ",
-        price: "$159",
-      },
-      {
-        image: "spreader1.jpg",
-        name: "Manure Spreader",
-        description: "Description 5",
-        price: "$159",
-      },
-      {
-        image: "sprayer2.jpg",
-        name: "Manure Spreader",
-        description:
-          "*6 tonne super capacity;*4 tonne Urea capacity;*Wide belt to handle organic matter (poultry waste, etc) with ease;*E spreader in cab rate control;*Electronic door actuator",
-        price: "$359",
-      },
-      {
-        image: "good1.png",
-        name: "JS130/Tracked-Excav",
-        description:
-          "13.7 tonne operating weight, Long carriage - providing excellent breakout force, 600mm steel tracks, Large air conditioned cabin, Heated seat with air suspension, Hydraulic hitch, High flow hydraulics, 900mm general purpose bucket, Heavy duty X undercarriage, JCB 74kw Tier 3 diesel engine ",
-        price: "$189",
-      },
-      {
-        image: "good2.png",
-        name: "CASE IH/Maxxum 125/FWA/4WD",
-        description:
-          "This Case Maxxum 125 Multi Controller Tractor has a Case LR2100 Self Levelling Loader and Bucket, 125HP Boost to 155HP, Active Drive 8 Speed Power Shift Transmission, Electronic Remotes, Integrated Loader Joystick Control, ",
-        price: "$255",
-      },
-      {
-        image: "good3.png",
-        name: "Taege/4.8m Triple Box Air Seeder/Seed Drills",
-        description:
-          "Taege 4.8m Air Seeder - triple box drill, 2 x 850L hoppers & 1 x 200L hopper, all three hoppers are electrically driven, all three are very easy to calibrate, Monitor shows fan speed and seeding rate of all hoppers, 4.8m working width and folds to 3.1m for road transport, covering harrows, 121mm tine spacing. Tilth grows seed.",
-        price: "$200",
-      },
-      {
-        image: "good4.png",
-        name: "Merlo/P72.10/Telescopic Handler",
-        description:
-          "With a max of 10 metre reach and 7.2 ton lift it is well suited to construction. The frame levelling and side shift make it ideal for accurate placement of goods on an uneven site and the single joystick makes it easy to control.",
-        price: "$260",
-      },
-      {
-        image: "good5.png",
-        name: "Fendt/Rotana 160V/Round Baler",
-        description:
-          "SOBUS, Also has monitor, bale size 0.9m to 1.60m, workshop checked, finance package available, happy to on farm.",
-        price: "$290",
-      },
-      {
-        image: "good6.png",
-        name: "PIUMA/Horticulture Harvester",
-        description:
-          "Only 1400mm wide, 4 Wheel Steering so great turning circle for tight headlands;Cruise Control for steering, 4 Conveyor belts, holds two bins while filling one;Gentle delivery from conveyor to bin, very quiet and economical 25 HP Diesel engine;Four Adjustable Height Platforms while two harvest in front at ground level.",
-        price: "$200",
-      },
-      {
-        image: "good10.png",
-        name: "Moore/Unidrill/Seed Drills",
-        description:
-          "The most straight forward, easy to use, and functional pasture based drill on the market;* Single discs;*90mm row spacing;*Rear guttler roller - very effective in pugged conditions and consolidating cultivated soil;*Accord metering system and pneumatic hopper is easy to set up and can handle any seed type.",
-        price: "$270",
-      },
-      {
-        image: "good11.png",
-        name: "Maschio Jumbo 8.0mtr/Power Harrows",
-        description:
-          "Maschio Jumbo 8.0mtr Power Harrow , Farmer owned , very tidy , as new Quickfit Tungsten tines , hydraulic depth control of tooth packer roller and leveling board , contour control , awesome efficient cultivation too",
-        price: "$290",
-      },
-      {
-        image: "good12.png",
-        name: "Kverneland/95130C/Rakes/Tedder",
-        description:
-          "The Kverneland 94125 C and 95130 C are targeted at making lighter work of tough and demanding operations. With an impressive capacity of 12.50m working width, straightforward design and the possibility to adjust both work and swath width, they are designed to boost the complete process of collection and pick-up, altering to the changing crop intensity during the season. The Kverneland 12.5m 4-rotor rake is offered with a choice of either ProLine or CompactLine gearbox. Both machines are similar in construction.",
-        price: "$260",
-      },
-    ],
-    store3: [
-      {
-        image: "tractor1.jpg",
-        name: "Deutz Fahr/Tractor",
-        description:
-          "This 2019 Deutz Fahr 6185 RC shift professional series tractor has only done 2,670 hours and is in great condition and ready to go to work . 50kph front suspension, front linkage and pto, this tractor is a serious contracting machine and with the loader would add incredible versitility to any fleet.",
-        price: "$369",
-      },
-      {
-        image: "roller1.jpg",
-        name: "3M Tyre/Roller",
-        description:
-          "Sakai SW250 Roller, hydrostatic transmission, vibrating smoother front, and rear drive rollers, 4 cylinder diesel engine. the SW250 offer the same features as SAKAI's larger size models:Single lever operated, fully hydrostatic, all drum drive. Both drums vibrate (with off/manual/auto mode selector)Centre-articulated steering mechanism; Rust-free and pressurized water sprinkler system; Neutral engine start and fail-safe brake system; Vibration free operator platform and low operating noise; Easy-to-monitor instruments (gauges and warning lamps); The hydraulic pump and motors are connected in series to offer the maximum traction and smooth rolling as well as excellent gradeability.",
-        price: "$119",
-      },
-      {
-        image: "sprayer1.jpg",
-        name: "Amazone/Sprayer",
-        description:
-          "Amazone UX5201 Super with 30 mtr boom , as new , 5200ltr tank with 580ltr fresh water , twin pumps 520ltrs/min , axle suspension , 9 sections with auto shut off , ISOBUS with Amazone joystick , DUS- Boom recirculation , comfort package , boom auto height control , LED lighting package.",
-        price: "$289",
-      },
-      {
-        image: "wrapper1.jpg",
-        name: "McHale/Fusion/Bale Wrapper",
-        description:
-          "2020 model. 22,000 bales. 1,000 speed gear box. 6 bar camless pickup. 650 tyres. ",
-        price: "$159",
-      },
-      {
-        image: "spreader1.jpg",
-        name: "Manure Spreader",
-        description: "Description 5",
-        price: "$159",
-      },
-      {
-        image: "sprayer2.jpg",
-        name: "Manure Spreader",
-        description:
-          "*6 tonne super capacity;*4 tonne Urea capacity;*Wide belt to handle organic matter (poultry waste, etc) with ease;*E spreader in cab rate control;*Electronic door actuator",
-        price: "$359",
-      },
-      {
-        image: "good1.png",
-        name: "JS130/Tracked-Excav",
-        description:
-          "13.7 tonne operating weight, Long carriage - providing excellent breakout force, 600mm steel tracks, Large air conditioned cabin, Heated seat with air suspension, Hydraulic hitch, High flow hydraulics, 900mm general purpose bucket, Heavy duty X undercarriage, JCB 74kw Tier 3 diesel engine ",
-        price: "$189",
-      },
-      {
-        image: "good2.png",
-        name: "CASE IH/Maxxum 125/FWA/4WD",
-        description:
-          "This Case Maxxum 125 Multi Controller Tractor has a Case LR2100 Self Levelling Loader and Bucket, 125HP Boost to 155HP, Active Drive 8 Speed Power Shift Transmission, Electronic Remotes, Integrated Loader Joystick Control, ",
-        price: "$255",
-      },
-      {
-        image: "good3.png",
-        name: "Taege/4.8m Triple Box Air Seeder/Seed Drills",
-        description:
-          "Taege 4.8m Air Seeder - triple box drill, 2 x 850L hoppers & 1 x 200L hopper, all three hoppers are electrically driven, all three are very easy to calibrate, Monitor shows fan speed and seeding rate of all hoppers, 4.8m working width and folds to 3.1m for road transport, covering harrows, 121mm tine spacing. Tilth grows seed.",
-        price: "$200",
-      },
-      {
-        image: "good4.png",
-        name: "Merlo/P72.10/Telescopic Handler",
-        description:
-          "With a max of 10 metre reach and 7.2 ton lift it is well suited to construction. The frame levelling and side shift make it ideal for accurate placement of goods on an uneven site and the single joystick makes it easy to control.",
-        price: "$260",
-      },
-      {
-        image: "good5.png",
-        name: "Fendt/Rotana 160V/Round Baler",
-        description:
-          "SOBUS, Also has monitor, bale size 0.9m to 1.60m, workshop checked, finance package available, happy to on farm.",
-        price: "$290",
-      },
-      {
-        image: "good6.png",
-        name: "PIUMA/Horticulture Harvester",
-        description:
-          "Only 1400mm wide, 4 Wheel Steering so great turning circle for tight headlands;Cruise Control for steering, 4 Conveyor belts, holds two bins while filling one;Gentle delivery from conveyor to bin, very quiet and economical 25 HP Diesel engine;Four Adjustable Height Platforms while two harvest in front at ground level.",
-        price: "$200",
-      },
-      {
-        image: "good13.png",
-        name: "McHale/V660/Round Baler",
-        description:
-          "Single belt;Rotor feed with 15 knives;2m pick up;bale size upto 1.68m",
-        price: "$340",
-      },
-      {
-        image: "good14.png",
-        name: "Combi RX148 Multi-feeder/Bale Wagon/Feedout",
-        description:
-          " Hustler Chainless Rear Floor Combi RX148 Multi-feeder with Brakes. 14.2 cube (17 cube heaped). Can handle all bale types and shapes and has awesome stability in rolling country. Can add other spec including scales",
-        price: "$310",
-      },
-      {
-        image: "good15.png",
-        name: "300EDBT121SS/Seed Drills",
-        description:
-          "TAEGE 300EDBT 121 3M DRILL, twin box, Stainless steel fert box, 121mm tine spacing, electronic rate control, small seed inserts, Broadcasting system, covering harrows, safety chain, LED tratier lights,Hazard panels, 2.8m drilling width",
-        price: "$300",
-      },
-    ],
-  };
-
   async function loadProducts(store) {
     var productHtml = "";
-    const res = await fetch(`/customer/store/${store}`).then((res) =>
-      res.json()
-    );
+    const res = await fetch(`/customer/store/${store}`).then(res => res.json())
     res.data.forEach(function (product) {
       productHtml += `
-            <div class="col-md-4 mb-4">
-              <div class="card">
-                <img src="{{ url_for('static', filename='${
-                  product.image
-                }') }}" class="card-img-top" alt="${product.name}">
-                <div class="card-body">
-                  <h5 class="card-title">${product.name}</h5>
-                  <p class="card-text">${product.description}</p>
-                  <p class="card-text">${product.price}</p>
-                  <button class="btn btn-primary add-to-cart" data-product='${JSON.stringify(
-                    product
-                  )}'>Add to Cart</button>
-                  <button class="btn btn-info view-details" data-product='${JSON.stringify(
-                    product
-                  )}'>View Details</button>
-                </div>
+          <div class="col-md-4 mb-4">
+            <div class="card">
+              <img src="/static/${product.Image}" class="card-img-top" alt="${product.name}">
+              <div class="card-body">
+                <h5 class="card-title">${product.name}/${product.category}</h5>
+                <p class="card-text">$${product.cost}/day</p>
+                <button class="btn btn-primary add-to-cart" data-product='${JSON.stringify(
+                  product
+                )}'>Add to Cart</button>
+                <button class="btn btn-info view-details" data-product='${JSON.stringify(
+                  product
+                )}'>View Details</button>
               </div>
             </div>
-          `;
+          </div>
+        `;
     });
     $("#productList").html(productHtml);
 
     $(".view-details").on("click", function () {
       var product = $(this).data("product");
       $(".modal-body").html(`
-            <img src="{{ url_for('static', filename='${product.image}') }}" class="img-fluid mb-3" alt="${product.name}">
-            <h5>${product.name}</h5>
-            <p>${product.description}</p>
-            <p>${product.price}</p>
-          `);
+          <img src="/static/${product.Image}" class="img-fluid mb-3" alt="${product.name}">
+          <h5>${product.name}/${product.category}</h5>
+          <p>${product.description}</p>
+          <p>$${product.cost}/day</p>
+        `);
       $("#productModal").modal("show");
     });
 

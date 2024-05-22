@@ -9,6 +9,7 @@ from flask_hashing  import Hashing
 from . import hashing
 from .utils import db_cursor, login_required
 
+
 customer_bp = Blueprint('customer', __name__, template_folder='templates/customer')
 
 
@@ -22,7 +23,6 @@ def dashboard():
         cursor.close()
         return render_template('customer_dashboard.html', stores=stores)
     return redirect(url_for('home.login'))
-
 
 
 @customer_bp.route('/customer_profile', methods=['GET', 'POST'])
@@ -95,19 +95,21 @@ def change_password():
 
     return redirect(url_for('customer.customer_profile'))
 
+
 @customer_bp.route('/store/<name>')
 def store(name):
     if 'loggedin' in session and session['role'] == 'customer':
         conn, cursor = db_cursor()
         cursor.execute("SELECT * FROM equipment JOIN stores ON equipment.store_id = stores.store_id WHERE stores.store_name = %s", (name,))
-        equipments = cursor.fetchall()
+        equipment = cursor.fetchall()
         cursor.close()
         return jsonify({
             'code': 200,
             'message': 'Success',
-            'data': equipments
+            'data': equipment
         })
     return jsonify({
         'code': 401,
         'message': 'Not Authorized'
     })
+
