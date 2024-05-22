@@ -101,12 +101,12 @@ def store(name):
     if 'loggedin' in session and session['role'] == 'customer':
         conn, cursor = db_cursor()
         cursor.execute("SELECT * FROM equipment JOIN stores ON equipment.store_id = stores.store_id WHERE stores.store_name = %s", (name,))
-        equipment = cursor.fetchall()
+        equipments = cursor.fetchall()
         cursor.close()
         return jsonify({
             'code': 200,
             'message': 'Success',
-            'data': equipment
+            'data': equipments
         })
     return jsonify({
         'code': 401,

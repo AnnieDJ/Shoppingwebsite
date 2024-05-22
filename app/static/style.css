@@ -150,3 +150,68 @@ body {
 .navbar {
   margin-bottom: 5px; /* Adds some space below the navbar */
 }
+
+.nav {
+  background: linear-gradient(
+    to right,
+    #4a8b32,
+    #f3f577
+  ) !important; /* Adjust the colors based on the exact green shades */
+  color: rgb(19, 16, 16) !important;
+  padding: 10px 20px !important;
+  text-align: center !important;
+}
+
+.custom-btn {
+  background-color: #4a8b32 !important;
+  border-color: #4a8b32 !important;
+}
+
+.services-icon {
+  font-size: 40px !important; /* Adjust the size as needed */
+}
+
+.navbar-brand {
+  color: #ffffff !important; /* Set brand text color */
+  font-weight: bold !important;
+  font-size: 24px !important;
+}
+
+.navbar-nav .nav-link {
+  color: #0f0101 !important;
+  padding: 8px 16px !important;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #4a8b32 !important;
+  background-color: #f3f577 !important;
+}
+
+.custom-btn {
+  background-color: #4a8b32 !important;
+  border-color: #4a8b32 !important;
+}
+
+.services-icon {
+  font-size: 40px !important; /* Adjust the size as needed */
+}
+
+.sidebar .nav-link {
+  color: #000000 !important; /* Set sidebar text color to black */
+}
+
+.custom-welcome {
+  font-size: 40px !important; /* Make text bigger */
+  font-weight: bold !important; /* Make text bold */
+  margin-top: 30px; /* Add margin for positioning */
+  text-align: left;
+}
+
+.nav-top-spacing {
+  margin-bottom: 40px; /* Adjust as needed */
+}
+
+.profile-container,
+.dashboard-container {
+  margin-left: 250px; /* Adjust based on your sidebar width */
+}
