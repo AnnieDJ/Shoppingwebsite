@@ -10,6 +10,8 @@ content %}
     >
       <div class="position-sticky pt-3">
         <ul class="nav flex-column">
+
+          <!-- Staff -->
           {% if session.get('role') == 'staff' %}
           <li class="nav-item">
             <a
@@ -63,7 +65,13 @@ content %}
               Promotions
             </a>
           </li>
+          
+        </ul>
+      </div>
+    </nav>
 
+
+          <!-- Local Manager -->
           {% elif session.get('role') == 'local_manager' %}
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('local_manager.dashboard') }}">
@@ -78,6 +86,15 @@ content %}
             >
               <i class="fa fa-user"></i>
               Profile
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="{{ url_for('local_manager.daily_checklist') }}"
+            >
+              <i class="fa fa-calendar-check"></i>
+              Checklists
             </a>
           </li>
           <li class="nav-item">
@@ -103,7 +120,7 @@ content %}
               class="nav-link"
               href="{{ url_for('local_manager.view_payments') }}"
             >
-              <i class="fa fa-cog"></i>
+              <i class="fa fa-dollar-sign"></i>
               Payments
             </a>
           </li>
@@ -112,7 +129,7 @@ content %}
               class="nav-link"
               href="{{ url_for('local_manager.view_promotions') }}"
             >
-              <i class="fa fa-paperclip"></i>
+              <i class="fa fa-bullhorn"></i>
               Promotions
             </a>
           </li>
@@ -122,10 +139,98 @@ content %}
               Reports
             </a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="fa fa-users"></i>
+              Staff
+            </a>
+          </li>
+         
+        </ul>
+      </div>
+    </nav>
+
+
+
+          <!-- Admin -->
+          {% elif session.get('role') == 'admin' %}
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('admin.dashboard') }}">
+              <i class="fa fa-home"></i>
+              Dashboard
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="{{ url_for('admin.admin_profile') }}"
+            >
+              <i class="fa fa-user"></i>
+              Profile
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="#"
+            >
+              <i class="fa fa-calendar-check"></i>
+              Checklists
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="#"
+            >
+              <i class="fa fa-shopping-cart"></i>
+              Orders
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="#"
+            >
+              <i class="fa fa-truck"></i>
+              Rentals
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="#"
+            >
+              <i class="fa fa-dollar-sign"></i>
+              Payments
+            </a>
+          </li>
+          <li class="nav-item">
+            <a
+              class="nav-link"
+              href="#"
+            >
+              <i class="fa fa-bullhorn"></i>
+              Promotions
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="fa fa-file"></i>
+              Reports
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">
+              <i class="fa fa-users"></i>
+              Staff
+            </a>
+          </li>
           {% endif %}
         </ul>
       </div>
     </nav>
+
 
     <!-- Main Content -->
     <main
@@ -142,4 +247,5 @@ content %}
     </main>
   </div>
 </div>
+
 {% endblock %}
