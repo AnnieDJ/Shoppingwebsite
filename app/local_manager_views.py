@@ -3,7 +3,7 @@ from mysql.connector import Error as MySQLError
 from flask import Blueprint,render_template, request, redirect, url_for, session, flash, jsonify,Flask
 from app import utils
 import re
-from datetime import datetime
+from datetime import datetime, date
 from .utils import db_cursor
 from flask_hashing  import Hashing
 from . import hashing
@@ -15,9 +15,11 @@ local_manager_bp = Blueprint('local_manager', __name__, template_folder='templat
 # local manager dashboard
 @local_manager_bp.route('/dashboard')
 def dashboard():
-    if 'loggedin' in session and session ['role'] == 'local_manager':
+    if 'loggedin' in session and (session ['role'] == 'local_manager' or session['role'] == 'admin'):
         conn, cursor = db_cursor()
         try:
+            
+            ## view rentals ##
             cursor.execute("""
                 SELECT r.*, u.username, e.name as equipment_name
                 FROM rentals r
@@ -28,6 +30,7 @@ def dashboard():
             """)
             rentals = cursor.fetchall()
 
+            ## view orderse ##
             cursor.execute("""
                 SELECT order_id, user_id, store_id, total_cost, tax, discount, final_price, status, creation_date
                 FROM orders
@@ -35,7 +38,17 @@ def dashboard():
                 LIMIT 5  
             """)
             orders = cursor.fetchall()
+            
+             
+            ## view equipment / inventory ##
+            cursor.execute("""
+                SELECT equipment_id, name, category, purchase_date, cost, 
+                serial_number, status, store_id, maximum_date, minimum_date 
+                FROM equipment
+            """)
+            inventory = cursor.fetchall()
 
+            ## view payments ##
             cursor.execute("""
                 SELECT payment_id, order_id, user_id, payment_type, amount, payment_status, payment_date
                 FROM payments
@@ -44,6 +57,7 @@ def dashboard():
             """)
             payments = cursor.fetchall()
 
+            ## view promotions ##
             cursor.execute("""
                 SELECT news_id, title, content, publish_date, creator_id, store_id
                 FROM news
@@ -60,7 +74,7 @@ def dashboard():
             cursor.close()
             conn.close()  
 
-        return render_template('local_manager_dashboard.html', rentals=rentals, orders=orders, payments=payments, promotions=promotions)
+        return render_template('local_manager_dashboard.html', rentals=rentals, orders=orders, payments=payments, inventory=inventory, promotions=promotions)
     else:
         return redirect(url_for('home.login'))
     
@@ -246,7 +260,72 @@ def view_promotions(): #news
     else:
         return redirect(url_for('local_manager.dashboard'))
     
-    
+
+
+
+## Inventory ##
+@local_manager_bp.route('/equipment')
+def view_inventory():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()  
+        try:
+            cursor.execute("""
+                SELECT equipment_id, name, category, purchase_date, cost, 
+                serial_number, status, store_id, maximum_date, minimum_date 
+                FROM equipment
+            """)
+            equipment = cursor.fetchall()
+            
+        except Exception as e:
+            print("An error occurred:", e)
+            flash("A database error occurred. Please try again.")
+            return redirect(url_for('local_manager.dashboard'))
+        finally:
+            cursor.close()
+            conn.close()  
+            
+        return render_template('equipment.html', equipment=equipment)
+    else:
+        return redirect(url_for('local_manager.dashboard'))
+
+
+@local_manager_bp.route('/daily_checklist')
+@login_required
+def daily_checklist():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        today = date.today().strftime('%Y-%m-%d')
+        print("Today's date:", today)
+        
+        conn, cursor = db_cursor()
+        try:
+            # Query today's bookings
+            sql_query = """
+               SELECT r.rental_id, r.user_id, r.equipment_id, e.name AS equipment_name, 
+                    r.start_date, r.end_date, r.status, u.username
+                FROM rentals r
+                JOIN equipment e ON r.equipment_id = e.equipment_id
+                JOIN user u ON r.user_id = u.user_id
+                WHERE r.start_date = %s AND r.status IN ('Completed', 'Pending', 'Canceled');
+            """
+            print("Date for query:", today)
+            cursor.execute(sql_query, (today,))
+            bookings = cursor.fetchall()
+            print("Number of bookings fetched:", len(bookings))
+        except Exception as e:
+            print("An error occurred:", e)
+            flash("A database error occurred. Please try again.")
+            return redirect(url_for('local_manager.dashboard'))
+        finally:
+            cursor.close()
+            conn.close()
+        
+        return render_template('local_manager_daily_checklist.html', bookings=bookings)
+    else:
+        flash("You are not authorized to view this page.")
+        return redirect(url_for('local_manager.dashboard'))
+
+
+
 
 ## Local Manager View Reports ##
 @local_manager_bp.route('/view_reports', methods=['POST'])

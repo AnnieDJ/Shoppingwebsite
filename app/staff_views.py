@@ -14,6 +14,7 @@ staff_bp = Blueprint('staff', __name__, template_folder='templates/staff')
 
 ## Staff dashboard ##
 @staff_bp.route('/dashboard')
+@login_required
 def dashboard():
     if 'loggedin' in session and session['role'] in ['staff', 'local_manager']:
         conn, cursor = db_cursor()
@@ -39,6 +40,14 @@ def dashboard():
             """)
             orders = cursor.fetchall()
             
+            ## view equipment / inventory ##
+            cursor.execute("""
+                SELECT equipment_id, name, category, purchase_date, cost, 
+                serial_number, status, store_id, maximum_date, minimum_date 
+                FROM equipment
+            """)
+            inventory = cursor.fetchall()
+            
             ## view payment list ##
             cursor.execute("""
                 SELECT payment_id, order_id, user_id, payment_type, amount, payment_status, payment_date
@@ -57,6 +66,17 @@ def dashboard():
             """)
             promotions = cursor.fetchall()
             
+            # Additional data for local managers
+            reports = []
+            if session['role'] == 'local_manager':
+                cursor.execute("""
+                    SELECT report_id, report_type, details, created_at
+                    FROM reports
+                    ORDER BY created_at DESC
+                    LIMIT 5
+                """)
+                reports = cursor.fetchall()
+            
         except Exception as e:
             print("An error occurred:", e)
             flash("A database error occurred. Please try again.")
@@ -65,7 +85,10 @@ def dashboard():
             cursor.close()
             conn.close()  
             
-        return render_template('staff_dashboard.html', rentals=rentals, orders=orders, payments=payments, promotions=promotions)
+        if session['role'] == 'local_manager':
+            return render_template('local_manager_dashboard.html', rentals=rentals, orders=orders, payments=payments, inventory=inventory, promotions=promotions, reports=reports)
+        else:
+            return render_template('staff_dashboard.html', rentals=rentals, orders=orders, payments=payments, inventory=inventory, promotions=promotions)
     else:
         return redirect(url_for('home.login'))
 
@@ -320,13 +343,11 @@ def daily_checklist():
 @staff_bp.route('/update_rental_status', methods=['POST'])
 @login_required
 def update_rental_status():
-    if 'loggedin' in session and session['role'] == 'staff':
         rental_id = request.form.get('rental_id')
         new_status = request.form.get('new_status')
 
-        if not rental_id:
-            flash("Missing rental ID or status.", 'danger')
-            return redirect(url_for('staff.daily_checklist'))
+        if not rental_id or not new_status:
+            return jsonify({'error': 'Missing rental ID or status'}), 400
 
         conn, cursor = db_cursor()
         try:
@@ -336,18 +357,13 @@ def update_rental_status():
                 WHERE rental_id = %s
             """, (new_status, rental_id))
             conn.commit()
-            flash(f'Rental status updated to {new_status}.', 'success')
+            return jsonify({'success': True, 'message': 'Status updated successfully.'})
         except Exception as e:
-            flash("A database error occurred. Please try again.", 'danger')
-            print("An error occurred:", e)
+            conn.rollback()
+            return jsonify({'error': str(e), 'message': 'Failed to update status.'}), 500
         finally:
             cursor.close()
             conn.close()
-            
-        return redirect(url_for('staff.daily_checklist'))
-    else:
-        flash("You are not authorized to perform this action.", 'danger')
-        return redirect(url_for('staff.dashboard'))
 
 
 @staff_bp.route('/verify_id', methods=['POST'])
@@ -355,6 +371,7 @@ def update_rental_status():
 def verify_id():
     rental_id = request.form.get('rental_id')
     id_verified = request.form.get('id_verified') == 'true'
+    print("Rental ID:", rental_id, "ID Verified:", id_verified)  
 
     if not rental_id:
         return jsonify({'error': 'Missing rental ID'}), 400
@@ -367,13 +384,13 @@ def verify_id():
             WHERE rental_id = %s
         """, (id_verified, rental_id))
         conn.commit()
-        return jsonify({'success': True}), 200
+        print("Update successful")  # Confirm successful commit
+        return jsonify({'success': True, 'message': 'ID verification status updated successfully.'}), 200
     except Exception as e:
+        print("Error:", e)  # Print any errors encountered
         conn.rollback()
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e), 'message': 'Failed to update ID verification status.'}), 500
     finally:
         cursor.close()
         conn.close()
-
-    return jsonify({'success': False}), 400
 
