@@ -1,10 +1,12 @@
-from flask import Flask
+from flask import Flask, session
 from .home_views import home_bp
 from .customer_views import customer_bp
 from .staff_views import staff_bp
 from .local_manager_views import local_manager_bp
 from .national_manager_views import national_manager_bp
 from .admin_views import admin_bp
+from datetime import datetime
+
 
 def create_app():
     app = Flask(__name__)
@@ -12,7 +14,7 @@ def create_app():
     app.config['DB_USER'] = 'root'
     app.config['DB_PASSWORD'] = 'Sql1234@'
     app.config['DB_HOST'] = 'localhost'
-    app.config['DB_NAME'] = 'local_asdatabas'
+    app.config['DB_NAME'] = 'asdatabase_scripts'
     app.register_blueprint(home_bp, url_prefix='/')
     app.register_blueprint(customer_bp, url_prefix='/customer')
     app.register_blueprint(staff_bp, url_prefix='/staff')
@@ -22,4 +24,13 @@ def create_app():
    
     app.secret_key = 'the first secret key for ava'
 
+
+    # Define context processor to inject 'today' into all templates
+    @app.context_processor
+    def inject_today_date():
+        if 'loggedin' in session:
+            today = datetime.now().strftime("%Y-%m-%d")
+            return {'today': today}
+        return {}
+    
     return app

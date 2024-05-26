@@ -87,6 +87,10 @@ CREATE TABLE IF NOT EXISTS rentals (
     FOREIGN KEY (equipment_id) REFERENCES equipment(equipment_id)
 );
 
+-- added a new column to verify customer's ID 
+ALTER TABLE rentals ADD COLUMN id_verified BOOLEAN DEFAULT FALSE;
+
+
 CREATE TABLE IF NOT EXISTS orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,

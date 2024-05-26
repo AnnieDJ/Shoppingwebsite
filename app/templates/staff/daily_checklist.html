@@ -1,0 +1,108 @@
+{% extends "sidebar_layout.html" %} 
+{% block title %}Today's Checklist{% endblock %} 
+{% block main_content %}
+<div class="container">
+<h2>Today's Rental Checklist</h2>
+  
+<div class="mb-4 ps-3 fs-4 text-end" style="font-size: 20px;">
+    <strong>Today is :</strong> {{ today }}
+</div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Rental ID</th>
+        <th>User Name</th>
+        <th>Equipment Name</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th>Status</th>
+        <th>ID Verified</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for booking in bookings %}
+    
+      <tr>
+        <td>{{ booking.rental_id }}</td>
+        <td>{{ booking.username }}</td>
+        <td>{{ booking.equipment_name }}</td>
+        <td>{{ booking.start_date }}</td>
+        <td>{{ booking.end_date }}</td>
+        <td id="status-{{ booking.rental_id }}">{{ booking.status }}</td>
+        <td>
+      <input type="checkbox" class="form-check-input" name="id_verified" data-rental-id="{{ booking.rental_id }}" onchange="toggleIDVerification({{ booking.rental_id }}, this.checked)">
+    </td>
+        <td id="action-buttons-{{ booking.rental_id }}">
+        <form action="{{ url_for('staff.update_rental_status') }}" method="POST">
+           <button type="button" class="btn btn-primary btn-sm d-block w-100 mb-2" onclick="updateStatus({{ booking.rental_id }}, 'Completed')">Checked Out</button>
+          <button type="button" class="btn btn-warning btn-sm d-block w-100 mb-2" onclick="updateStatus({{ booking.rental_id }}, 'Pending')">Back to Pending</button>
+          <button type="button" class="btn btn-danger btn-sm d-block w-100 mb-2" onclick="updateStatus({{ booking.rental_id }}, 'Canceled')">Job Cancelled</button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+function toggleStatus(rentalId, isChecked) {
+    var statusCell = document.getElementById('status-' + rentalId);
+    var buttons = document.getElementById('action-buttons-' + rentalId);
+    if (isChecked) {
+        updateStatus(rentalId, 'Completed'); // Automatically mark as completed when checked
+    } else {
+        buttons.style.display = 'block'; // Show buttons if unchecked
+    }
+}
+
+function updateStatus(rentalId, newStatus) {
+    var form = new FormData();
+    form.append('rental_id', rentalId);
+    form.append('new_status', newStatus);
+
+    fetch('{{ url_for('staff.update_rental_status') }}', {
+        method: 'POST',
+        body: form
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('status-' + rentalId).textContent = newStatus;
+            document.getElementById('action-buttons-' + rentalId).style.display = (newStatus === 'Completed' ? 'none' : 'block');
+            alert('Status updated to ' + newStatus);
+        } else {
+            throw new Error(data.error || 'Unknown error occurred');
+        }
+    })
+    .catch(error => {
+        console.error('Error updating status:', error);
+        alert('Failed to update status: ' + error.message);
+    });
+}
+
+function toggleIDVerification(rentalId, isChecked) {
+    fetch('{{ url_for('staff.verify_id') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'rental_id=' + rentalId + '&id_verified=' + isChecked
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to verify ID');
+        }
+        alert('ID verification status updated.');
+    })
+    .catch(error => {
+        console.error('Error verifying ID:', error);
+        alert('Failed to verify ID: ' + error.message);
+    });
+}
+</script>
+
+
+{% endblock %}
