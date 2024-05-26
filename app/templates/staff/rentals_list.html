@@ -6,8 +6,12 @@
   <h1 class="h2">Rental List</h1>
 </div>
 
+<div class="mb-4 ps-3 fs-4 text-end" style="font-size: 20px;">
+    <strong>Today is </strong> {{ today }}
+</div>
+
 <div class="table-responsive">
-  <table class="table table-striped">
+  <table class="table table-striped" id="rentalTable">
     <thead>
       <tr>
         <th>
@@ -34,16 +38,16 @@
             placeholder="Filter"
           />
         </th>
-        <th>
-          Start Date<input
+        <th onclick="sortTable(3)">
+          Start Date &#x25B2;&#x25BC;<input
             type="date"
             id="filterStartDate"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th>
-          End Date<input
+        <th onclick="sortTable(4)">
+          End Date &#x25B2;&#x25BC;<input
             type="date"
             id="filterEndDate"
             class="form-control form-control-sm"
@@ -104,6 +108,51 @@
       }
     }
   });
+
+  function sortTable(column) {
+    var table,
+      rows,
+      switching,
+      i,
+      x,
+      y,
+      shouldSwitch,
+      dir,
+      switchcount = 0;
+    table = document.getElementById("rentalTable");
+    switching = true;
+    dir = "asc"; // Initial direction is ascending
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+      for (i = 1; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("TD")[column];
+        y = rows[i + 1].getElementsByTagName("TD")[column];
+        if (dir == "asc") {
+          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+            shouldSwitch = true;
+            break;
+          }
+        } else if (dir == "desc") {
+          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+            shouldSwitch = true;
+            break;
+          }
+        }
+      }
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        switchcount++;
+      } else {
+        if (switchcount == 0 && dir == "asc") {
+          dir = "desc";
+          switching = true;
+        }
+      }
+    }
+  }
 </script>
 
 {% endblock %}
