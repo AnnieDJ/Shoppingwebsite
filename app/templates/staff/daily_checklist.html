@@ -13,9 +13,9 @@ endblock %} {% block main_content %}
         <th>Equipment Name</th>
         <th>Start Date</th>
         <th>End Date</th>
-        <th>Checkout Status</th>
         <th>ID Verified</th>
-        <th>Action</th>
+        <th>Status</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -27,28 +27,29 @@ endblock %} {% block main_content %}
         <td>{{ booking.equipment_name }}</td>
         <td>{{ booking.start_date }}</td>
         <td>{{ booking.end_date }}</td>
-        <td id="status-{{ booking.rental_id }}">{{ booking.status }}</td>
+        
         <td>
           <button
             type="button"
             class="btn btn-success"
             id="btn-check-{{ booking.rental_id }}"
-            onclick="toggleIDVerification({{ booking.rental_id }}, true)"
+            onclick= "toggleIDVerification({{ booking.rental_id }}, true)"
             {% if booking.id_verified %} style="display: none;" {% endif %}
           >
-            <i class="fa fa-check" aria-hidden="true"></i>
+            <i class="fa fa-square" aria-hidden="true"></i>
           </button>
-          <!-- X Button -->
+
           <button
             type="button"
-            class="btn btn-danger"
+            class="btn btn-success"
             id="btn-uncheck-{{ booking.rental_id }}"
             onclick="toggleIDVerification({{ booking.rental_id }}, false)"
             {% if not booking.id_verified %} style="display: none;" {% endif %}
           >
-            <i class="fa fa-times" aria-hidden="true"></i>
+            <i class="fa fa-check" aria-hidden="true"></i>
           </button>
         </td>
+<td id="status-{{ booking.rental_id }}">{{ booking.checkout_status }}</td>
 
         <td id="action-buttons-{{ booking.rental_id }}">
           <button
@@ -106,8 +107,7 @@ endblock %} {% block main_content %}
           alert('Failed to update status: ' + error.message);
       });
   }
-
-  function toggleIDVerification(rentalId, isChecked) {
+function toggleIDVerification(rentalId, isChecked) {
       fetch('{{ url_for('staff.verify_id') }}', {
           method: 'POST',
           headers: {
@@ -120,7 +120,7 @@ endblock %} {% block main_content %}
           if (data.success) {
               // Alert message for success
               alert('ID verification status updated successfully.');
-              
+
               // Update button visibility based on the verification status
               var checkButton = document.getElementById('btn-check-' + rentalId);
               var uncheckButton = document.getElementById('btn-uncheck-' + rentalId);
