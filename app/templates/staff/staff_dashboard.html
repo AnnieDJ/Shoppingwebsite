@@ -1,9 +1,13 @@
 {% extends "sidebar_layout.html" %} {% block title %}Staff Dashboard{% endblock
 %} {% block main_content %}
+{% if session.get('loggedin') %}
+      <div class="custom-welcome">
+        Welcome back, {{ session.get('username') }}!
+      </div>
+      {% endif %}
+<h3>Staff Dashboard</h3>
 
-<h2>Staff Dashboard</h2>
-
-<div class="mb-4 ps-3 fs-4 text-end" style="font-size: 20px;">
+<div class="mb-4 ps-3 fs-4 text-end" style="font-size: 10px;">
     <strong>Today is </strong> {{ today }}
 </div>
 
@@ -56,7 +60,7 @@
       <div class="row"> 
       <!-- Inventory -->
       <div class="col-md-4">
-        <a href="{{ url_for('staff.view_inventory') }}" class="text-decoration-none">
+        <a href="{{ url_for('staff.inventory_management') }}" class="text-decoration-none">
           <div class="card widget-card border-light shadow-sm">
             <div
               class="card-header bg-transparent p-4 border-light-subtle text-center"
@@ -82,20 +86,6 @@
         </a>
       </div>
 
-      <!-- Promotions -->
-      <div class="col-md-4">
-        <a href="{{ url_for('staff.view_promotions') }}" class="text-decoration-none">
-          <div class="card widget-card border-light shadow-sm">
-            <div
-              class="card-header bg-transparent p-4 border-light-subtle text-center"
-            >
-              <i class="fas fa fa-bullhorn fa-2x"></i>
-              <h5 class="card-title widget-card-title m-0">Promotions</h5>
-            </div>
-          </div>
-        </a>
-      </div>
-      
     </div>
   </div>
 </section>

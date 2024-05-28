@@ -1,11 +1,11 @@
 from flask import current_app as app
 from mysql.connector import Error as MySQLError
-from flask import Blueprint,render_template, request, redirect, url_for, session, flash,jsonify,Flask
+from flask import Blueprint,render_template, request, redirect, url_for, session, flash, jsonify
 from app import utils
 import re
 from datetime import datetime, date
 from .utils import db_cursor
-from flask_hashing  import Hashing
+from flask_hashing import Hashing
 from . import hashing
 from .utils import db_cursor, login_required
 
@@ -17,78 +17,11 @@ staff_bp = Blueprint('staff', __name__, template_folder='templates/staff')
 @login_required
 def dashboard():
     if 'loggedin' in session and session['role'] in ['staff', 'local_manager']:
-        conn, cursor = db_cursor()
-        try:
-                   
-            ## view rental list ## 
-            cursor.execute("""
-                SELECT r.*, u.username, e.name as equipment_name
-                FROM rentals r
-                JOIN user u ON r.user_id = u.user_id
-                JOIN equipment e ON r.equipment_id = e.equipment_id
-                ORDER BY r.rental_id DESC
-                LIMIT 5 
-            """)
-            rentals = cursor.fetchall()
-            
-            ## view order list ##
-            cursor.execute("""
-                SELECT order_id, user_id, store_id, total_cost, tax, discount, final_price, status, creation_date
-                FROM orders
-                ORDER BY creation_date DESC
-                LIMIT 5  
-            """)
-            orders = cursor.fetchall()
-            
-            ## view equipment / inventory ##
-            cursor.execute("""
-                SELECT equipment_id, name, category, purchase_date, cost, 
-                serial_number, status, store_id, maximum_date, minimum_date 
-                FROM equipment
-            """)
-            inventory = cursor.fetchall()
-            
-            ## view payment list ##
-            cursor.execute("""
-                SELECT payment_id, order_id, user_id, payment_type, amount, payment_status, payment_date
-                FROM payments
-                ORDER BY payment_date DESC
-                LIMIT 5  
-            """)
-            payments = cursor.fetchall()
-            
-            ## view news list ##
-            cursor.execute("""
-                SELECT news_id, title, content, publish_date, creator_id, store_id
-                FROM news
-                ORDER BY publish_date DESC
-                LIMIT 5  
-            """)
-            promotions = cursor.fetchall()
-            
-            # Additional data for local managers
-            reports = []
-            if session['role'] == 'local_manager':
-                cursor.execute("""
-                    SELECT report_id, report_type, details, created_at
-                    FROM reports
-                    ORDER BY created_at DESC
-                    LIMIT 5
-                """)
-                reports = cursor.fetchall()
-            
-        except Exception as e:
-            print("An error occurred:", e)
-            flash("A database error occurred. Please try again.")
-            return redirect(url_for('home.login'))
-        finally:
-            cursor.close()
-            conn.close()  
-            
+
         if session['role'] == 'local_manager':
-            return render_template('local_manager_dashboard.html', rentals=rentals, orders=orders, payments=payments, inventory=inventory, promotions=promotions, reports=reports)
+            return render_template('local_manager_dashboard.html')
         else:
-            return render_template('staff_dashboard.html', rentals=rentals, orders=orders, payments=payments, inventory=inventory, promotions=promotions)
+            return render_template('staff_dashboard.html')
     else:
         return redirect(url_for('home.login'))
 
@@ -271,32 +204,93 @@ def view_promotions(): #news
         return redirect(url_for('staff.dashboard'))
 
 
-
-## Inventory ##
-@staff_bp.route('/equipment')
-def view_inventory():
+# Inventory management
+@staff_bp.route('/inventory_management')
+def inventory_management():
     if 'loggedin' in session and session['role'] == 'staff':
-        conn, cursor = db_cursor()  
-        try:
-            cursor.execute("""
-                SELECT equipment_id, name, category, purchase_date, cost, 
-                serial_number, status, store_id, maximum_date, minimum_date 
-                FROM equipment
-            """)
-            equipment = cursor.fetchall()
-            
-        except Exception as e:
-            print("An error occurred:", e)
-            flash("A database error occurred. Please try again.")
-            return redirect(url_for('staff.dashboard'))
-        finally:
-            cursor.close()
-            conn.close()  
-            
-        return render_template('equipment.html', equipment=equipment)
-    else:
-        return redirect(url_for('staff.dashboard'))
+        conn, cursor = db_cursor()
+        category = []
+        cursor.execute(f'SELECT store_id FROM staff WHERE user_id = {session["userid"]}')
+        store_id = cursor.fetchone()['store_id']
+        if store_id:
+            cursor.execute(f"""
+                    SELECT category,
+                        SUM(CASE WHEN status = 'Available' THEN 1 ELSE 0 END) AS AvailableCount,
+                        SUM(CASE WHEN status = 'Rented' THEN 1 ELSE 0 END) AS RentedCount,
+                        SUM(CASE WHEN status = 'Under Repair' THEN 1 ELSE 0 END) AS UnderRepairCount,
+                        SUM(CASE WHEN status = 'Retired' THEN 1 ELSE 0 END) AS RetiredCount
+                    FROM
+                        equipment
+                    WHERE store_id = {store_id}
+                    GROUP BY
+                        category;
+                    """)
+            category = cursor.fetchall()
+        cursor.close()
+        return render_template('staff_inventory_management.html', category=category)
+    return redirect(url_for('staff.dashboard'))
 
+
+# View machinery's details
+@staff_bp.route('/equipment/detail')
+def equipment_detail():
+    if 'loggedin' in session and session['role'] == 'staff':
+        category = request.args.get('category')
+        conn, cursor = db_cursor()
+        cursor.execute(f"SELECT * FROM equipment WHERE category = '{category}'")
+        equipment = cursor.fetchall()
+        cursor.close()
+        return render_template('staff_equipment_detail.html', equipment=equipment)
+    return redirect(url_for('home.login'))
+
+# Update a machinery's details
+@staff_bp.route('/equipment/update', methods=['POST'])
+def equipment_update():
+    if 'loggedin' in session and session['role'] == 'staff':
+        serial_number = request.form['serial_number']
+        Image = request.form['Image']
+        purchase_date = request.form['purchase_date']
+        cost = request.form['cost']
+        category = request.form['category']
+        status = request.form['status']
+        conn, cursor = db_cursor()
+        cursor.execute(f"UPDATE equipment SET Image = '{Image}', purchase_date = '{purchase_date}', cost = '{cost}', category = '{category}', status = '{status}' WHERE serial_number = '{serial_number}'")
+        conn.commit()
+        cursor.close()
+        return jsonify({
+            "code": 200,
+            "message": "Success",
+            "data": True
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
+
+
+# Add a new machinery
+@staff_bp.route('/equipment/add', methods=['POST'])
+def equipment_add():
+    if 'loggedin' in session and session['role'] == 'staff':
+        serial_number = request.form['serial_number']
+        Image = request.form['Image']
+        purchase_date = request.form['purchase_date']
+        cost = request.form['cost']
+        category = request.form['category']
+        status = request.form['status']
+        conn, cursor = db_cursor()
+        cursor.execute(f"INSERT INTO equipment (serial_number, Image, purchase_date, cost, category, status) VALUES ('{serial_number}', '{Image}', '{purchase_date}', '{cost}', '{category}', '{status}')")
+        conn.commit()
+        cursor.close()
+        return jsonify({
+            "code": 200,
+            "message": "Success",
+            "data": True
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
 
 
 ## Today's checklist ##
