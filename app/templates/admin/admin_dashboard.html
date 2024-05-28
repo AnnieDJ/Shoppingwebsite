@@ -1,12 +1,18 @@
 {% extends "sidebar_layout.html" %} {% block title %}Admin Dashboard{% endblock
-%} {% block content %}
+%} {% block main_content %}
+
+<div
+  class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+>
+  <h1 class="h2">Admin Dashboard</h1>
+</div>
 
 <!-- Breadcrumb -->
 <section class="py-3 py-md-4 py-xl-5 bg-light">
   <div class="container">
     <div class="row">
       <div class="col-12">
-        <h1 class="h4">Admin Dashboard</h1>
+        <h1 class="h4"></h1>
       </div>
     </div>
   </div>
@@ -21,7 +27,9 @@
             <div
               class="card-header bg-transparent p-4 border-light-subtle text-center"
             >
-              <h5 class="card-title widget-card-title m-0">Select Store</h5>
+              <h5 class="card-title widget-card-title m-0">
+                <i class="fa fa-building"></i> Select Store
+              </h5>
             </div>
           </div>
         </a>
@@ -38,6 +46,7 @@
               class="card-header bg-transparent p-4 border-light-subtle text-center"
             >
               <h5 class="card-title widget-card-title m-0">
+                <i class="fa fa-user"></i>
                 Profile Management
               </h5>
             </div>
@@ -52,7 +61,9 @@
             <div
               class="card-header bg-transparent p-4 border-light-subtle text-center"
             >
-              <h5 class="card-title widget-card-title m-0">Staff Management</h5>
+              <h5 class="card-title widget-card-title m-0">
+                <i class="fa fa-users"></i> Staff Management
+              </h5>
             </div>
           </div>
         </a>
@@ -69,7 +80,8 @@
               class="card-header bg-transparent p-4 border-light-subtle text-center"
             >
               <h5 class="card-title widget-card-title m-0">
-                Local Manager Dashboard
+                <i class="fa fa-tachometer-alt" aria-hidden="true"></i>
+                Manager Dashboard
               </h5>
             </div>
           </div>
