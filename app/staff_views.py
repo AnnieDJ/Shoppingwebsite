@@ -241,7 +241,7 @@ def equipment_detail():
         equipment = cursor.fetchall()
         cursor.close()
         return render_template('staff_equipment_detail.html', equipment=equipment)
-    return redirect(url_for('home.login'))
+    return redirect(url_for('staff.dashboard'))
 
 # Update a machinery's details
 @staff_bp.route('/equipment/update', methods=['POST'])
