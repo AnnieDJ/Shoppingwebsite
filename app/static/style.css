@@ -1,11 +1,21 @@
+body, .container, .sidebar, html {
+    padding: 0;
+    margin: 0;
+}
+
+.nav, .main-content {
+    margin: 0;
+}
+
+.container-fluid {
+    display: grid;
+    grid-template-columns: 10px 1fr; /* 250px for sidebar and remaining space for content */
+}
+
 .nav a {
   text-decoration: none;
   padding: 10px 15px;
   font-weight: bold;
-}
-
-.nav a:hover {
-  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .services-icon {
@@ -19,8 +29,9 @@
     #f3f577
   ); /* Adjust the colors based on the exact green shades */
   color: rgb(19, 16, 16);
-  padding: 10px 20px;
   text-align: center;
+  top: 0;
+  width: 100%;
 }
 
 .custom-btn {
@@ -28,52 +39,40 @@
   border-color: #4a8b32;
 }
 
-.sidebar {
-  background: linear-gradient(to bottom, #4a8b32, #a9f77b);
-  height: 100vh; /* Full viewport height */
-  padding-top: 20px;
-  margin-top: 0; /* Ensure it starts from the top */
-  border-radius: 0; /* Remove any rounding for seamless integration */
-}
-
 .main-content {
-  margin-left: 250px; /* Match the sidebar width */
+  margin-left: 250px;
 }
 
 .sidebar {
-  color: #000000 !important; /* Set sidebar text color to black */
-  padding: 10px 15px;
-  margin: 5px 0;
-  border-radius: 5px;
-  background: none; /* Remove individual background */
-  transition: background-color 0.3s, color 0.3s;
+  top: 70px;
+  height: 100vh;
+  width: 250px;
+  color: #000000;
+  background: linear-gradient(
+    to bottom,
+    #629a3c,
+    #f3f577
+  );
 }
 
-.sidebar .nav-link:hover {
-  background-color: #f3f577;
-  color: #4a8b32 !important;
-}
-
-.custom-welcome {
-  font-size: 24px !important; /* Make text bigger */
-  font-weight: bold !important; /* Make text bold */
-  margin-top: 20px; /* Add margin for positioning */
+.sidebar-item {
+  border-bottom: 1px solid #6a6a6a;
 }
 
 .navbar-brand {
   color: #ffffff !important; /* Set brand text color to white */
   font-weight: bold !important;
-  font-size: px !important;
+  font-size: 24px !important;
 }
 
-.navbar-nav .nav-link {
-  color: #0f0101 !important;
-  padding: 8px 16px !important;
-}
-
-.navbar-nav .nav-link:hover {
-  color: #4a8b32 !important;
-  background-color: #f3f577 !important;
+.nav-link, .fa {
+  display: flex;
+  align-items: center;
+  text-align: left;
+  font-weight: bold;
+  color: #0f0101;
+  padding: 12px 8px;
+  margin-left: 5px;
 }
 
 .custom-btn {
@@ -141,69 +140,22 @@ body {
 .container,
 .row {
   padding-right: 0;
-  padding-left: 0;
   margin-right: auto;
-  margin-left: auto;
+
 }
 
 /* Adjust the navigation bar to align with the content below */
-.navbar {
-  margin-bottom: 5px; /* Adds some space below the navbar */
-}
 
-.nav {
-  background: linear-gradient(
-    to right,
-    #4a8b32,
-    #f3f577
-  ) !important; /* Adjust the colors based on the exact green shades */
-  color: rgb(19, 16, 16) !important;
-  padding: 10px 20px !important;
-  text-align: center !important;
-}
-
-.custom-btn {
-  background-color: #4a8b32 !important;
-  border-color: #4a8b32 !important;
-}
-
-.services-icon {
-  font-size: 40px !important; /* Adjust the size as needed */
-}
-
-.navbar-brand {
-  color: #ffffff !important; /* Set brand text color */
-  font-weight: bold !important;
-  font-size: 24px !important;
-}
 
 .navbar-nav .nav-link {
   color: #0f0101 !important;
-  padding: 8px 16px !important;
-}
-
-.navbar-nav .nav-link:hover {
-  color: #4a8b32 !important;
-  background-color: #f3f577 !important;
-}
-
-.custom-btn {
-  background-color: #4a8b32 !important;
-  border-color: #4a8b32 !important;
-}
-
-.services-icon {
-  font-size: 40px !important; /* Adjust the size as needed */
-}
-
-.sidebar .nav-link {
-  color: #000000 !important; /* Set sidebar text color to black */
+  padding: 5px 10px !important;
 }
 
 .custom-welcome {
-  font-size: 40px !important; /* Make text bigger */
+  font-size: 25px !important; /* Make text bigger */
   font-weight: bold !important; /* Make text bold */
-  margin-top: 30px; /* Add margin for positioning */
+  margin-top: 20px; /* Add margin for positioning */
   text-align: left;
 }
 
@@ -211,7 +163,6 @@ body {
   margin-bottom: 40px; /* Adjust as needed */
 }
 
-.profile-container,
-.dashboard-container {
+.profile-container {
   margin-left: 250px; /* Adjust based on your sidebar width */
 }
