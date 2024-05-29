@@ -109,7 +109,7 @@ block content %} {% if session.get('loggedin') %}
                     <div class="card-body">
                       <h5 class="card-title">${product.name}</h5>
                       <p class="card-text">${product.description}</p>
-                      <p class="card-text">${product.price}</p>
+                      <p class="card-text">$${product.cost}</p>
                       <button class="btn btn-primary add-to-cart" data-product='${JSON.stringify(
                         product
                       )}'>Add to Cart</button>
@@ -129,7 +129,7 @@ block content %} {% if session.get('loggedin') %}
                 <img src="/static/${product.Image}" class="img-fluid mb-3" alt="${product.name}">
                 <h5>${product.name}</h5>
                 <p>${product.description}</p>
-                <p>${product.price}</p>
+                <p>$${product.cost}</p>
               `);
       $("#productModal").modal("show");
     });
