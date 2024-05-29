@@ -1,5 +1,5 @@
 # home_views.py
-from flask import Blueprint, render_template, request, redirect, url_for, session, flash, json
+from flask import Blueprint, render_template, request, redirect, url_for, session, flash, json,jsonify
 import re
 from datetime import datetime
 from .utils import db_cursor
@@ -130,3 +130,15 @@ def get_store():
     stores = stores.fetchall()
     stores = json.dumps(stores)
     return render_template("chose.html", stores=stores)
+
+@home_bp.route("/user")
+def get_user():
+    conn, cursor = db_cursor()
+    user_id = session['userid']
+    cursor.execute(f"SELECT * FROM user WHERE user_id = {user_id}")
+    user = cursor.fetchone()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": user
+    })

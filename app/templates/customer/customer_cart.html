@@ -1,0 +1,150 @@
+{% extends "base.html" %} {% block title %}Customer Dashboard{% endblock %} {%
+block content %}
+<div class="container" style="width: 80%; margin-top: 20px">
+  <div id="content" class="card" style="padding: 30px"></div>
+</div>
+
+<script>
+  function amount() {
+    const totals = document.getElementsByClassName("total");
+    console.log(totals);
+  }
+
+  function start(dom) {
+    dom.nextElementSibling.nextElementSibling.textContent =
+      (new Date(dom.nextElementSibling.value).getTime() -
+        new Date(dom.value).getTime()) /
+      (24 * 60 * 60 * 1000);
+    dom.nextElementSibling.min = new Date(
+      new Date(dom.value).getTime() + 24 * 60 * 60 * 1000
+    )
+      .toISOString()
+      .split("T")[0];
+    dom.nextElementSibling.max = new Date(
+      new Date(dom.value).getTime() + 14 * 24 * 60 * 60 * 1000
+    )
+      .toISOString()
+      .split("T")[0];
+  }
+
+  function end(dom) {
+    dom.nextElementSibling.textContent =
+      (new Date(dom.value).getTime() -
+        new Date(dom.previousElementSibling.value).getTime()) /
+      (24 * 60 * 60 * 1000);
+  }
+
+  (async function () {
+    const formData = new FormData();
+    formData.append("ids", JSON.parse(localStorage.getItem("cart")));
+    const res = await fetch("/customer/equipment", {
+      method: "POST",
+      body: formData,
+    }).then((res) => res.json());
+
+    const response = await fetch("/user").then((res) => res.json());
+    console.log(response.data);
+
+    const content = document.getElementById("content");
+
+    res.data.forEach((entry) => {
+      content.innerHTML += `
+                    <div class="card" style="height: 75px; margin-top: 15px; display: flex; flex-direction: row; align-items: center; justify-content: space-between">
+                        <div style="display: flex; align-items: center;">
+                            <div style="padding: 5px 10px; font-weight: bold;">${
+                              entry.equipment_id
+                            }</div>
+                            <div style="padding: 5px 10px; font-weight: bold;">${
+                              entry.name
+                            }</div>
+                            <div style="padding: 5px 10px;">
+                                <img alt="" style="width: 50px; height: 50px; border-radius: 8px" src="/static/${
+                                  entry.Image
+                                }">
+                            </div>
+                            <div style="padding: 5px 10px; font-weight: bold;">${
+                              entry.cost
+                            }</div>
+                        </div>
+    
+                        <div style="padding: 5px 10px;">
+                            <input value="${
+                              new Date().toISOString().split("T")[0]
+                            }" oninput="start(this)" id="startDate${
+        entry.equipment_id
+      }" min="${
+        new Date().toISOString().split("T")[0]
+      }" type="date" placeholder="Start Date">
+                            <input value="${
+                              new Date(
+                                new Date().getTime() + 24 * 60 * 60 * 1000
+                              )
+                                .toISOString()
+                                .split("T")[0]
+                            }" id="endDate${entry.equipment_id}" min="${
+        new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split("T")[0]
+      }" max="${
+        new Date(new Date().getTime() + 14 * 24 * 60 * 60 * 1000)
+          .toISOString()
+          .split("T")[0]
+      }" oninput="end(this)" type="date" placeholder="End Date">
+                            <strong data-price="${
+                              entry.price
+                            }" class="total" style="padding: 5px 10px;">1</strong>
+                        </div>
+                    </div>
+                `;
+    });
+
+    content.innerHTML += `<div class="card" style="margin-top: 15px; padding: 20px; display: flex; justify-content: space-between; flex-direction: row; align-items: center;">
+                <div>
+                    <div style="font-weight: bold">name: ${
+                      response.data.username
+                    }</div>
+                    <div style="font-weight: bold">email: ${
+                      response.data.email
+                    }</div>
+                    <div style="font-weight: bold">birthday: ${new Date(
+                      response.data.date_of_birth
+                    ).toLocaleDateString()}</div>
+                </div>
+    
+                <div>
+                    <div>amount: ${5}</div>
+                    <div>total: ${5}</div>
+                </div>
+            `;
+
+    content.innerHTML += `<button type="button" style="margin-top: 20px;" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Checkout</button>
+                <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Checkout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      <form>
+                        <div class="mb-3">
+                          <label for="CardID" class="col-form-label">CardID:</label>
+                          <input type="text" class="form-control" id="CardID">
+                        </div>
+                        <div class="mb-3">
+                          <label for="CVC" class="col-form-label">CVC:</label>
+                          <input class="form-control" id="CVC">
+                        </div>
+                      </form>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Confirm</button>
+                    </div>
+                    </div>
+                    </div>
+                 </div>
+            `;
+  })();
+</script>
+{% endblock %}

@@ -1,10 +1,20 @@
 {% extends "base.html" %} {% block title %}Customer Dashboard{% endblock %} {%
-block content %}
-{% if session.get('loggedin') %}
-      <div class="custom-welcome">
-        Welcome back, {{ session.get('username') }}! Please select a store to start browsing available machinery
-      </div>
-      {% endif %}
+block content %} {% if session.get('loggedin') %}
+<style>
+  .custom-welcome p {
+    margin-bottom: 5px;
+    font-size: 18px;
+    color: #144603;
+    font-weight: normal;
+    font-family: "Arial", sans-serif;
+  }
+</style>
+<div class="custom-welcome">
+  <p>Welcome back, farmer007!</p>
+  <p>Please select a store to start browsing available machinery</p>
+</div>
+
+{% endif %}
 <div class="container mt-4">
   <div class="row mb-4">
     <div class="col-md-6">
@@ -20,9 +30,14 @@ block content %}
         </button>
         <ul class="dropdown-menu" aria-labelledby="storeDropdown">
           {% for store in stores %}
-              <li>
-                <a class="dropdown-item" href="#" data-store="{{ store.store_name }}">{{ store.store_name }}</a>
-              </li>
+          <li>
+            <a
+              class="dropdown-item"
+              href="#"
+              data-store="{{ store.store_name }}"
+              >{{ store.store_name }}</a
+            >
+          </li>
           {% endfor %}
         </ul>
       </div>
@@ -81,42 +96,60 @@ block content %}
 <script>
   async function loadProducts(store) {
     var productHtml = "";
-    const res = await fetch(`/customer/store/${store}`).then(res => res.json())
+    const res = await fetch(`/customer/store/${store}`).then((res) =>
+      res.json()
+    );
     res.data.forEach(function (product) {
       productHtml += `
-          <div class="col-md-4 mb-4">
-            <div class="card">
-              <img src="/static/${product.Image}" class="card-img-top" alt="${product.name}">
-              <div class="card-body">
-                <h5 class="card-title">${product.name}/${product.category}</h5>
-                <p class="card-text">$${product.cost}/day</p>
-                <button class="btn btn-primary add-to-cart" data-product='${JSON.stringify(
-                  product
-                )}'>Add to Cart</button>
-                <button class="btn btn-info view-details" data-product='${JSON.stringify(
-                  product
-                )}'>View Details</button>
-              </div>
-            </div>
-          </div>
-        `;
+                <div class="col-md-4 mb-4">
+                  <div class="card">
+                    <img src="/static/${
+                      product.Image
+                    }" class="card-img-top" alt="${product.name}">
+                    <div class="card-body">
+                      <h5 class="card-title">${product.name}</h5>
+                      <p class="card-text">${product.description}</p>
+                      <p class="card-text">${product.price}</p>
+                      <button class="btn btn-primary add-to-cart" data-product='${JSON.stringify(
+                        product
+                      )}'>Add to Cart</button>
+                      <button class="btn btn-info view-details" data-product='${JSON.stringify(
+                        product
+                      )}'>View Details</button>
+                    </div>
+                  </div>
+                </div>
+              `;
     });
     $("#productList").html(productHtml);
 
     $(".view-details").on("click", function () {
       var product = $(this).data("product");
       $(".modal-body").html(`
-          <img src="/static/${product.Image}" class="img-fluid mb-3" alt="${product.name}">
-          <h5>${product.name}/${product.category}</h5>
-          <p>${product.description}</p>
-          <p>$${product.cost}/day</p>
-        `);
+                <img src="/static/${product.Image}" class="img-fluid mb-3" alt="${product.name}">
+                <h5>${product.name}</h5>
+                <p>${product.description}</p>
+                <p>${product.price}</p>
+              `);
       $("#productModal").modal("show");
     });
 
     $(".add-to-cart").on("click", function () {
       var product = $(this).data("product");
-      alert(`${product.name} added to cart!`);
+      if (localStorage.getItem("cart")) {
+        const cart = JSON.parse(localStorage.getItem("cart"));
+        if (cart.includes(product.equipment_id)) {
+          alert("Product already in cart!");
+          return;
+        }
+
+        cart.push(product.equipment_id);
+        localStorage.setItem("cart", JSON.stringify(cart));
+      } else {
+        localStorage.setItem("cart", JSON.stringify([product.equipment_id]));
+      }
+
+      alert("Product added to cart!");
     });
   }
 

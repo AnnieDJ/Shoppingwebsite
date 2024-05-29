@@ -113,3 +113,28 @@ def store(name):
         'message': 'Not Authorized'
     })
 
+@customer_bp.route('/cart')
+def cart():
+    if 'loggedin' in session and session['role'] == 'customer':
+        return render_template('customer_cart.html')
+    return redirect(url_for('home.login'))
+
+
+@customer_bp.route('/equipment', methods=['POST'])
+def equipment():
+    if 'loggedin' in session and session['role'] == 'customer':
+        session.get('')
+        ids = request.form.get('ids')
+        conn, cursor = db_cursor()
+        cursor.execute(f"SELECT * FROM equipment WHERE equipment_id in ({ids})")
+        equipments = cursor.fetchall()
+        cursor.close()
+        return jsonify({
+            'code': 200,
+            'message': 'Success',
+            'data': equipments
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
