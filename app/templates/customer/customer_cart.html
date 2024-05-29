@@ -31,7 +31,8 @@ block content %}
     dom.nextElementSibling.textContent =
       (new Date(dom.value).getTime() -
         new Date(dom.previousElementSibling.value).getTime()) /
-      (24 * 60 * 60 * 1000);
+        (24 * 60 * 60 * 1000) +
+      " days";
   }
 
   (async function () {
@@ -51,10 +52,10 @@ block content %}
       content.innerHTML += `
                     <div class="card" style="height: 75px; margin-top: 15px; display: flex; flex-direction: row; align-items: center; justify-content: space-between">
                         <div style="display: flex; align-items: center;">
-                            <div style="padding: 5px 10px; font-weight: bold;">${
+                            <div style="padding: 5px 10px; font-weight: bold;">Equipment ID:${
                               entry.equipment_id
                             }</div>
-                            <div style="padding: 5px 10px; font-weight: bold;">${
+                            <div style="padding: 5px 10px; font-weight: bold;">Equipment Model:${
                               entry.name
                             }</div>
                             <div style="padding: 5px 10px;">
@@ -62,7 +63,7 @@ block content %}
                                   entry.Image
                                 }">
                             </div>
-                            <div style="padding: 5px 10px; font-weight: bold;">${
+                            <div style="padding: 5px 10px; font-weight: bold;">$${
                               entry.cost
                             }</div>
                         </div>
@@ -112,8 +113,9 @@ block content %}
                 </div>
     
                 <div>
-                    <div>amount: ${5}</div>
-                    <div>total: ${5}</div>
+                    <div>before tax: </div>
+                    <div>GST 15%</div>
+                    <div>total: </div>
                 </div>
             `;
 

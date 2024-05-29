@@ -1,15 +1,19 @@
-body, .container, .sidebar, html {
-    padding: 0;
-    margin: 0;
+body,
+.container,
+.sidebar,
+html {
+  padding: 0;
+  margin: 0;
 }
 
-.nav, .main-content {
-    margin: 0;
+.nav,
+.main-content {
+  margin: 0;
 }
 
 .container-fluid {
-    display: grid;
-    grid-template-columns: 10px 1fr; /* 250px for sidebar and remaining space for content */
+  display: grid;
+  grid-template-columns: 10px 1fr; /* 250px for sidebar and remaining space for content */
 }
 
 .nav a {
@@ -48,11 +52,7 @@ body, .container, .sidebar, html {
   height: 100vh;
   width: 250px;
   color: #000000;
-  background: linear-gradient(
-    to bottom,
-    #629a3c,
-    #f3f577
-  );
+  background: linear-gradient(to bottom, #629a3c, #f3f577);
 }
 
 .sidebar-item {
@@ -65,7 +65,8 @@ body, .container, .sidebar, html {
   font-size: 24px !important;
 }
 
-.nav-link, .fa {
+.nav-link,
+.fa {
   display: flex;
   align-items: center;
   text-align: left;
@@ -141,11 +142,9 @@ body {
 .row {
   padding-right: 0;
   margin-right: auto;
-
 }
 
 /* Adjust the navigation bar to align with the content below */
-
 
 .navbar-nav .nav-link {
   color: #0f0101 !important;

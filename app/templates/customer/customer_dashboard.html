@@ -8,7 +8,66 @@ block content %} {% if session.get('loggedin') %}
     font-weight: normal;
     font-family: "Arial", sans-serif;
   }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 600px; /* Ensure height is not cutting off content */
+    margin: 15px auto; /* Increased margin and centered */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Added subtle shadow for better visibility */
+    border: 1px solid #ccc; /* Ensure visibility against all backgrounds */
+  }
+  .card-img-top {
+    width: 100%;
+    height: 200px; /* Increased height for better visibility */
+    object-fit: cover;
+  }
+  .card-body {
+    flex-grow: 1;
+    padding: 10px; /* Added padding for spacing inside card */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    font-family: "Arial", sans-serif;
+    font-weight: bold; /* Ensures the card title uses full width of its container */
+  }
+
+  .card-title .product-cost {
+    font-weight: bold;
+    flex-shrink: 0;
+  }
+  .card-text {
+    font-family: "Arial", sans-serif;
+    font-size: 16px;
+  }
+  .btn-primary.add-to-cart {
+    background-color: orangered; /* Green */
+    border-color: white;
+  }
+
+  .btn-primary.add-to-cart:hover {
+    background-color: #e29e5a;
+    border-color: #434844;
+  }
+
+  .btn-info.view-details {
+    background-color: rgb(24, 119, 61); /* Green */
+    border-color: white;
+    color: white;
+  }
+  .btn-info.view-details:hover {
+    background-color: #75c779; /* Darker green on hover */
+    border-color: #b4bbb5;
+  }
 </style>
+
 <div class="custom-welcome">
   <p>Welcome back, farmer007!</p>
   <p>Please select a store to start browsing available machinery</p>
@@ -107,9 +166,13 @@ block content %} {% if session.get('loggedin') %}
                       product.Image
                     }" class="card-img-top" alt="${product.name}">
                     <div class="card-body">
-                      <h5 class="card-title">${product.name}</h5>
+                      <h5 class="card-title"><span>${
+                        product.name
+                      }</span> <span class="product-cost">$${
+        product.cost
+      }</span></h5>
                       <p class="card-text">${product.description}</p>
-                      <p class="card-text">$${product.cost}</p>
+                      
                       <button class="btn btn-primary add-to-cart" data-product='${JSON.stringify(
                         product
                       )}'>Add to Cart</button>
@@ -127,9 +190,9 @@ block content %} {% if session.get('loggedin') %}
       var product = $(this).data("product");
       $(".modal-body").html(`
                 <img src="/static/${product.Image}" class="img-fluid mb-3" alt="${product.name}">
-                <h5>${product.name}</h5>
+                <h5 class="card-title"><span>${product.name}</span> <span class="product-cost">$${product.cost}</span></h5>
                 <p>${product.description}</p>
-                <p>$${product.cost}</p>
+                
               `);
       $("#productModal").modal("show");
     });
