@@ -17,14 +17,94 @@ staff_bp = Blueprint('staff', __name__, template_folder='templates/staff')
 @login_required
 def dashboard():
     if 'loggedin' in session and session['role'] in ['staff', 'local_manager']:
+        conn, cursor = db_cursor()
+        user_id = session['userid']  # Assuming 'userid' is stored in session upon login
+        
+        # Fetch the store_id and store name for the logged-in staff member
+        cursor.execute("""
+            SELECT s.store_id, st.store_name
+            FROM staff s
+            JOIN stores st ON s.store_id = st.store_id
+            WHERE s.user_id = %s
+        """, (user_id,))
+        store_info = cursor.fetchone()
+        store_name = store_info['store_name'] if store_info else 'Not Assigned'
+        store_id = store_info['store_id'] if store_info else None
+        
+        if store_id:
+        # Fetch top 5 daily checklist entries
+            cursor.execute("""
+                SELECT r.*, u.username, e.name as equipment_name
+                FROM rentals r
+                JOIN user u ON r.user_id = u.user_id
+                JOIN equipment e ON r.equipment_id = e.equipment_id
+                WHERE e.store_id = %s
+                ORDER BY r.start_date DESC
+                LIMIT 5
+            """, (store_id,))
+            top_bookings = cursor.fetchall()
+            
+            # Fetch top 5 returns
+            today = date.today().strftime('%Y-%m-%d')
+            cursor.execute("""
+                SELECT r.rental_id, u.username, e.name as equipment_name, r.end_date, r.status, c.first_name, c.family_name
+                FROM rentals r
+                JOIN user u ON r.user_id = u.user_id
+                JOIN equipment e ON r.equipment_id = e.equipment_id
+                JOIN customer c ON u.user_id = c.user_id
+                WHERE r.end_date = %s AND e.store_id = %s
+                ORDER BY r.end_date DESC
+                LIMIT 5
+            """, (today, store_id))
+            top_returns = cursor.fetchall()
 
-        if session['role'] == 'local_manager':
-            return render_template('local_manager_dashboard.html')
+            # Fetch top 5 rentals
+            cursor.execute("""
+                SELECT r.*, u.username, e.name as equipment_name
+                FROM rentals r
+                JOIN user u ON r.user_id = u.user_id
+                JOIN equipment e ON r.equipment_id = e.equipment_id
+                WHERE e.store_id = %s
+                ORDER BY r.start_date DESC
+                LIMIT 5
+            """, (store_id,))
+            top_rentals = cursor.fetchall()
+            
+            # Fetch top 5 orders
+            cursor.execute("""
+                SELECT o.order_id, o.user_id, o.total_cost, o.tax, o.discount, o.final_price, o.status, o.creation_date
+                FROM orders o
+                WHERE o.store_id = %s
+                ORDER BY o.creation_date DESC
+                LIMIT 5
+            """, (store_id,))
+            top_orders = cursor.fetchall()
+            
+        
+            # Fetch top 5 payments
+            cursor.execute("""
+                SELECT p.payment_id, p.order_id, p.user_id, p.payment_type, p.payment_status, p.amount, p.payment_date
+                    FROM payments p
+                    JOIN orders o ON p.order_id = o.order_id
+                    WHERE o.store_id = %s
+                    ORDER BY p.payment_date DESC
+                    LIMIT 5
+            """, (store_id,))
+            top_payments = cursor.fetchall()
+        
         else:
-            return render_template('staff_dashboard.html')
+            top_bookings, top_returns, top_rentals, top_orders, top_payments = [], [], [], [], []
+
+        cursor.close()
+        conn.close()
+        
+       # Choose the right template based on the role
+        template_name = 'local_manager_dashboard.html' if session['role'] == 'local_manager' else 'staff_dashboard.html'
+        return render_template(template_name, top_bookings=top_bookings, top_returns=top_returns, top_rentals=top_rentals, 
+                               top_orders=top_orders, top_payments=top_payments, store_name=store_name)
     else:
         return redirect(url_for('home.login'))
-
+    
 
 ## Staff Profile ## 
 @staff_bp.route('/staff_profile', methods=['GET', 'POST'])
@@ -100,21 +180,20 @@ def change_password():
     return redirect(url_for('staff.staff_profile'))
 
 
-
-## view Rentals ##
-@staff_bp.route('/rentals')
-def view_rentals():
+## View Customers ##
+@staff_bp.route('/customers')
+def view_customers():
     if 'loggedin' in session and session['role'] == 'staff':
         conn, cursor = db_cursor()
+        
         try:
             cursor.execute("""
-                SELECT r.*, u.username, e.name as equipment_name
-                FROM rentals r
-                JOIN user u ON r.user_id = u.user_id
-                JOIN equipment e ON r.equipment_id = e.equipment_id
+            SELECT c.customer_id, c.user_id, c.title, c.first_name, c.family_name, c.phone_number, c.address, u.username
+            FROM customer c
+            JOIN user u ON c.user_id = u.user_id
             """)
-            rentals = cursor.fetchall()
-            
+            customers = cursor.fetchall()
+        
         except Exception as e:
             print("An error occurred:", e)
             flash("A database error occurred. Please try again.")
@@ -123,7 +202,51 @@ def view_rentals():
             cursor.close()
             conn.close()
             
-        return render_template('rentals_list.html', rentals=rentals)
+        return render_template('staff_view_customers.html', customers=customers)
+    else:
+        return redirect(url_for('staff.dashboard'))
+
+
+## view Rentals ##
+@staff_bp.route('/rentals')
+def view_rentals():
+    if 'loggedin' in session and session['role'] == 'staff':
+        conn, cursor = db_cursor()
+        user_id = session['userid']
+        
+        try:
+            
+            # Fetch the store_id and store name for the logged-in staff member
+            cursor.execute("""
+                SELECT s.store_id, st.store_name
+                FROM staff s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
+            store_id = store_info['store_id'] if store_info else None
+            
+            if store_id:
+                cursor.execute("""
+                    SELECT r.rental_id, c.first_name, c.family_name, e.name as equipment_name, r.start_date, r.end_date, r.status
+                    FROM rentals r
+                    JOIN customer c ON r.user_id = c.user_id
+                    JOIN equipment e ON r.equipment_id = e.equipment_id
+                """)
+                rentals = cursor.fetchall()
+            else:
+                rentals = []
+                
+        except Exception as e:
+            print("An error occurred:", e)
+            flash("A database error occurred. Please try again.")
+            return redirect(url_for('home.login'))
+        finally:
+            cursor.close()
+            conn.close()
+            
+        return render_template('rentals_list.html', rentals=rentals, store_name=store_name)
     else:
         return redirect(url_for('staff.dashboard'))
 
@@ -133,12 +256,31 @@ def view_rentals():
 def view_orders():
     if 'loggedin' in session and session['role'] == 'staff':
         conn, cursor = db_cursor()  
+        user_id = session['userid']
+        
         try:
+            # Fetch the store_id and store name for the logged-in staff member
             cursor.execute("""
-                SELECT order_id, user_id, store_id, total_cost, tax, discount, final_price, status, creation_date
-                FROM orders
-            """)
-            orders = cursor.fetchall()
+                SELECT s.store_id, st.store_name
+                FROM staff s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
+            store_id = store_info['store_id'] if store_info else None
+            
+            if store_id:
+                cursor.execute("""
+                    SELECT o.order_id, c.first_name, c.family_name, o.store_id, o.total_cost, 
+                    o.tax, o.discount, o.final_price, o.status, o.creation_date
+                    FROM orders o
+                    JOIN customer c ON o.user_id = c.user_id
+                    WHERE o.store_id = %s
+                """, (store_id,))
+                orders = cursor.fetchall()
+            else: 
+                orders = []
             
         except Exception as e:
             print("An error occurred:", e)
@@ -148,7 +290,7 @@ def view_orders():
             cursor.close()
             conn.close()  
             
-        return render_template('order_list.html', orders=orders)
+        return render_template('order_list.html', orders=orders, store_name=store_name)
     else:
         return redirect(url_for('staff.dashboard'))
 
@@ -158,13 +300,31 @@ def view_orders():
 def view_payments():
     if 'loggedin' in session and session['role'] == 'staff':
         conn, cursor = db_cursor()  
-        try:
+        user_id = session['userid']
         
+        try:
+            # Fetch the store_id and store name for the logged-in staff member
             cursor.execute("""
-                SELECT payment_id, order_id, user_id, payment_type, payment_status, amount, payment_date
-                FROM payments
-            """)
-            payments = cursor.fetchall()
+                SELECT s.store_id, st.store_name
+                FROM staff s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
+            store_id = store_info['store_id'] if store_info else None
+            
+            if store_id:
+                cursor.execute("""
+                    SELECT p.payment_id, p.order_id, p.user_id, p.payment_type, p.payment_status, p.amount, p.payment_date
+                    FROM payments p
+                    JOIN orders o ON p.order_id = o.order_id
+                    WHERE o.store_id = %s
+                    ORDER BY p.payment_date DESC
+                """, (store_id,))
+                payments = cursor.fetchall()
+            else:
+                payments = []   
         
         except Exception as e:
             print("An error occurred:", e)
@@ -174,7 +334,7 @@ def view_payments():
             cursor.close()
             conn.close()  
         
-        return render_template('payments.html', payments=payments)
+        return render_template('payments.html', payments=payments, store_name=store_name)
     else:
         return redirect(url_for('staff.dashboard'))
 
@@ -299,34 +459,43 @@ def equipment_add():
 def daily_checklist():
     if 'loggedin' in session and session['role'] == 'staff':
         today = date.today().strftime('%Y-%m-%d')
-        print("Today's date:", today)
-        
-        
         conn, cursor = db_cursor()
+        user_id = session['userid']
+        
         try:
-            # Query today's bookings
-            sql_query = """
-               SELECT r.rental_id, r.user_id, r.equipment_id, e.name AS equipment_name, 
-                    r.start_date, r.end_date, r.status, u.username
-                FROM rentals r
-                JOIN equipment e ON r.equipment_id = e.equipment_id
-                JOIN user u ON r.user_id = u.user_id
-                WHERE r.start_date = %s AND r.status IN ('Completed', 'Pending', 'Canceled');
-            """
-            print("Date for query:", today)
-            cursor.execute(sql_query, (today,))  
+            # Fetch the store_id and store name for the logged-in staff member
+            cursor.execute("""
+                SELECT s.store_id, st.store_name
+                FROM staff s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
+            store_id = store_info['store_id'] if store_info else None
             
-            bookings = cursor.fetchall()
-            print("Number of bookings fetched:", len(bookings))  
-        except Exception as e:
-            print("An error occurred:", e)
-            flash("A database error occurred. Please try again.")
-            return redirect(url_for('staff.dashboard'))
+            if store_id:
+                # Query today's bookings
+                sql_query = """
+                SELECT r.rental_id, r.equipment_id, e.name AS equipment_name, 
+                        r.start_date, r.end_date, r.status, r.id_verified, co.first_name, co.family_name
+                    FROM rentals r
+                    JOIN equipment e ON r.equipment_id = e.equipment_id
+                    JOIN user u ON r.user_id = u.user_id
+                    LEFT JOIN customer co ON u.user_id = co.user_id
+                    WHERE r.start_date = %s AND r.status IN ('Completed', 'Pending', 'Canceled');
+                """
+                print("Date for query:", today)
+                cursor.execute(sql_query, (today,))  
+                bookings = cursor.fetchall()
+            else:
+                bookings = []
+            
         finally:
             cursor.close()
             conn.close()
         
-        return render_template('daily_checklist.html', bookings=bookings)
+        return render_template('daily_checklist.html', bookings=bookings, store_name=store_name, today=today)
     else:
         flash("You are not authorized to view this page.")
         return redirect(url_for('staff.dashboard'))
@@ -345,6 +514,14 @@ def update_rental_status():
 
         conn, cursor = db_cursor()
         try:
+            
+            # Verify ID first before changing status to 'Completed'
+            if new_status == 'Completed':
+                cursor.execute("SELECT id_verified FROM rentals WHERE rental_id = %s", (rental_id,))
+                result = cursor.fetchone()
+                if not result or not result['id_verified']:
+                    return jsonify({'error': 'ID verification is required before checkout.'}), 403
+                
             cursor.execute("""
                 UPDATE rentals
                 SET status = %s
@@ -359,7 +536,7 @@ def update_rental_status():
             cursor.close()
             conn.close()
 
-
+## Verify ID ##
 @staff_bp.route('/verify_id', methods=['POST'])
 @login_required
 def verify_id():
@@ -387,4 +564,77 @@ def verify_id():
     finally:
         cursor.close()
         conn.close()
+        
 
+## Today's returns ##
+@staff_bp.route('/daily_returns')
+@login_required
+def daily_returns():
+    if 'loggedin' in session and session['role'] == 'staff':
+        today = date.today().strftime('%Y-%m-%d')
+        conn, cursor = db_cursor()
+        user_id = session['userid']
+        
+        try:
+            # Fetch the store_id and store name for the logged-in staff member
+            cursor.execute("""
+                SELECT s.store_id, st.store_name
+                FROM staff s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
+            store_id = store_info['store_id'] if store_info else None
+            
+            if store_id:
+                # Query today's returns
+                sql_query = """
+                SELECT r.rental_id, r.equipment_id, e.name AS equipment_name, 
+                        r.start_date, r.end_date, r.status, co.first_name, co.family_name
+                    FROM rentals r
+                    JOIN equipment e ON r.equipment_id = e.equipment_id
+                    JOIN user u ON r.user_id = u.user_id
+                    LEFT JOIN customer co ON u.user_id = co.user_id
+                    WHERE r.end_date = %s AND r.status IN ('Completed', 'Pending', 'Canceled');
+                """
+                cursor.execute(sql_query, (today,))  
+                returns = cursor.fetchall()
+            else:
+                returns = []
+            
+        finally:
+            cursor.close()
+            conn.close()
+        
+        return render_template('staff_equipment_return.html', returns=returns, store_name=store_name, today=today)
+    else:
+        flash("You are not authorized to view this page.")
+        return redirect(url_for('staff.dashboard'))
+    
+
+## Update Daily Returns ##
+@staff_bp.route('/update_return_status', methods=['POST'])
+@login_required
+def update_return_status():
+    rental_id = request.form.get('rental_id')
+    new_status = request.form.get('new_status')
+
+    if not rental_id or not new_status:
+        return jsonify({'error': 'Missing rental ID or status'}), 400
+
+    conn, cursor = db_cursor()
+    try:
+        cursor.execute("""
+            UPDATE rentals
+            SET status = %s
+            WHERE rental_id = %s
+        """, (new_status, rental_id))
+        conn.commit()
+        return jsonify({'success': True, 'message': 'Status updated successfully.'})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({'error': str(e), 'message': 'Failed to update status.'}), 500
+    finally:
+        cursor.close()
+        conn.close()

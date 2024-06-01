@@ -1,75 +1,97 @@
-{% extends "base.html" %} {% block title %}Rental List{% endblock %} {% block
+{% extends "base.html" %} {% block title %}Customer List{% endblock %} {% block
 content %}
 <div
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
-  <h1 class="h2">Rental List - {{ store_name }} Store</h1>
+  <h1 class="h2">Customer List - All Stores</h1>
 </div>
 
 <div class="table-responsive">
-  <table class="table table-striped" id="rentalTable">
+  <table class="table table-striped">
     <thead>
       <tr>
-        <th onclick="sortTable(0)">
-          Rental ID &#x25B2;&#x25BC;<input
+        <th scope="col">
+          Customer ID &#x25B2;&#x25BC;<input
             type="text"
-            id="filterRentalID"
+            id="filterCustomerID"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(1)">
-          Customer Name &#x25B2;&#x25BC;<input
+        <th scope="col">
+          User ID &#x25B2;&#x25BC;<input
             type="text"
             id="filterUserID"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(2)">
-          Equipment &#x25B2;&#x25BC;<input
+        <th scope="col">
+          User Name &#x25B2;&#x25BC;<input
             type="text"
-            id="filterEquipmentID"
+            id="filterUserName"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(3)">
-          Start Date &#x25B2;&#x25BC;<input
-            type="date"
-            id="filterStartDate"
-            class="form-control form-control-sm"
-            placeholder="Filter"
-          />
-        </th>
-        <th onclick="sortTable(4)">
-          End Date &#x25B2;&#x25BC;<input
-            type="date"
-            id="filterEndDate"
-            class="form-control form-control-sm"
-            placeholder="Filter"
-          />
-        </th>
-        <th>
-          Status<select id="filterStatus" class="form-control form-control-sm">
+        <th scope="col">
+          Title
+          <select id="filterTitle" class="form-control form-control-sm">
             <option value="">All</option>
-            <option value="completed">Completed</option>
-            <option value="pending">Pending</option>
-            <option value="cancelled">Cancelled</option>
+            <option value="Mr">Mr</option>
+            <option value="Mrs">Mrs</option>
+            <option value="Miss">Miss</option>
+            <option value="Dr">Dr</option>
+            <option value="Prof">Prof</option>
+            <option value="Others">Others</option>
           </select>
+        </th>
+        <th scope="col">
+          First Name &#x25B2;&#x25BC;<input
+            type="text"
+            id="filterFirstName"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Family Name &#x25B2;&#x25BC;<input
+            type="text"
+            id="filterFamilyName"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Phone Number<input
+            type="text"
+            id="filterPhoneNumber"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th scope="col">
+          Address<input
+            type="text"
+            id="filterAddress"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
         </th>
       </tr>
     </thead>
     <tbody></tbody>
-    <tbody id="ordersTableBody">
-      {% for rental in rentals %}
+    <tbody id="customersTableBody">
+      {% for customer in customers %}
       <tr>
-        <td>{{ rental.rental_id }}</td>
-        <td>{{ rental.first_name }} {{ rental.family_name }}</td>
-        <td>{{ rental.equipment_name }}</td>
-        <td>{{ rental.start_date }}</td>
-        <td>{{ rental.end_date }}</td>
-        <td>{{ rental.status }}</td>
+        <td>{{ customer.customer_id }}</td>
+        <td>{{ customer.user_id }}</td>
+        <td>{{ customer.username }}</td>
+        <td>{{ customer.title }}</td>
+        <td>{{ customer.first_name }}</td>
+        <td>{{ customer.family_name }}</td>
+        <td>{{ customer.phone_number }}</td>
+        <td>{{ customer.address }}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -79,7 +101,7 @@ content %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const filterInputs = document.querySelectorAll("thead input, thead select");
-    const tableBody = document.getElementById("ordersTableBody");
+    const tableBody = document.getElementById("customersTableBody");
     const rows = tableBody.getElementsByTagName("tr");
 
     filterInputs.forEach((input) => {
@@ -115,7 +137,7 @@ content %}
       shouldSwitch,
       dir,
       switchcount = 0;
-    table = document.getElementById("rentalTable");
+    table = document.getElementById("customerTable");
     switching = true;
     dir = "asc"; // Initial direction is ascending
     while (switching) {

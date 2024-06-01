@@ -1,7 +1,7 @@
-{% extends "sidebar_layout.html" %} {% block title %}Today's Checklist{%
-endblock %} {% block main_content %}
+{% extends "base.html" %} {% block title %}Today's Checklist{%
+endblock %} {% block content %}
 <div class="container-fluid">
-  <h2>Today's Rental Checklist</h2>
+  <h2>Today's Rental Checklist - {{ store_name }} Store</h2>
     <h3 style="font-weight: bold; padding: 10px 0;">Date: {{today}}</h3>
   </div>
 
@@ -9,13 +9,13 @@ endblock %} {% block main_content %}
     <thead>
       <tr>
         <th>Rental ID</th>
-        <th>User Name</th>
+        <th>Customer Name</th>
         <th>Equipment Name</th>
         <th>Start Date</th>
         <th>End Date</th>
         <th>ID Verified</th>
         <th>Status</th>
-        <th></th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
@@ -23,11 +23,10 @@ endblock %} {% block main_content %}
 
       <tr>
         <td>{{ booking.rental_id }}</td>
-        <td>{{ booking.username }}</td>
+        <td>{{ booking.first_name }} {{ booking.family_name }}</td>
         <td>{{ booking.equipment_name }}</td>
         <td>{{ booking.start_date }}</td>
         <td>{{ booking.end_date }}</td>
-        
         <td>
           <button
             type="button"
@@ -49,13 +48,16 @@ endblock %} {% block main_content %}
             <i class="fa fa-check" aria-hidden="true"></i>
           </button>
         </td>
+
 <td id="status-{{ booking.rental_id }}">{{ booking.checkout_status }}</td>
 
         <td id="action-buttons-{{ booking.rental_id }}">
           <button
             type="button"
             class="btn btn-primary btn-sm d-block w-100 mb-2"
+            id="checkout-btn-{{ booking.rental_id }}"
             onclick="updateStatus({{ booking.rental_id }}, 'Completed')"
+            {{ 'disabled' if not booking.id_verified }}
           >
             Ready to Checkout
           </button>
@@ -82,6 +84,31 @@ endblock %} {% block main_content %}
 
 
 <script>
+
+function toggleIDVerification(rentalId, shouldVerify) {
+    fetch('{{ url_for('staff.verify_id') }}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `rental_id=${rentalId}&id_verified=${shouldVerify}`
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('btn-check-' + rentalId).style.display = shouldVerify ? 'none' : 'block';
+            document.getElementById('btn-uncheck-' + rentalId).style.display = shouldVerify ? 'block' : 'none';
+            document.getElementById('checkout-btn-' + rentalId).disabled = !shouldVerify;
+
+        } else {
+            throw new Error(data.message || 'An unknown error occurred.');
+        }
+    })
+    .catch(error => {
+        console.error('Error verifying ID:', error);
+        alert('Failed to verify ID: ' + error.message);
+    });
+}
+
+
   function updateStatus(rentalId, newStatus) {
       var form = new FormData();
       form.append('rental_id', rentalId);
@@ -91,7 +118,12 @@ endblock %} {% block main_content %}
           method: 'POST',
           body: form
       })
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();  // This will fail if the response is not JSON
+    })
       .then(data => {
           if (data.success) {
               document.getElementById('status-' + rentalId).textContent = newStatus;
@@ -107,39 +139,7 @@ endblock %} {% block main_content %}
           alert('Failed to update status: ' + error.message);
       });
   }
-function toggleIDVerification(rentalId, isChecked) {
-      fetch('{{ url_for('staff.verify_id') }}', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: `rental_id=${rentalId}&id_verified=${isChecked}`
-      })
-      .then(response => response.json())
-      .then(data => {
-          if (data.success) {
-              // Alert message for success
-              alert('ID verification status updated successfully.');
 
-              // Update button visibility based on the verification status
-              var checkButton = document.getElementById('btn-check-' + rentalId);
-              var uncheckButton = document.getElementById('btn-uncheck-' + rentalId);
-              if (isChecked) {
-                  checkButton.style.display = 'none';
-                  uncheckButton.style.display = 'block';
-              } else {
-                  checkButton.style.display = 'block';
-                  uncheckButton.style.display = 'none';
-              }
-          } else {
-              throw new Error(data.message || 'An unknown error occurred.');
-          }
-      })
-      .catch(error => {
-          console.error('Error verifying ID:', error);
-          alert('Failed to verify ID: ' + error.message);
-      });
-  }
 </script>
 
 {% endblock %}

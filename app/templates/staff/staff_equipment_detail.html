@@ -1,10 +1,9 @@
-{% extends "sidebar_layout.html" %} {% block title %}Staff Dashboard{% endblock %} {%
-block main_content %}
-<div style="padding: 20px;">
-
-<table class="table" style="margin-top: 10px;">
+{% extends "base.html" %} {% block title %}Staff Dashboard{% endblock %} {%
+block content %}
+<div style="padding: 20px">
+  <table class="table" style="margin-top: 10px">
     <thead>
-    <tr>
+      <tr>
         <th>Serial_Number</th>
         <th>Image</th>
         <th>Purchase Date</th>
@@ -12,90 +11,101 @@ block main_content %}
         <th>Category</th>
         <th>Status</th>
         <th>Edit</th>
-    </tr>
+      </tr>
     </thead>
     <tbody>
-    {% for entry in equipment %}
-    <tr id="{{ entry.serial_number }}">
+      {% for entry in equipment %}
+      <tr id="{{ entry.serial_number }}">
         <td data-type="SERIAL">{{ entry.serial_number }}</td>
         <td data-type="IMG">
-            <img alt="{{ entry.name }}" style="width: 50px; height: 50px;" src="/static/{{ entry.Image }}">
+          <img
+            alt="{{ entry.name }}"
+            style="width: 50px; height: 50px"
+            src="/static/{{ entry.Image }}"
+          />
         </td>
         <td data-name="purchase_date">{{ entry.purchase_date }}</td>
         <td data-name="cost">${{ entry.cost }}/day</td>
         <td data-name="category">{{ entry.category }}</td>
         <td data-name="status">{{ entry.status }}</td>
         <td data-type="BUTTON">
-            <button class="btn custom-btn" onclick="editInfo({{ entry.serial_number }})">Edit</button>
+          <button
+            class="btn custom-btn"
+            onclick="editInfo({{ entry.serial_number }})"
+          >
+            Edit
+          </button>
         </td>
-    </tr>
-    {% endfor %}
+      </tr>
+      {% endfor %}
     </tbody>
-</table>
+  </table>
 
-<div>
+  <div>
     <button type="button" class="btn custom-btn">Add A New Machinery</button>
-</div>
-
+  </div>
 </div>
 
 <script>
-    const editInfo = (serial_number) => {
-        const children = document.getElementById(serial_number).children;
-        Array.from(children).forEach(entry => {
-            switch (entry.dataset.type) {
-                case "SERIAL":
-                    break;
-                case "IMG":
-                    const src = entry.children[0].src;
-                    entry.innerHTML = `<input type="text" value="${src}">`;
-                    break;
-                case "BUTTON":
-                    entry.innerHTML = `<button class="btn custom-btn" onclick="saveInfo(${serial_number})">Save</button>`
-                    break;
-                default:
-                    const value = entry.textContent;
-                    entry.innerHTML = `<input type="text" value="${value}">`;
-                    break;
-            }
-        })
+  const editInfo = (serial_number) => {
+    const children = document.getElementById(serial_number).children;
+    Array.from(children).forEach((entry) => {
+      switch (entry.dataset.type) {
+        case "SERIAL":
+          break;
+        case "IMG":
+          const src = entry.children[0].src;
+          entry.innerHTML = `<input type="text" value="${src}">`;
+          break;
+        case "BUTTON":
+          entry.innerHTML = `<button class="btn custom-btn" onclick="saveInfo(${serial_number})">Save</button>`;
+          break;
+        default:
+          const value = entry.textContent;
+          entry.innerHTML = `<input type="text" value="${value}">`;
+          break;
+      }
+    });
+  };
+
+  const saveInfo = async (serial_number) => {
+    const formData = new FormData();
+    const children = document.getElementById(serial_number).children;
+    Array.from(children).forEach((entry) => {
+      switch (entry.dataset.type) {
+        case "SERIAL":
+          formData.append("serial_number", serial_number);
+          break;
+        case "IMG":
+          const src = entry.children[0].value.replace(
+            location.origin + "/static/",
+            ""
+          );
+          formData.append("Image", src);
+          entry.innerHTML = `<img style="width: 50px; height: 50px;" src="/static/${src}">`;
+          break;
+        case "BUTTON":
+          entry.innerHTML = `<button class="btn custom-btn" onclick="editInfo(${serial_number})">Edit</button>`;
+          break;
+        default:
+          const value = entry.children[0].value;
+          formData.append(entry.dataset.name, value);
+          entry.innerHTML = value;
+          break;
+      }
+    });
+
+    const res = await fetch("/staff/equipment/update", {
+      method: "POST",
+      body: formData,
+    }).then((res) => res.json());
+
+    if (res.code === 200) {
+      alert("Equipment details have been updated successfully!");
+    } else {
+      location.href = window.location.href;
+      alert("Update failed, please try again!");
     }
-
-    const saveInfo = async (serial_number) => {
-        const formData = new FormData();
-        const children = document.getElementById(serial_number).children;
-        Array.from(children).forEach(entry => {
-            switch (entry.dataset.type) {
-                case "SERIAL":
-                    formData.append("serial_number", serial_number);
-                    break;
-                case "IMG":
-                    const src = entry.children[0].value.replace(location.origin + '/static/', '');
-                    formData.append("Image", src)
-                    entry.innerHTML = `<img style="width: 50px; height: 50px;" src="/static/${src}">`;
-                    break;
-                case "BUTTON":
-                    entry.innerHTML = `<button class="btn custom-btn" onclick="editInfo(${serial_number})">Edit</button>`
-                    break;
-                default:
-                    const value = entry.children[0].value;
-                    formData.append(entry.dataset.name, value);
-                    entry.innerHTML = value;
-                    break;
-            }
-        })
-
-        const res = await fetch('/staff/equipment/update', {
-            method: 'POST',
-            body: formData
-        }).then(res => res.json())
-
-        if (res.code === 200) {
-            alert("Equipment details have been updated successfully!");
-        } else {
-            location.href = window.location.href;
-            alert("Update failed, please try again!");
-        }
-    }
+  };
 </script>
 {% endblock %}
