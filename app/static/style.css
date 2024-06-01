@@ -4,6 +4,10 @@
   font-weight: bold;
 }
 
+.nav a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
 .services-icon {
   font-size: 40px; /* Adjust the size as needed */
 }
@@ -27,6 +31,12 @@
 
 .main-content {
   margin-left: 250px;
+  margin-right: 20px; /* Adds right margin */
+  padding: 20px; /* Adds padding inside the content area */
+}
+
+.logout-container {
+  margin-left: auto; /* Pushes logout to the far right */
 }
 
 .sidebar {
@@ -47,15 +57,45 @@
   font-size: 24px !important;
 }
 
-.nav-link,
-.fa {
+.navbar-nav .nav-link {
+  color: #0f0101 !important;
+  padding: 5px 10px !important;
   display: flex;
-  align-items: center;
+  align-items: center; /* Ensures vertical alignment is centered */
+  margin-right: auto; /* Pushes everything to the left */
+}
+
+/* New styles for separators */
+.navbar-nav .nav-item {
+  display: inline-block;
+  position: relative;
+  padding-right: 20px;
+}
+
+.navbar-nav .nav-item::after {
+  content: "|";
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%); /* Vertically center the separator */
+}
+
+.navbar-nav .nav-item:last-child::after {
+  content: "";
+}
+.custom-welcome {
+  font-size: 25px !important; /* Make text bigger */
+  font-weight: bold !important; /* Make text bold */
+  margin-top: 30px; /* Add margin for positioning */
   text-align: left;
-  font-weight: bold;
-  color: #0f0101;
-  padding: 12px 8px;
-  margin-left: 5px;
+}
+
+.nav-top-spacing {
+  margin-bottom: 40px; /* Adjust as needed */
+}
+
+.profile-container {
+  margin-left: 250px; /* Adjust based on your sidebar width */
 }
 
 .custom-btn {
@@ -110,8 +150,10 @@ body {
 }
 
 .dashboard-header {
-  padding-left: 20px; /* Aligns header with the table's left edge */
-  margin-bottom: 20px; /* Gives some space between the title and the table */
+  padding-left: 28px; /* Aligns header with the table's left edge */
+  margin-top: 30px;
+  margin-bottom: 20px;
+  color: green;
 }
 
 .table-container {
@@ -124,26 +166,4 @@ body {
 .row {
   padding-right: 0;
   margin-right: auto;
-}
-
-/* Adjust the navigation bar to align with the content below */
-
-.navbar-nav .nav-link {
-  color: #0f0101 !important;
-  padding: 5px 10px !important;
-}
-
-.custom-welcome {
-  font-size: 25px !important; /* Make text bigger */
-  font-weight: bold !important; /* Make text bold */
-  margin-top: 20px; /* Add margin for positioning */
-  text-align: left;
-}
-
-.nav-top-spacing {
-  margin-bottom: 40px; /* Adjust as needed */
-}
-
-.profile-container {
-  margin-left: 250px; /* Adjust based on your sidebar width */
 }

@@ -1,20 +1,40 @@
-{% extends "sidebar_layout.html" %} {% block title %}Inventory Management{% endblock %} {%
-block main_content %}
-    <div style="padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 200px)); grid-gap: 1rem;">
-        {% for entry in category %}
-            <div class="card" style="width: 100%; max-width: 250px;">
-                <img src="{{ url_for('static', filename= entry.category|lower + '.jpg') }}" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h5 class="card-title">{{ entry.category }}</h5>
-                    <ul class="card-text" style="list-style: none; padding: 10px 10px 10px 0">
-                        <li>Available: {{ entry.AvailableCount }}</li>
-                        <li>Rented: {{ entry.RentedCount }}</li>
-                        <li>Under Repair: {{ entry.UnderRepairCount }}</li>
-                        <li>Retired: {{ entry.RetiredCount }}</li>
-                    </ul>
-                    <a href="/staff/equipment/detail?category={{ entry.category }}" class="btn custom-btn">View Details</a>
-                </div>
-            </div>
-        {% endfor %}
+{% extends "base.html" %} {% block title %}Inventory Management{% endblock %} {%
+block content %}
+
+<div class="container-fluid">
+  <h2>Inventory - {{ store_name }} Store</h2>
+</div>
+
+<div
+  style="
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 200px));
+    grid-gap: 1rem;
+  "
+>
+  {% for entry in category %}
+  <div class="card" style="width: 100%; max-width: 250px">
+    <img
+      src="{{ url_for('static', filename= entry.category|lower + '.jpg') }}"
+      class="card-img-top"
+      alt="..."
+    />
+    <div class="card-body">
+      <h5 class="card-title">{{ entry.category }}</h5>
+      <ul class="card-text" style="list-style: none; padding: 10px 10px 10px 0">
+        <li>Available: {{ entry.AvailableCount }}</li>
+        <li>Rented: {{ entry.RentedCount }}</li>
+        <li>Under Repair: {{ entry.UnderRepairCount }}</li>
+        <li>Retired: {{ entry.RetiredCount }}</li>
+      </ul>
+      <a
+        href="/staff/equipment/detail?category={{ entry.category }}"
+        class="btn custom-btn"
+        >View Details</a
+      >
     </div>
+  </div>
+  {% endfor %}
+</div>
 {% endblock %}

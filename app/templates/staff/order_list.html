@@ -1,58 +1,40 @@
-{% extends "sidebar_layout.html" %} {% block title %}Order List{% endblock %} {%
-block main_content %}
+{% extends "base.html" %} {% block title %}Order List{% endblock %} {% block
+content %}
 <div
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
-  <h1 class="h2">Order List</h1>
+  <h1 class="h2">Order List - {{ store_name }} Store</h1>
 </div>
-
 
 <div class="table-responsive">
   <table class="table table-striped" id="orderTable">
     <thead>
-      <tr>
-        <th scope="col">
-          Order ID<input
+        <th onclick="sortTable(0)" scope="col">
+          Order ID &#x25B2;&#x25BC;<input
             type="text"
             id="filterOrderID"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th scope="col">
-          User ID<input
+        <th onclick="sortTable(1)" scope="col">
+          Customer Name &#x25B2;&#x25BC;<input
             type="text"
             id="filterUserID"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th scope="col">
-          Store ID<input
-            type="text"
-            id="filterStoreID"
-            class="form-control form-control-sm"
-            placeholder="Filter"
-          />
-        </th>
-        <th scope="col">
-          Total Cost<input
+        <th onclick="sortTable(2)" scope="col">
+          Total Cost &#x25B2;&#x25BC;<input
             type="text"
             id="filterTotalCost"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th scope="col">
-          GST<input
-            type="text"
-            id="filterTax"
-            class="form-control form-control-sm"
-            placeholder="Filter"
-          />
-        </th>
-        <th scope="col">
-          Discount %<input
+        <th onclick="sortTable(3)" scope="col">
+          Discount % &#x25B2;&#x25BC;<input
             type="text"
             id="filterDiscount"
             class="form-control form-control-sm"
@@ -60,7 +42,7 @@ block main_content %}
           />
         </th>
         <th scope="col">
-          Final Price<input
+          Final Price (incl. GST) &#x25B2;&#x25BC;<input
             type="text"
             id="filterFinalPrice"
             class="form-control form-control-sm"
@@ -90,10 +72,8 @@ block main_content %}
       {% for order in orders %}
       <tr>
         <td>{{ order.order_id }}</td>
-        <td>{{ order.user_id }}</td>
-        <td>{{ order.store_id }}</td>
+        <td>{{ order.first_name }} {{ order.family_name }}</td>
         <td>{{ order.total_cost }}</td>
-        <td>{{ order.tax }}</td>
         <td>{{ order.discount }}</td>
         <td>{{ order.final_price }}</td>
         <td>{{ order.status }}</td>
