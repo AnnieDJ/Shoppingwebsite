@@ -47,7 +47,7 @@ def dashboard():
             # Fetch top 5 returns
             today = date.today().strftime('%Y-%m-%d')
             cursor.execute("""
-                SELECT r.rental_id, u.username, e.name as equipment_name, r.end_date, r.status, c.first_name, c.family_name
+                SELECT r.rental_id, c.first_name, c.family_name, e.name as equipment_name, r.end_date, r.status, c.first_name, c.family_name
                 FROM rentals r
                 JOIN user u ON r.user_id = u.user_id
                 JOIN equipment e ON r.equipment_id = e.equipment_id
@@ -457,19 +457,24 @@ def equipment_add():
 @staff_bp.route('/daily_checklist')
 @login_required
 def daily_checklist():
-    if 'loggedin' in session and session['role'] == 'staff':
+    if 'loggedin' in session and session['role'] in ['staff', 'local_manager']:
         today = date.today().strftime('%Y-%m-%d')
         conn, cursor = db_cursor()
         user_id = session['userid']
         
         try:
-            # Fetch the store_id and store name for the logged-in staff member
+            # Fetch the store_id and store name for the logged-in staff member or local manager
             cursor.execute("""
                 SELECT s.store_id, st.store_name
                 FROM staff s
                 JOIN stores st ON s.store_id = st.store_id
                 WHERE s.user_id = %s
-            """, (user_id,))
+                UNION
+                SELECT l.store_id, st.store_name
+                FROM local_manager l
+                JOIN stores st ON l.store_id = st.store_id
+                WHERE l.user_id = %s
+            """, (user_id, user_id))
             store_info = cursor.fetchone()
             store_name = store_info['store_name'] if store_info else 'Not Assigned'
             store_id = store_info['store_id'] if store_info else None
@@ -570,7 +575,7 @@ def verify_id():
 @staff_bp.route('/daily_returns')
 @login_required
 def daily_returns():
-    if 'loggedin' in session and session['role'] == 'staff':
+    if 'loggedin' in session and session['role'] in ['staff', 'local_manager']:
         today = date.today().strftime('%Y-%m-%d')
         conn, cursor = db_cursor()
         user_id = session['userid']
@@ -582,7 +587,12 @@ def daily_returns():
                 FROM staff s
                 JOIN stores st ON s.store_id = st.store_id
                 WHERE s.user_id = %s
-            """, (user_id,))
+                UNION
+                SELECT l.store_id, st.store_name
+                FROM local_manager l
+                JOIN stores st ON l.store_id = st.store_id
+                WHERE l.user_id = %s
+            """, (user_id, user_id))
             store_info = cursor.fetchone()
             store_name = store_info['store_name'] if store_info else 'Not Assigned'
             store_id = store_info['store_id'] if store_info else None

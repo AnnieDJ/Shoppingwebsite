@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block title %}Daily Return List{% endblock %} {%
 block content %}
-<h2>Today's Equipment Returns - {{ store_name }} Store</h2>
+<h2>Today's Rental Returns - {{ store_name }} Store</h2>
     <h3 style="font-weight: bold; padding: 10px 0;">Date: {{today}}</h3>
   </div>
 
@@ -48,7 +48,7 @@ block content %}
     form.append('rental_id', rentalId);
     form.append('new_status', newStatus);
 
-    fetch('{{ url_for("staff.update_return_status") }}', {
+    fetch('{{ url_for('staff.update_return_status') }}', {
         method: 'POST',
         body: form
     })
@@ -56,15 +56,16 @@ block content %}
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        return response.json();  // This will fail if the response is not JSON
+        return response.json();
     })
     .then(data => {
         if (data.success) {
             document.getElementById('status-' + rentalId).textContent = newStatus;
-            document.getElementById('action-buttons-' + rentalId).style.display = 'none';
+            var actionButtons = document.getElementById('action-buttons-' + rentalId);
+            actionButtons.style.display = (newStatus === 'Completed' ? 'none' : 'block');
             alert('Status updated to ' + newStatus);
         } else {
-            throw new Error(data.error || 'Unknown error occurred');
+            throw new Error(data.message || 'Unknown error occurred');
         }
     })
     .catch(error => {

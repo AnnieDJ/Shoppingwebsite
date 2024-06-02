@@ -1,0 +1,31 @@
+{% extends "base.html" %} {% block title %}Local Manager View Reports{% endblock
+%} {% block content %}
+<div
+  class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+>
+  <h1 class="h2">Report Details - {{ report.store_name }} Store</h1>
+</div>
+
+<div class="container">
+  <h3>{{ report.title }}</h3>
+  <p><strong>Creation Date:</strong> {{ report.creation_date }}</p>
+  <p>{{ report.content }}</p>
+  <p>
+    <strong>PDF Document:</strong>
+    <a href="{{ report.document_link }}" target="_blank"
+      >{{ report.document_link }}</a
+    >
+  </p>
+</div>
+
+<script>
+  document.getElementById("printButton").onclick = function () {
+    window.print();
+  };
+
+  document.getElementById("emailButton").onclick = function () {
+    alert("Email functionality to be implemented.");
+  };
+</script>
+
+{% endblock %}

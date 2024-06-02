@@ -157,13 +157,19 @@ body {
 }
 
 .table-container {
-  padding-left: 20px; /* This should match the dashboard-header padding for alignment */
-  padding-right: 20px;
+  padding: 20px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Add margin to tables */
+table {
+  width: 100%; /* Ensure the table fits within the container */
 }
 
 /* If using Bootstrap, you can adjust the container or row class */
 .container,
 .row {
-  padding-right: 0;
+  padding-right: 20px;
   margin-right: auto;
 }
