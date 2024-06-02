@@ -17,54 +17,21 @@ local_manager_bp = Blueprint('local_manager', __name__, template_folder='templat
 def dashboard():
     if 'loggedin' in session and (session ['role'] == 'local_manager' or session['role'] == 'admin'):
         conn, cursor = db_cursor()
+        user_id = session['userid']
+        
         try:
             
-            ## view rentals ##
+            # Fetch the store_id and store name for the logged-in local manager
             cursor.execute("""
-                SELECT r.*, u.username, e.name as equipment_name
-                FROM rentals r
-                JOIN user u ON r.user_id = u.user_id
-                JOIN equipment e ON r.equipment_id = e.equipment_id
-                ORDER BY r.rental_id DESC
-                LIMIT 5 
-            """)
-            rentals = cursor.fetchall()
+                SELECT s.store_id, st.store_name
+                FROM local_manager s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
 
-            ## view orderse ##
-            cursor.execute("""
-                SELECT order_id, user_id, store_id, total_cost, tax, discount, final_price, status, creation_date
-                FROM orders
-                ORDER BY creation_date DESC
-                LIMIT 5  
-            """)
-            orders = cursor.fetchall()
-            
-             
-            ## view equipment / inventory ##
-            cursor.execute("""
-                SELECT equipment_id, name, category, purchase_date, cost, 
-                serial_number, status, store_id, maximum_date, minimum_date 
-                FROM equipment
-            """)
-            inventory = cursor.fetchall()
-
-            ## view payments ##
-            cursor.execute("""
-                SELECT payment_id, order_id, user_id, payment_type, amount, payment_status, payment_date
-                FROM payments
-                ORDER BY payment_date DESC
-                LIMIT 5  
-            """)
-            payments = cursor.fetchall()
-
-            ## view promotions ##
-            cursor.execute("""
-                SELECT news_id, title, content, publish_date, creator_id, store_id
-                FROM news
-                ORDER BY publish_date DESC
-                LIMIT 5  
-            """)
-            promotions = cursor.fetchall()
+         
             
         except Exception as e:
             print("An error occurred:", e)
@@ -74,7 +41,7 @@ def dashboard():
             cursor.close()
             conn.close()  
 
-        return render_template('local_manager_dashboard.html', rentals=rentals, orders=orders, payments=payments, inventory=inventory, promotions=promotions)
+        return render_template('local_manager_dashboard.html', store_name=store_name)
     else:
         return redirect(url_for('home.login'))
     
@@ -163,13 +130,29 @@ def change_password():
 def view_rentals():
     if 'loggedin' in session and session['role'] == 'local_manager':
         conn, cursor = db_cursor()
+        user_id = session['userid']
+        
         try:
+            
+            # Fetch the store_id and store name for the logged-in local manager
             cursor.execute("""
-                SELECT r.*, u.username, e.name as equipment_name
+                SELECT s.store_id, st.store_name
+                FROM local_manager l
+                JOIN stores st ON l.store_id = st.store_id
+                WHERE l.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
+            store_id = store_info['store_id'] if store_info else None
+            
+            cursor.execute("""
+                SELECT r.*, c.first_name, c.family_name, e.name as equipment_name, 
+                r.start_date, r.end_date, r.status
                 FROM rentals r
-                JOIN user u ON r.user_id = u.user_id
+                JOIN customer c ON r.user_id = c.user_id
                 JOIN equipment e ON r.equipment_id = e.equipment_id
-            """)
+                WHERE e.store_id = %s
+            """, (store_id,))
             rentals = cursor.fetchall()
             
         except Exception as e:
@@ -180,7 +163,7 @@ def view_rentals():
             cursor.close()
             conn.close()
             
-        return render_template('rentals_list.html', rentals=rentals)
+        return render_template('rentals_list.html', rentals=rentals, store_name=store_name)
     else:
         return redirect(url_for('local_manager.dashboard'))
 
@@ -190,11 +173,28 @@ def view_rentals():
 def view_orders():
     if 'loggedin' in session and session['role'] == 'local_manager':
         conn, cursor = db_cursor()  
+        user_id = session['userid']
+        
         try:
+            
+            # Fetch the store_id and store name for the logged-in local manager
             cursor.execute("""
-                SELECT order_id, user_id, store_id, total_cost, tax, discount, final_price, status, creation_date
-                FROM orders
-            """)
+                SELECT s.store_id, st.store_name
+                FROM local_manager s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
+            store_id = store_info['store_id'] if store_info else None
+            
+            cursor.execute("""
+                SELECT o.order_id, c.first_name, c.family_name, o.store_id, o.total_cost, 
+                       o.tax, o.discount, o.final_price, o.status, o.creation_date
+                FROM orders o
+                JOIN customer c ON o.user_id = c.user_id
+                WHERE o.store_id = %s
+            """, (store_id,))
             orders = cursor.fetchall()
             
         except Exception as e:
@@ -205,7 +205,7 @@ def view_orders():
             cursor.close()
             conn.close()  
             
-        return render_template('order_list.html', orders=orders)
+        return render_template('order_list.html', orders=orders, store_name=store_name)
     else:
         return redirect(url_for('local_manager.dashboard'))
 
@@ -215,12 +215,28 @@ def view_orders():
 def view_payments():
     if 'loggedin' in session and session['role'] == 'local_manager':
         conn, cursor = db_cursor()  
+        user_id = session['userid']
+        
         try:
         
+            # Fetch the store_id and store name for the logged-in local manager
             cursor.execute("""
-                SELECT payment_id, order_id, user_id, payment_type, payment_status, amount, payment_date
-                FROM payments
-            """)
+                SELECT s.store_id, st.store_name
+                FROM local_manager s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
+            store_id = store_info['store_id'] if store_info else None
+            
+            cursor.execute("""
+                SELECT p.payment_id, p.order_id, p.user_id, p.payment_type, p.payment_status, p.amount, p.payment_date
+                FROM payments p
+                JOIN orders o ON p.order_id = o.order_id
+                WHERE o.store_id = %s
+                ORDER BY p.payment_date DESC
+            """, (store_id,))
             payments = cursor.fetchall()
         
         except Exception as e:
@@ -231,21 +247,37 @@ def view_payments():
             cursor.close()
             conn.close()  
         
-        return render_template('payments.html', payments=payments)
+        return render_template('payments.html', payments=payments, store_name=store_name)
     else:
         return redirect(url_for('local_manager.dashboard'))
 
 
-## View Promotions (News) ##
+## View Promotions ##
 @local_manager_bp.route('/promotions')
 def view_promotions(): #news
     if 'loggedin' in session and session['role'] == 'local_manager':
-        conn, cursor = db_cursor()  
+        conn, cursor = db_cursor() 
+        user_id = session['userid']
+         
         try:
+            
+            # Fetch the store_id and store name for the logged-in local manager
             cursor.execute("""
-                SELECT news_id, title, content, publish_date, creator_id, store_id
-                FROM news
-            """)
+                SELECT s.store_id, st.store_name
+                FROM local_manager s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
+            store_id = store_info['store_id'] if store_info else None
+            
+            cursor.execute("""
+                SELECT promotion_id, title, description, start_date, end_date, creator_id, store_id
+                FROM promotions
+                WHERE store_id = %s
+                ORDER BY start_date DESC
+            """, (store_id,))
             promotions = cursor.fetchall()
         
         except Exception as e:
@@ -256,7 +288,7 @@ def view_promotions(): #news
             cursor.close()
             conn.close()  
             
-        return render_template('promotions.html', promotions=promotions)
+        return render_template('promotions.html', promotions=promotions, store_name=store_name)
     else:
         return redirect(url_for('local_manager.dashboard'))
     
@@ -268,12 +300,27 @@ def view_promotions(): #news
 def view_inventory():
     if 'loggedin' in session and session['role'] == 'local_manager':
         conn, cursor = db_cursor()  
+        user_id = session['userid']
+        
         try:
+            
+            # Fetch the store_id and store name for the logged-in local manager
+            cursor.execute("""
+                SELECT s.store_id, st.store_name
+                FROM local_manager s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
+            store_id = store_info['store_id'] if store_info else None
+            
             cursor.execute("""
                 SELECT equipment_id, name, category, purchase_date, cost, 
                 serial_number, status, store_id, maximum_date, minimum_date 
                 FROM equipment
-            """)
+                WHERE store_id = %s
+            """, (store_id,))
             equipment = cursor.fetchall()
             
         except Exception as e:
@@ -284,11 +331,12 @@ def view_inventory():
             cursor.close()
             conn.close()  
             
-        return render_template('equipment.html', equipment=equipment)
+        return render_template('equipment.html', equipment=equipment, store_name=store_name)
     else:
         return redirect(url_for('local_manager.dashboard'))
 
 
+## Daily Checklist ## 
 @local_manager_bp.route('/daily_checklist')
 @login_required
 def daily_checklist():
@@ -327,8 +375,166 @@ def daily_checklist():
 
 
 
+
 ## Local Manager View Reports ##
-@local_manager_bp.route('/view_reports', methods=['POST'])
+@local_manager_bp.route('/view_reports', methods=['GET'])
 @login_required
 def view_reports():
-    return redirect(url_for('local_manager.local_manager_dashboard'))
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()
+        user_id = session['userid']
+        
+        try:
+            # Fetch the store_id and store name for the logged-in local manager
+            cursor.execute("""
+                SELECT s.store_id, st.store_name
+                FROM local_manager s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
+            store_id = store_info['store_id'] if store_info else None
+            
+            cursor.execute("""
+                SELECT r.report_id, r.title, r.content, r.creation_date, r.store_id, r.document_link
+                FROM reports r
+                WHERE r.store_id = %s
+            """, (store_id,))
+            reports = cursor.fetchall()
+        
+        except Exception as e:
+            print("An error occurred:", e)
+            flash("A database error occurred. Please try again.")
+            return redirect(url_for('local_manager.dashboard'))
+        finally:
+            cursor.close()
+            conn.close()
+            
+        return render_template('local_manager_view_reports.html', reports=reports, store_name=store_name)
+    else:
+        return redirect(url_for('local_manager_dashboard'))
+
+
+
+## View Report Details ##
+@local_manager_bp.route('/view_report/<int:report_id>', methods=['GET'])
+@login_required
+def view_report(report_id):
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()
+        
+        try:
+            cursor.execute("""
+                SELECT r.report_id, r.title, r.content, r.creation_date, r.document_link, s.store_name
+                FROM reports r
+                JOIN stores s ON r.store_id = s.store_id
+                WHERE r.report_id = %s
+            """, (report_id,))
+            report = cursor.fetchone()
+            
+            if not report:
+                flash("Report not found.", 'danger')
+                return redirect(url_for('local_manager.view_reports'))
+        
+        except Exception as e:
+            print("An error occurred:", e)
+            flash("A database error occurred. Please try again.")
+            return redirect(url_for('local_manager.view_reports'))
+        finally:
+            cursor.close()
+            conn.close()
+        
+        return render_template('local_manager_report_details.html', report=report)
+    else:
+        return redirect(url_for('local_manager.dashboard'))
+
+
+
+## View Staff ##
+@local_manager_bp.route('/staff')
+def view_staff():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()
+        user_id = session['userid']
+        
+        try:
+            # Fetch the store_id and store name for the logged-in local manager
+            cursor.execute("""
+                SELECT s.store_id, st.store_name
+                FROM local_manager s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
+            store_id = store_info['store_id'] if store_info else None
+            
+            cursor.execute("""
+                SELECT s.staff_id, s.user_id, s.store_id, s.title, s.first_name, s.family_name, s.phone_number, s.status, u.email
+                FROM staff s
+                JOIN user u ON s.user_id = u.user_id
+                WHERE s.store_id = %s
+            """, (store_id,))
+            staff = cursor.fetchall()
+        
+        except Exception as e:
+            print("An error occurred:", e)
+            flash("A database error occurred. Please try again.")
+            return redirect(url_for('local_manager.dashboard'))
+        finally:
+            cursor.close()
+            conn.close()
+            
+        return render_template('local_manager_view_staff.html', staff=staff, store_name=store_name)
+    else:
+        return redirect(url_for('local_manager.dashboard'))
+
+
+## Update Staff ##
+@local_manager_bp.route('/update_staff/<int:staff_id>', methods=['GET', 'POST'])
+def update_staff(staff_id):
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()
+        
+        if request.method == 'POST':
+            title = request.form['title']
+            first_name = request.form['first_name']
+            family_name = request.form['family_name']
+            phone_number = request.form['phone_number']
+            status = request.form['status']
+            
+            try:
+                cursor.execute("""
+                    UPDATE staff s
+                    JOIN user u ON s.user_id = u.user_id
+                    SET s.title = %s, s.first_name = %s, s.family_name = %s, s.phone_number = %s, s.status = %s
+                    WHERE s.staff_id = %s
+                """, (title, first_name, family_name, phone_number, status, staff_id))
+                conn.commit()
+                flash('Staff updated successfully!', 'success')
+                return redirect(url_for('local_manager.view_staff'))
+            except MySQLError as e:
+                print("An error occurred:", e)
+                flash("A database error occurred. Please try again.")
+            finally:
+                cursor.close()
+                conn.close()
+        
+        else:
+            cursor.execute("""
+                SELECT s.staff_id, s.user_id, s.title, s.first_name, s.family_name, s.phone_number, u.email, s.status
+                FROM staff s
+                JOIN user u ON s.user_id = u.user_id
+                WHERE s.staff_id = %s
+            """, (staff_id,))
+            staff = cursor.fetchone()
+            
+            if not staff:
+                flash("Staff not found.", 'danger')
+                return redirect(url_for('local_manager.view_staff'))
+            
+            return render_template('local_manager_update_staff.html', staff=staff)
+    else:
+        return redirect(url_for('home.login'))
+

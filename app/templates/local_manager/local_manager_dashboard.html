@@ -1,21 +1,40 @@
-{% extends "sidebar_layout.html" %} {% block title %}Local Manager Dashboard{%
-endblock %} {% block main_content %}
+{% extends "base.html" %} {% block title %}Local Manager Dashboard{% endblock %}
+{% block content %}
 
-<h2>Store Manager Dashboard</h2>
-
+<h2>Store Manager Dashboard - {{ store_name }} Store</h2>
 
 <section class="py-3 py-md-4 py-xl-5 bg-light">
   <div class="container">
     <div class="row mb-8">
       <!-- Checklists -->
       <div class="col-md-4">
-        <a href="{{ url_for('local_manager.daily_checklist') }}" class="text-decoration-none">
+        <a
+          href="{{ url_for('staff.daily_checklist') }}"
+          class="text-decoration-none"
+        >
           <div class="card widget-card border-light shadow-sm">
             <div
               class="card-header bg-transparent p-4 border-light-subtle text-center"
             >
               <i class="fas fa-calendar-check fa-2x"></i>
-              <h5 class="card-title widget-card-title m-0">CHECKLISTS</h5>
+              <h5 class="card-title widget-card-title m-0">DAILY CHECKLISTS</h5>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <!-- Returns -->
+      <div class="col-md-4">
+        <a
+          href="{{ url_for('staff.daily_returns') }}"
+          class="text-decoration-none"
+        >
+          <div class="card widget-card border-light shadow-sm">
+            <div
+              class="card-header bg-transparent p-4 border-light-subtle text-center"
+            >
+              <i class="fas fa-calendar-check fa-2x"></i>
+              <h5 class="card-title widget-card-title m-0">DAILY RETURNS</h5>
             </div>
           </div>
         </a>
@@ -23,7 +42,10 @@ endblock %} {% block main_content %}
 
       <!-- Orders -->
       <div class="col-md-4">
-        <a href="{{ url_for('local_manager.view_orders') }}" class="text-decoration-none">
+        <a
+          href="{{ url_for('local_manager.view_orders') }}"
+          class="text-decoration-none"
+        >
           <div class="card widget-card border-light shadow-sm">
             <div
               class="card-header bg-transparent p-4 border-light-subtle text-center"
@@ -37,7 +59,10 @@ endblock %} {% block main_content %}
 
       <!-- Rentals -->
       <div class="col-md-4">
-        <a href="{{ url_for('local_manager.view_rentals') }}" class="text-decoration-none">
+        <a
+          href="{{ url_for('local_manager.view_rentals') }}"
+          class="text-decoration-none"
+        >
           <div class="card widget-card border-light shadow-sm">
             <div
               class="card-header bg-transparent p-4 border-light-subtle text-center"
@@ -49,11 +74,12 @@ endblock %} {% block main_content %}
         </a>
       </div>
 
-
-      <div class="row"> 
       <!-- Inventory -->
       <div class="col-md-4">
-        <a href="{{ url_for('local_manager.view_inventory') }}" class="text-decoration-none">
+        <a
+          href="{{ url_for('local_manager.view_inventory') }}"
+          class="text-decoration-none"
+        >
           <div class="card widget-card border-light shadow-sm">
             <div
               class="card-header bg-transparent p-4 border-light-subtle text-center"
@@ -67,7 +93,10 @@ endblock %} {% block main_content %}
 
       <!-- Payments -->
       <div class="col-md-4">
-        <a href="{{ url_for('local_manager.view_payments') }}" class="text-decoration-none">
+        <a
+          href="{{ url_for('local_manager.view_payments') }}"
+          class="text-decoration-none"
+        >
           <div class="card widget-card border-light shadow-sm">
             <div
               class="card-header bg-transparent p-4 border-light-subtle text-center"
@@ -81,7 +110,10 @@ endblock %} {% block main_content %}
 
       <!-- Promotions -->
       <div class="col-md-4">
-        <a href="{{ url_for('local_manager.view_promotions') }}" class="text-decoration-none">
+        <a
+          href="{{ url_for('local_manager.view_promotions') }}"
+          class="text-decoration-none"
+        >
           <div class="card widget-card border-light shadow-sm">
             <div
               class="card-header bg-transparent p-4 border-light-subtle text-center"
@@ -92,27 +124,30 @@ endblock %} {% block main_content %}
           </div>
         </a>
       </div>
-      
 
       <!-- Reports -->
       <div class="col-md-4">
-        <a href="#" class="text-decoration-none">
+        <a
+          href="{{ url_for('local_manager.view_reports') }}"
+          class="text-decoration-none"
+        >
           <div class="card widget-card border-light shadow-sm">
             <div
               class="card-header bg-transparent p-4 border-light-subtle text-center"
             >
-              <i class="fas fa fa-bullhorn fa-2x"></i>
+              <i class="fas fa fa-file fa-2x"></i>
               <h5 class="card-title widget-card-title m-0">REPORTS</h5>
             </div>
           </div>
-           </a>
+        </a>
       </div>
-      
 
-          
       <!-- Staff -->
       <div class="col-md-4">
-        <a href="#" class="text-decoration-none">
+        <a
+          href="{{ url_for('local_manager.view_staff') }}"
+          class="text-decoration-none"
+        >
           <div class="card widget-card border-light shadow-sm">
             <div
               class="card-header bg-transparent p-4 border-light-subtle text-center"
@@ -123,7 +158,6 @@ endblock %} {% block main_content %}
           </div>
         </a>
       </div>
-
     </div>
   </div>
 </section>

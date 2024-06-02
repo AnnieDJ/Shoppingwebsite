@@ -3,7 +3,7 @@ content %}
 <div
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
-  <h1 class="h2">Inventory</h1>
+  <h1 class="h2">Inventory - {{ store_name }} Store</h1>
 </div>
 
 <div class="table-responsive">
@@ -85,14 +85,6 @@ content %}
             <option value="retired">Retired</option>
           </select>
         </th>
-
-        <th scope="col">
-          Store ID<input
-            type="text"
-            id="filterCreationDate"
-            class="form-control form-control-sm"
-          />
-        </th>
         <th scope="col">
           Max. Date<input
             type="text"
@@ -120,7 +112,6 @@ content %}
         <td>{{ equipment_item.cost }}</td>
         <td>{{ equipment_item.purchase_date }}</td>
         <td>{{ equipment_item.status }}</td>
-        <td>{{ equipment_item.store_id }}</td>
         <td>{{ equipment_item.maximum_date }}</td>
         <td>{{ equipment_item.minimum_date }}</td>
       </tr>

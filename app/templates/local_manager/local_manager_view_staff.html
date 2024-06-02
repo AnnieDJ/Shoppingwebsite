@@ -1,83 +1,100 @@
-{% extends "base.html" %} {% block title %}Order List{% endblock %} {% block
-content %}
+{% extends "base.html" %} {% block title %}Local Manager View Staff List{%
+endblock %} {% block content %}
 <div
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
-  <h1 class="h2">Order List - {{ store_name }} Store</h1>
+  <h1 class="h2">Staff List - {{ store_name }} Store</h1>
 </div>
 
 <div class="table-responsive">
-  <table class="table table-striped" id="orderTable">
+  <table class="table table-striped" id="staffTable">
     <thead>
+      <tr>
         <th onclick="sortTable(0)" scope="col">
-          Order ID &#x25B2;&#x25BC;<input
+          Staff ID &#x25B2;&#x25BC;<input
             type="text"
-            id="filterOrderID"
-            class="form-control form-control-sm"
-            placeholder="Filter"
-          />
-        </th>
-        <th onclick="sortTable(1)" scope="col">
-          Customer Name &#x25B2;&#x25BC;<input
-            type="text"
-            id="filterFirstNameFamilyName"
+            id="filterStaffID"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
         <th onclick="sortTable(2)" scope="col">
-          Total Cost &#x25B2;&#x25BC;<input
+          Title &#x25B2;&#x25BC;<input
             type="text"
-            id="filterTotalCost"
+            id="filterTitle"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
         <th onclick="sortTable(3)" scope="col">
-          Discount % &#x25B2;&#x25BC;<input
+          First Name &#x25B2;&#x25BC;<input
             type="text"
-            id="filterDiscount"
+            id="filterFirstName"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th scope="col">
-          Final Price (incl. GST) &#x25B2;&#x25BC;<input
+        <th onclick="sortTable(4)" scope="col">
+          Family Name &#x25B2;&#x25BC;<input
             type="text"
-            id="filterFinalPrice"
+            id="filterFamilyName"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th scope="col">
-          Status<select id="filterStatus" class="form-control form-control-sm">
-            <option value="">All</option>
-            <option value="completed">Completed</option>
-            <option value="pending">Pending</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </th>
-        <th onclick="sortTable(3)">
-          Order Date &#x25B2;&#x25BC;<input
-            type="date"
-            id="filterCreationDate"
+        <th onclick="sortTable(5)" scope="col">
+          Email &#x25B2;&#x25BC;<input
+            type="text"
+            id="filterEmail"
             class="form-control form-control-sm"
             placeholder="Filter"
+          />
+        </th>
+        <th onclick="sortTable(5)" scope="col">
+          Phone Number &#x25B2;&#x25BC;<input
+            type="text"
+            id="filterPhoneNumber"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th onclick="sortTable(6)" scope="col">
+          Status &#x25B2;&#x25BC;<input
+            type="text"
+            id="filterStatus"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th onclick="sortTable(7)" scope="col">
+          Actions &#x25B2;&#x25BC;<input
+            type="text"
+            id="filterActions"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+            disabled
           />
         </th>
       </tr>
     </thead>
     <tbody></tbody>
-    <tbody id="ordersTableBody">
-      {% for order in orders %}
+    <tbody id="staffTableBody">
+      {% for member in staff %}
       <tr>
-        <td>{{ order.order_id }}</td>
-        <td>{{ order.first_name }} {{ order.family_name }}</td>
-        <td>{{ order.total_cost }}</td>
-        <td>{{ order.discount }}</td>
-        <td>{{ order.final_price }}</td>
-        <td>{{ order.status }}</td>
-        <td>{{ order.creation_date }}</td>
+        <td>{{ member.staff_id }}</td>
+        <td>{{ member.title }}</td>
+        <td>{{ member.first_name }}</td>
+        <td>{{ member.family_name }}</td>
+        <td>{{ member.email }}</td>
+        <td>{{ member.phone_number }}</td>
+        <td>{{ member.status }}</td>
+        <td>
+          <a
+            href="{{ url_for('local_manager.update_staff', staff_id=member.staff_id) }}"
+            class="btn btn-sm btn-warning"
+            >Update</a
+          >
+        </td>
       </tr>
       {% endfor %}
     </tbody>
@@ -87,7 +104,7 @@ content %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const filterInputs = document.querySelectorAll("thead input, thead select");
-    const tableBody = document.getElementById("ordersTableBody");
+    const tableBody = document.getElementById("staffTableBody");
     const rows = tableBody.getElementsByTagName("tr");
 
     filterInputs.forEach((input) => {
@@ -123,7 +140,7 @@ content %}
       shouldSwitch,
       dir,
       switchcount = 0;
-    table = document.getElementById("orderTable");
+    table = document.getElementById("staffTable");
     switching = true;
     dir = "asc"; // Initial direction is ascending
     while (switching) {

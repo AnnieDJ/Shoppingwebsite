@@ -38,6 +38,9 @@ CREATE TABLE IF NOT EXISTS staff (
     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
 
+ALTER TABLE staff ADD COLUMN status TINYINT DEFAULT 1;
+ALTER TABLE staff MODIFY COLUMN status ENUM('active', 'inactive') DEFAULT 'active';
+
 CREATE TABLE IF NOT EXISTS local_manager (
     local_manager_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     user_id INT NOT NULL,

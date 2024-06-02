@@ -1,9 +1,9 @@
-{% extends "base.html" %} {% block title %}Promotion_News List{% endblock %} {%
-block content %}
+{% extends "base.html" %} {% block title %}Local Manager View Reports{% endblock
+%} {% block content %}
 <div
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
-  <h1 class="h2">Promotions - {{ store_name }} Store</h1>
+  <h1 class="h2">Reports - {{ store_name }} Store</h1>
 </div>
 
 <div class="table-responsive">
@@ -11,9 +11,9 @@ block content %}
     <thead>
       <tr>
         <th scope="col">
-          Promotion ID<input
+          Report ID<input
             type="text"
-            id="filterPromotionID"
+            id="filterReportID"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
@@ -27,33 +27,17 @@ block content %}
           />
         </th>
         <th scope="col">
-          Description<input
+          Content<input
             type="text"
-            id="filterDescription"
+            id="filterContent"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
         <th scope="col">
-          Start Date<input
+          Creation Date<input
             type="date"
-            id="filterStartDate"
-            class="form-control form-control-sm"
-            placeholder="Filter"
-          />
-        </th>
-        <th scope="col">
-          End Date<input
-            type="date"
-            id="filterEndDate"
-            class="form-control form-control-sm"
-            placeholder="Filter"
-          />
-        </th>
-        <th scope="col">
-          Creator ID<input
-            type="text"
-            id="filterCreatorID"
+            id="filterCreationDate"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
@@ -61,15 +45,18 @@ block content %}
       </tr>
     </thead>
     <tbody></tbody>
-    <tbody id="ordersTableBody">
-      {% for promotion in promotions %}
+    <tbody id="reportsTableBody">
+      {% for report in reports %}
       <tr>
-        <td>{{ promotion.promotion_id }}</td>
-        <td>{{ promotion.title }}</td>
-        <td>{{ promotion.description }}</td>
-        <td>{{ promotion.start_date }}</td>
-        <td>{{ promotion.end_date }}</td>
-        <td>{{ promotion.creator_id }}</td>
+        <td>{{ report.report_id }}</td>
+        <td>
+          <a
+            href="{{ url_for('local_manager.view_report', report_id=report.report_id) }}"
+            >{{ report.title }}</a
+          >
+        </td>
+        <td>{{ report.content }}</td>
+        <td>{{ report.creation_date }}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -79,7 +66,7 @@ block content %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const filterInputs = document.querySelectorAll("thead input, thead select");
-    const tableBody = document.getElementById("ordersTableBody");
+    const tableBody = document.getElementById("reportsTableBody");
     const rows = tableBody.getElementsByTagName("tr");
 
     filterInputs.forEach((input) => {
