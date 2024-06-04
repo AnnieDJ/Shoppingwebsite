@@ -43,7 +43,7 @@ def register():
 
             cursor.execute('SELECT * FROM user WHERE username = %s', (username,))
             if cursor.fetchone():
-                flash('Account already exists!', 'danger')#这个出现的地方不对
+                flash('Account already exists!', 'danger')
                 #return redirect(url_for('home.register'))
                 return render_template('index.html', msg=msg, modal='modal')  # Render the same registration page with a flash message
 

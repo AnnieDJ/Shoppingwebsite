@@ -25,32 +25,32 @@
 }
 
 .custom-btn {
-  background-color: #4a8b32;
-  border-color: #4a8b32;
+  background-color: darkgreen;
+  border-color: darkgreen;
 }
 
 :root {
-    --primary-color: #248c00; /* Green color as primary */
-    --secondary-color: #f3f577; /* Light yellow color as secondary */
+  --primary-color: darkgreen; /* Green color as primary */
+  --secondary-color: rgb(156, 154, 154);
 }
 
 .btn-primary {
-    background-color: var(--primary-color);
-    border-color: var(--primary-color);
-    color: white;
-    transition: background-color 0.3s, border-color 0.3s;
+  background-color: darkgreen;
+  border-color: darkgreen;
+  color: white;
+  transition: background-color 0.3s, border-color 0.3s;
 }
 
 .btn-secondary {
-    background-color: var(--secondary-color);
-    border-color: var(--secondary-color);
-    color: black;
-    transition: background-color 0.3s, border-color 0.3s;
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: black;
+  transition: background-color 0.3s, border-color 0.3s;
 }
 
 .form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(74, 139, 50, 0.25);
+  border-color: darkgreen;
+  box-shadow: 0 0 0 0.2rem rgba(74, 139, 50, 0.25);
 }
 
 .logout-container {
@@ -117,7 +117,7 @@
 }
 
 .table-card .card-header {
-  background: #4a8b32;
+  background: darkgreen;
   color: #ffffff;
   border-radius: 10px 10px 0 0;
 }
@@ -127,13 +127,13 @@
 }
 
 .table-card .btn-success {
-  background-color: #4a8b32;
-  border-color: #4a8b32;
+  background-color: darkgreen;
+  border-color: darkgreen;
 }
 
 .table-card .btn-success:hover {
-  background-color: #367a26;
-  border-color: #367a26;
+  background-color: darkgreen;
+  border-color: darkgreen;
 }
 
 .column-narrow {
@@ -159,7 +159,7 @@ table {
 }
 
 .table thead {
-  background: #4a8b32;
+  background: darkgreen;
   color: #ffffff;
 }
 
@@ -179,7 +179,7 @@ table {
 }
 
 .table tbody tr:last-of-type {
-  border-bottom: 2px solid #4a8b32;
+  border-bottom: 2px solid darkgreen;
 }
 
 /* Consistent button styling */
@@ -201,21 +201,21 @@ table {
 }
 
 .cost::before {
-          content: "$";
-      }
+  content: "$";
+}
 
 .cost::after {
-          content: "/day";
-      }
+  content: "/day";
+}
 
 .cart_equipment_id::before {
-            content: "#";
-      }
+  content: "#";
+}
 
 .cart_cost::before {
-          content: "$";
-      }
+  content: "$";
+}
 
 .total::after {
-          content: "day";
-      }
+  content: "day";
+}

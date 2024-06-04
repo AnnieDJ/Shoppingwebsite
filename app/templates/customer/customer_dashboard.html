@@ -68,12 +68,8 @@ block content %} {% if session.get('loggedin') %}
   }
 </style>
 
-<div class="custom-welcome">
-  <p>Welcome back, farmer007!</p>
-  <p>Please select a store to start browsing available machinery</p>
-</div>
-
-{% endif %}
+Welcome back, {{ session.get('username') }}! <br />Please select a store to
+start browsing available machinery {% endif %}
 <div class="container mt-4">
   <div class="row mb-4">
     <div class="col-md-6">
@@ -166,9 +162,11 @@ block content %} {% if session.get('loggedin') %}
         product.name
       }">
               <div class="card-body">
-                <h5 class="card-title">${product.name}</h5>
+                <h5 class="card-title">${
+                  product.name
+                }</h5><p class="card-text">$${product.cost}</p>
                 <p class="card-text">${product.description}</p>
-                <p class="card-text">${product.price}</p>
+                
                 <button class="btn btn-primary add-to-cart" data-product='${JSON.stringify(
                   product
                 )}'>Add to Cart</button>
@@ -186,9 +184,12 @@ block content %} {% if session.get('loggedin') %}
       var product = $(this).data("product");
       $(".modal-body").html(`
           <img src="/static/${product.Image}" class="img-fluid mb-3" alt="${product.name}">
-          <h5>${product.name}</h5>
+          <div class="product-details">
+            <h5 class="product-name">${product.name}</h5>
+            <p class="product-cost">$${product.cost}</p>
+        </div>
           <p>${product.description}</p>
-          <p>${product.price}</p>
+          
         `);
       $("#productModal").modal("show");
     });
@@ -237,7 +238,7 @@ block content %} {% if session.get('loggedin') %}
               <div class="card-body">
                 <h5 class="card-title">${product.name}</h5>
                 <p class="card-text">${product.description}</p>
-                <p class="card-text">${product.price}</p>
+                <p class="card-text">$${product.cost}</p>
                 <button class="btn btn-primary add-to-cart" data-product='${JSON.stringify(
                   product
                 )}'>Add to Cart</button>
@@ -257,7 +258,7 @@ block content %} {% if session.get('loggedin') %}
           <img src="/static/${product.Image}" class="img-fluid mb-3" alt="${product.name}">
           <h5>${product.name}</h5>
           <p>${product.description}</p>
-          <p>${product.price}</p>
+          <p>$${product.cost}</p>
         `);
       $("#productModal").modal("show");
     });
