@@ -41,9 +41,8 @@ block content %}
   </table>
 </div>
 
-
 <script>
- function updateStatus(rentalId, newStatus) {
+function updateStatus(rentalId, newStatus) {
     var form = new FormData();
     form.append('rental_id', rentalId);
     form.append('new_status', newStatus);
@@ -73,7 +72,6 @@ block content %}
         alert('Failed to update status: ' + error.message);
     });
 }
-
 </script>
 
 {% endblock %}

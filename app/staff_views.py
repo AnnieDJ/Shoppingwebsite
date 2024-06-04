@@ -8,6 +8,7 @@ from .utils import db_cursor
 from flask_hashing import Hashing
 from . import hashing
 from .utils import db_cursor, login_required
+from .utils import db_cursor, fetch_checklist_entries, fetch_returns, fetch_rentals, fetch_orders, fetch_payments
 
 staff_bp = Blueprint('staff', __name__, template_folder='templates/staff')
 
@@ -20,6 +21,7 @@ def dashboard():
         conn, cursor = db_cursor()
         user_id = session['userid']  # Assuming 'userid' is stored in session upon login
         
+         
         # Fetch the store_id and store name for the logged-in staff member
         cursor.execute("""
             SELECT s.store_id, st.store_name
@@ -32,73 +34,19 @@ def dashboard():
         store_id = store_info['store_id'] if store_info else None
         
         if store_id:
-        # Fetch top 5 daily checklist entries
-            cursor.execute("""
-                SELECT r.*, u.username, e.name as equipment_name
-                FROM rentals r
-                JOIN user u ON r.user_id = u.user_id
-                JOIN equipment e ON r.equipment_id = e.equipment_id
-                WHERE e.store_id = %s
-                ORDER BY r.start_date DESC
-                LIMIT 5
-            """, (store_id,))
-            top_bookings = cursor.fetchall()
-            
-            # Fetch top 5 returns
             today = date.today().strftime('%Y-%m-%d')
-            cursor.execute("""
-                SELECT r.rental_id, c.first_name, c.family_name, e.name as equipment_name, r.end_date, r.status, c.first_name, c.family_name
-                FROM rentals r
-                JOIN user u ON r.user_id = u.user_id
-                JOIN equipment e ON r.equipment_id = e.equipment_id
-                JOIN customer c ON u.user_id = c.user_id
-                WHERE r.end_date = %s AND e.store_id = %s
-                ORDER BY r.end_date DESC
-                LIMIT 5
-            """, (today, store_id))
-            top_returns = cursor.fetchall()
-
-            # Fetch top 5 rentals
-            cursor.execute("""
-                SELECT r.*, u.username, e.name as equipment_name
-                FROM rentals r
-                JOIN user u ON r.user_id = u.user_id
-                JOIN equipment e ON r.equipment_id = e.equipment_id
-                WHERE e.store_id = %s
-                ORDER BY r.start_date DESC
-                LIMIT 5
-            """, (store_id,))
-            top_rentals = cursor.fetchall()
-            
-            # Fetch top 5 orders
-            cursor.execute("""
-                SELECT o.order_id, o.user_id, o.total_cost, o.tax, o.discount, o.final_price, o.status, o.creation_date
-                FROM orders o
-                WHERE o.store_id = %s
-                ORDER BY o.creation_date DESC
-                LIMIT 5
-            """, (store_id,))
-            top_orders = cursor.fetchall()
-            
-        
-            # Fetch top 5 payments
-            cursor.execute("""
-                SELECT p.payment_id, p.order_id, p.user_id, p.payment_type, p.payment_status, p.amount, p.payment_date
-                    FROM payments p
-                    JOIN orders o ON p.order_id = o.order_id
-                    WHERE o.store_id = %s
-                    ORDER BY p.payment_date DESC
-                    LIMIT 5
-            """, (store_id,))
-            top_payments = cursor.fetchall()
-        
+            top_bookings = fetch_checklist_entries(cursor, store_id, today, limit=5)
+            top_returns = fetch_returns(cursor, store_id, today, limit=5)
+            top_rentals = fetch_rentals(cursor, store_id, limit=5)
+            top_orders = fetch_orders(cursor, store_id, limit=5)
+            top_payments = fetch_payments(cursor, store_id, limit=5)
         else:
             top_bookings, top_returns, top_rentals, top_orders, top_payments = [], [], [], [], []
 
         cursor.close()
         conn.close()
         
-       # Choose the right template based on the role
+        # Choose the right template based on the role
         template_name = 'local_manager_dashboard.html' if session['role'] == 'local_manager' else 'staff_dashboard.html'
         return render_template(template_name, top_bookings=top_bookings, top_returns=top_returns, top_rentals=top_rentals, 
                                top_orders=top_orders, top_payments=top_payments, store_name=store_name)
@@ -228,13 +176,7 @@ def view_rentals():
             store_id = store_info['store_id'] if store_info else None
             
             if store_id:
-                cursor.execute("""
-                    SELECT r.rental_id, c.first_name, c.family_name, e.name as equipment_name, r.start_date, r.end_date, r.status
-                    FROM rentals r
-                    JOIN customer c ON r.user_id = c.user_id
-                    JOIN equipment e ON r.equipment_id = e.equipment_id
-                """)
-                rentals = cursor.fetchall()
+                rentals = fetch_rentals(cursor, store_id)
             else:
                 rentals = []
                 
@@ -271,14 +213,7 @@ def view_orders():
             store_id = store_info['store_id'] if store_info else None
             
             if store_id:
-                cursor.execute("""
-                    SELECT o.order_id, c.first_name, c.family_name, o.store_id, o.total_cost, 
-                    o.tax, o.discount, o.final_price, o.status, o.creation_date
-                    FROM orders o
-                    JOIN customer c ON o.user_id = c.user_id
-                    WHERE o.store_id = %s
-                """, (store_id,))
-                orders = cursor.fetchall()
+                orders = fetch_orders(cursor, store_id)
             else: 
                 orders = []
             
@@ -315,14 +250,7 @@ def view_payments():
             store_id = store_info['store_id'] if store_info else None
             
             if store_id:
-                cursor.execute("""
-                    SELECT p.payment_id, p.order_id, p.user_id, p.payment_type, p.payment_status, p.amount, p.payment_date
-                    FROM payments p
-                    JOIN orders o ON p.order_id = o.order_id
-                    WHERE o.store_id = %s
-                    ORDER BY p.payment_date DESC
-                """, (store_id,))
-                payments = cursor.fetchall()
+                payments = fetch_payments(cursor, store_id)
             else:
                 payments = []   
         
@@ -461,10 +389,9 @@ def daily_checklist():
         today = date.today().strftime('%Y-%m-%d')
         conn, cursor = db_cursor()
         user_id = session['userid']
-        
-        try:
+      
             # Fetch the store_id and store name for the logged-in staff member or local manager
-            cursor.execute("""
+        cursor.execute("""
                 SELECT s.store_id, st.store_name
                 FROM staff s
                 JOIN stores st ON s.store_id = st.store_id
@@ -475,31 +402,18 @@ def daily_checklist():
                 JOIN stores st ON l.store_id = st.store_id
                 WHERE l.user_id = %s
             """, (user_id, user_id))
-            store_info = cursor.fetchone()
-            store_name = store_info['store_name'] if store_info else 'Not Assigned'
-            store_id = store_info['store_id'] if store_info else None
+        store_info = cursor.fetchone()
+        store_name = store_info['store_name'] if store_info else 'Not Assigned'
+        store_id = store_info['store_id'] if store_info else None
             
-            if store_id:
-                # Query today's bookings
-                sql_query = """
-                SELECT r.rental_id, r.equipment_id, e.name AS equipment_name, 
-                        r.start_date, r.end_date, r.status, r.id_verified, co.first_name, co.family_name
-                    FROM rentals r
-                    JOIN equipment e ON r.equipment_id = e.equipment_id
-                    JOIN user u ON r.user_id = u.user_id
-                    LEFT JOIN customer co ON u.user_id = co.user_id
-                    WHERE r.start_date = %s AND r.status IN ('Completed', 'Pending', 'Canceled');
-                """
-                print("Date for query:", today)
-                cursor.execute(sql_query, (today,))  
-                bookings = cursor.fetchall()
-            else:
+        if store_id:
+                bookings = fetch_checklist_entries(cursor, store_id, today)
+        else:
                 bookings = []
+             
+        cursor.close()
+        conn.close()
             
-        finally:
-            cursor.close()
-            conn.close()
-        
         return render_template('daily_checklist.html', bookings=bookings, store_name=store_name, today=today)
     else:
         flash("You are not authorized to view this page.")
@@ -580,9 +494,9 @@ def daily_returns():
         conn, cursor = db_cursor()
         user_id = session['userid']
         
-        try:
-            # Fetch the store_id and store name for the logged-in staff member
-            cursor.execute("""
+   
+        # Fetch the store_id and store name for the logged-in staff member
+        cursor.execute("""
                 SELECT s.store_id, st.store_name
                 FROM staff s
                 JOIN stores st ON s.store_id = st.store_id
@@ -593,36 +507,24 @@ def daily_returns():
                 JOIN stores st ON l.store_id = st.store_id
                 WHERE l.user_id = %s
             """, (user_id, user_id))
-            store_info = cursor.fetchone()
-            store_name = store_info['store_name'] if store_info else 'Not Assigned'
-            store_id = store_info['store_id'] if store_info else None
+        store_info = cursor.fetchone()
+        store_name = store_info['store_name'] if store_info else 'Not Assigned'
+        store_id = store_info['store_id'] if store_info else None
             
-            if store_id:
-                # Query today's returns
-                sql_query = """
-                SELECT r.rental_id, r.equipment_id, e.name AS equipment_name, 
-                        r.start_date, r.end_date, r.status, co.first_name, co.family_name
-                    FROM rentals r
-                    JOIN equipment e ON r.equipment_id = e.equipment_id
-                    JOIN user u ON r.user_id = u.user_id
-                    LEFT JOIN customer co ON u.user_id = co.user_id
-                    WHERE r.end_date = %s AND r.status IN ('Completed', 'Pending', 'Canceled');
-                """
-                cursor.execute(sql_query, (today,))  
-                returns = cursor.fetchall()
-            else:
-                returns = []
-            
-        finally:
-            cursor.close()
-            conn.close()
+        if store_id:
+            returns = fetch_returns(cursor, store_id, today)
+        else:
+            returns = [] 
+
+        cursor.close()
+        conn.close()
         
         return render_template('staff_equipment_return.html', returns=returns, store_name=store_name, today=today)
     else:
         flash("You are not authorized to view this page.")
         return redirect(url_for('staff.dashboard'))
-    
-
+ 
+ 
 ## Update Daily Returns ##
 @staff_bp.route('/update_return_status', methods=['POST'])
 @login_required
@@ -631,7 +533,7 @@ def update_return_status():
     new_status = request.form.get('new_status')
 
     if not rental_id or not new_status:
-        return jsonify({'error': 'Missing rental ID or status'}), 400
+        return jsonify({'success': False, 'message': 'Missing parameters'}), 400
 
     conn, cursor = db_cursor()
     try:
@@ -644,7 +546,7 @@ def update_return_status():
         return jsonify({'success': True, 'message': 'Status updated successfully.'})
     except Exception as e:
         conn.rollback()
-        return jsonify({'error': str(e), 'message': 'Failed to update status.'}), 500
+        return jsonify({'success': False, 'message': str(e)}), 500
     finally:
         cursor.close()
         conn.close()
