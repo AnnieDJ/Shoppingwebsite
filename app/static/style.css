@@ -29,26 +29,32 @@
   border-color: #4a8b32;
 }
 
-.main-content {
-  margin-left: 250px;
-  margin-right: 20px; /* Adds right margin */
-  padding: 20px; /* Adds padding inside the content area */
+:root {
+    --primary-color: #248c00; /* Green color as primary */
+    --secondary-color: #f3f577; /* Light yellow color as secondary */
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: black;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(74, 139, 50, 0.25);
 }
 
 .logout-container {
   margin-left: auto; /* Pushes logout to the far right */
-}
-
-.sidebar {
-  top: 70px;
-  height: 100vh;
-  width: 250px;
-  color: #000000;
-  background: linear-gradient(to bottom, #629a3c, #f3f577);
-}
-
-.sidebar-item {
-  border-bottom: 1px solid #6a6a6a;
 }
 
 .navbar-brand {
@@ -98,14 +104,6 @@
   margin-left: 250px; /* Adjust based on your sidebar width */
 }
 
-.custom-btn {
-  background-color: #4a8b32 !important;
-  border-color: #4a8b32 !important;
-}
-
-.services-icon {
-  font-size: 40px !important; /* Adjust the size as needed */
-}
 /* Additional styles for improved design */
 
 /* Background enhancement */
@@ -211,3 +209,23 @@ table {
   padding-right: 20px;
   margin-right: auto;
 }
+
+.cost::before {
+          content: "$";
+      }
+
+.cost::after {
+          content: "/day";
+      }
+
+.cart_equipment_id::before {
+            content: "#";
+      }
+
+.cart_cost::before {
+          content: "$";
+      }
+
+.total::after {
+          content: "day";
+      }

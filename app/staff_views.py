@@ -374,21 +374,21 @@ def inventory_management():
         store_id = cursor.fetchone()['store_id']
         if store_id:
             cursor.execute(f"""
-                    SELECT category,
-                        SUM(CASE WHEN status = 'Available' THEN 1 ELSE 0 END) AS AvailableCount,
-                        SUM(CASE WHEN status = 'Rented' THEN 1 ELSE 0 END) AS RentedCount,
-                        SUM(CASE WHEN status = 'Under Repair' THEN 1 ELSE 0 END) AS UnderRepairCount,
-                        SUM(CASE WHEN status = 'Retired' THEN 1 ELSE 0 END) AS RetiredCount
-                    FROM
-                        equipment
-                    WHERE store_id = {store_id}
-                    GROUP BY
-                        category;
-                    """)
+                        SELECT category,
+                            SUM(CASE WHEN status = 'Available' THEN 1 ELSE 0 END) AS AvailableCount,
+                            SUM(CASE WHEN status = 'Rented' THEN 1 ELSE 0 END) AS RentedCount,
+                            SUM(CASE WHEN status = 'Under Repair' THEN 1 ELSE 0 END) AS UnderRepairCount,
+                            SUM(CASE WHEN status = 'Retired' THEN 1 ELSE 0 END) AS RetiredCount
+                        FROM
+                            equipment
+                        WHERE store_id = {store_id}
+                        GROUP BY
+                            category;
+                        """)
             category = cursor.fetchall()
         cursor.close()
         return render_template('staff_inventory_management.html', category=category)
-    return redirect(url_for('staff.dashboard'))
+    return redirect(url_for('home.login'))
 
 
 # View machinery's details
@@ -400,10 +400,10 @@ def equipment_detail():
         cursor.execute(f"SELECT * FROM equipment WHERE category = '{category}'")
         equipment = cursor.fetchall()
         cursor.close()
-        return render_template('staff_equipment_detail.html', equipment=equipment)
-    return redirect(url_for('staff.dashboard'))
+        return render_template('staff_equipment_detail.html', equipment=equipment, categories=all_category())
+    return redirect(url_for('home.login'))
 
-# Update a machinery's details
+
 @staff_bp.route('/equipment/update', methods=['POST'])
 def equipment_update():
     if 'loggedin' in session and session['role'] == 'staff':
@@ -428,18 +428,21 @@ def equipment_update():
     })
 
 
-# Add a new machinery
 @staff_bp.route('/equipment/add', methods=['POST'])
 def equipment_add():
     if 'loggedin' in session and session['role'] == 'staff':
         serial_number = request.form['serial_number']
+        name = request.form['name']
+        description = request.form['description']
         Image = request.form['Image']
         purchase_date = request.form['purchase_date']
         cost = request.form['cost']
         category = request.form['category']
         status = request.form['status']
         conn, cursor = db_cursor()
-        cursor.execute(f"INSERT INTO equipment (serial_number, Image, purchase_date, cost, category, status) VALUES ('{serial_number}', '{Image}', '{purchase_date}', '{cost}', '{category}', '{status}')")
+        cursor.execute(f'SELECT store_id FROM staff WHERE user_id = {session["userid"]}')
+        store_id = cursor.fetchone()['store_id']
+        cursor.execute(f"INSERT INTO equipment (serial_number, name, description, Image, purchase_date, cost, category, status, maximum_date, minimum_date, store_id) VALUES ('{serial_number}', '{name}', '{description}', '{Image}', '{purchase_date}', '{cost}', '{category}', '{status}', '360', '1', '{store_id}')")
         conn.commit()
         cursor.close()
         return jsonify({
@@ -451,6 +454,14 @@ def equipment_add():
         'code': 401,
         'message': 'Not Authorized'
     })
+
+
+def all_category():
+    conn, cursor = db_cursor()
+    cursor.execute("SELECT category FROM equipment GROUP BY category")
+    categories = cursor.fetchall()
+    cursor.close()
+    return categories
 
 
 ## Today's checklist ##

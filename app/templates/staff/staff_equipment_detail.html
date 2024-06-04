@@ -1,111 +1,220 @@
 {% extends "base.html" %} {% block title %}Staff Dashboard{% endblock %} {%
 block content %}
-<div style="padding: 20px">
-  <table class="table" style="margin-top: 10px">
+<div style="padding: 20px;">
+
+<div>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add A New Machinery</button>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form>
+            <div class="mb-3">
+              <label for="serial_number" class="col-form-label">Serial Number:</label>
+              <input type="text" class="form-control" id="serial_number">
+            </div>
+            <div class="mb-3">
+              <label for="name" class="col-form-label">Name:</label>
+              <input type="text" class="form-control" id="name">
+            </div>
+            <div class="mb-3">
+              <label for="Image" class="col-form-label">Image:</label>
+              <input type="text" class="form-control" id="Image">
+            </div>
+              <div class="mb-3">
+              <label for="purchase_date" class="col-form-label">Purchase Date:</label>
+              <input type="date" class="form-control" id="purchase_date">
+            </div>
+              <div class="mb-3">
+              <label for="cost" class="col-form-label">Cost:</label>
+              <input type="text" class="form-control" id="cost">
+            </div>
+          <div class="mb-3">
+              <label for="description" class="col-form-label">Description:</label>
+              <input type="text" class="form-control" id="description">
+            </div>
+              <div class="mb-3">
+              <label for="category" class="col-form-label">Category:</label>
+              <select id="category">
+                {% for entry in categories %}
+                <option value="{{ entry.category }}">{{ entry.category }}</option>
+                {% endfor %}
+              </select>
+            </div>
+              <div class="mb-3">
+              <label for="status" class="col-form-label">Status:</label>
+              <select id="status">
+                <option value="Available">Available</option>
+                <option value="Rented">Rented</option>
+                <option value="Under Repair">Under Repair</option>
+                <option value="Retired">Retired</option>
+            </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button data-bs-dismiss="modal" onclick="add()" type="button" class="btn btn-primary">Confirm</button>
+        </div>
+        </div>
+        </div>
+     </div>
+</div>
+
+<table class="table" style="margin-top: 10px;">
     <thead>
-      <tr>
-        <th>Serial_Number</th>
+    <tr>
+        <th>Serial Number</th>
         <th>Image</th>
         <th>Purchase Date</th>
         <th>Cost</th>
         <th>Category</th>
         <th>Status</th>
-        <th>Edit</th>
-      </tr>
+        <th>Update</th>
+    </tr>
     </thead>
     <tbody>
-      {% for entry in equipment %}
-      <tr id="{{ entry.serial_number }}">
+    {% for entry in equipment %}
+    <tr id="{{ entry.serial_number }}">
         <td data-type="SERIAL">{{ entry.serial_number }}</td>
         <td data-type="IMG">
-          <img
-            alt="{{ entry.name }}"
-            style="width: 50px; height: 50px"
-            src="/static/{{ entry.Image }}"
-          />
+            <img alt="{{ entry.name }}" style="width: 50px; height: 50px;" src="/static/{{ entry.Image }}">
         </td>
-        <td data-name="purchase_date">{{ entry.purchase_date }}</td>
-        <td data-name="cost">${{ entry.cost }}/day</td>
-        <td data-name="category">{{ entry.category }}</td>
-        <td data-name="status">{{ entry.status }}</td>
+        <td data-type="DATE" data-name="purchase_date">{{ entry.purchase_date }}</td>
+        <td class="cost" data-name="cost">{{ entry.cost }}</td>
+        <td data-type="CATEGORY" data-name="category">{{ entry.category }}</td>
+        <td data-type="STATUS" data-name="status">{{ entry.status }}</td>
         <td data-type="BUTTON">
-          <button
-            class="btn custom-btn"
-            onclick="editInfo({{ entry.serial_number }})"
-          >
-            Edit
-          </button>
+            <button class="btn btn-primary" onclick="editInfo({{ entry.serial_number }})">Edit</button>
         </td>
-      </tr>
-      {% endfor %}
+    </tr>
+    {% endfor %}
     </tbody>
-  </table>
-
-  <div>
-    <button type="button" class="btn custom-btn">Add A New Machinery</button>
-  </div>
+</table>
 </div>
 
 <script>
-  const editInfo = (serial_number) => {
-    const children = document.getElementById(serial_number).children;
-    Array.from(children).forEach((entry) => {
-      switch (entry.dataset.type) {
-        case "SERIAL":
-          break;
-        case "IMG":
-          const src = entry.children[0].src;
-          entry.innerHTML = `<input type="text" value="${src}">`;
-          break;
-        case "BUTTON":
-          entry.innerHTML = `<button class="btn custom-btn" onclick="saveInfo(${serial_number})">Save</button>`;
-          break;
-        default:
-          const value = entry.textContent;
-          entry.innerHTML = `<input type="text" value="${value}">`;
-          break;
-      }
-    });
-  };
+    const editInfo = (serial_number) => {
+        const children = document.getElementById(serial_number).children;
+        Array.from(children).forEach(entry => {
+            switch (entry.dataset.type) {
+                case "SERIAL":
+                    break;
+                case "DATE":
+                    const date = entry.textContent;
+                    entry.innerHTML = `<input type="date" value="${date}">`;
+                    break
+                case "IMG":
+                    const src = entry.children[0].src;
+                    entry.innerHTML = `<input type="text" value="${src}">`;
+                    break;
+                case "CATEGORY":
+                    const category = entry.textContent;
+                    entry.innerHTML = `
+                        <select>
+                            {% for entry in categories %}
+                            <option value="{{ entry.category }}">{{ entry.category }}</option>
+                            {% endfor %}
+                        </select>
+                    `;
 
-  const saveInfo = async (serial_number) => {
-    const formData = new FormData();
-    const children = document.getElementById(serial_number).children;
-    Array.from(children).forEach((entry) => {
-      switch (entry.dataset.type) {
-        case "SERIAL":
-          formData.append("serial_number", serial_number);
-          break;
-        case "IMG":
-          const src = entry.children[0].value.replace(
-            location.origin + "/static/",
-            ""
-          );
-          formData.append("Image", src);
-          entry.innerHTML = `<img style="width: 50px; height: 50px;" src="/static/${src}">`;
-          break;
-        case "BUTTON":
-          entry.innerHTML = `<button class="btn custom-btn" onclick="editInfo(${serial_number})">Edit</button>`;
-          break;
-        default:
-          const value = entry.children[0].value;
-          formData.append(entry.dataset.name, value);
-          entry.innerHTML = value;
-          break;
-      }
-    });
-
-    const res = await fetch("/staff/equipment/update", {
-      method: "POST",
-      body: formData,
-    }).then((res) => res.json());
-
-    if (res.code === 200) {
-      alert("Equipment details have been updated successfully!");
-    } else {
-      location.href = window.location.href;
-      alert("Update failed, please try again!");
+                    try {
+                        document.querySelector("option[value='" + category + "']").selected = true;
+                    } catch (e) {
+                        console.log("Could not select category: "+ e);
+                    }
+                    break;
+                case "STATUS":
+                    const status = entry.textContent;
+                    entry.innerHTML = `
+                        <select>
+                            <option value="Available">Available</option>
+                            <option value="Rented">Rented</option>
+                            <option value="Under Repair">Under Repair</option>
+                            <option value="Retired">Retired</option>
+                        </select>
+                    `;
+                    try {
+                        document.querySelector("option[value='" + status + "']").selected = true;
+                    } catch (e) {
+                        console.log("Could not select status: "+ e);
+                    }
+                    break;
+                case "BUTTON":
+                    entry.innerHTML = `<button class="btn btn-primary" onclick="saveInfo(${serial_number})">Save</button>`
+                    break;
+                default:
+                    const value = entry.textContent;
+                    entry.innerHTML = `<input type="text" value="${value}">`;
+                    break;
+            }
+        })
     }
-  };
+
+    const saveInfo = async (serial_number) => {
+        const formData = new FormData();
+        const children = document.getElementById(serial_number).children;
+        Array.from(children).forEach(entry => {
+            switch (entry.dataset.type) {
+                case "SERIAL":
+                    formData.append("serial_number", serial_number);
+                    break;
+                case "IMG":
+                    const src = entry.children[0].value.replace(location.origin + '/static/', '');
+                    formData.append("Image", src)
+                    entry.innerHTML = `<img style="width: 50px; height: 50px;" src="/static/${src}">`;
+                    break;
+                case "BUTTON":
+                    entry.innerHTML = `<button class="btn btn-primary" onclick="editInfo(${serial_number})">edit</button>`
+                    break;
+                default:
+                    const value = entry.children[0].value;
+                    formData.append(entry.dataset.name, value);
+                    entry.innerHTML = value;
+                    break;
+            }
+        })
+
+        const res = await fetch('/staff/equipment/update', {
+            method: 'POST',
+            body: formData
+        }).then(res => res.json())
+
+        if (res.code === 200) {
+            alert("Equipment details have been updated successfully!");
+        } else {
+            location.reload();
+            alert("Update failed! Please try again!");
+        }
+    }
+
+    const add = async () => {
+        const formData = new FormData();
+        formData.append("serial_number", document.getElementById("serial_number").value);
+        formData.append("name", document.getElementById("name").value);
+        formData.append("description", document.getElementById("description").value);
+        formData.append("Image", document.getElementById("Image").value);
+        formData.append("purchase_date", document.getElementById("purchase_date").value);
+        formData.append("cost", document.getElementById("cost").value);
+        formData.append("category", document.getElementById("category").value);
+        formData.append("status", document.getElementById("status").value);
+
+        const res = await fetch('/staff/equipment/add', {
+            method: 'POST',
+            body: formData
+        }).then(res => res.json());
+
+        if (res.code === 200) {
+            alert("A new equipment has been added in the inventory!");
+        } else {
+            location.reload();
+            alert("Attempt to add a new equipment failed! Please try again!");
+        }
+    }
 </script>
 {% endblock %}
