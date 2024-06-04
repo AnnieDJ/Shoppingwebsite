@@ -52,6 +52,11 @@ CREATE TABLE IF NOT EXISTS local_manager (
     FOREIGN KEY (user_id) REFERENCES user(user_id),
     FOREIGN KEY (store_id) REFERENCES stores(store_id)
 );
+
+ALTER TABLE local_manager ADD COLUMN status ENUM('active', 'inactive') DEFAULT 'active';
+
+
+
     
 CREATE TABLE IF NOT EXISTS admin_national_manager (
     admin_manager_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
@@ -62,6 +67,21 @@ CREATE TABLE IF NOT EXISTS admin_national_manager (
     phone_number VARCHAR(20),
     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
+
+-- Add the role column to the table
+ALTER TABLE asdatabase_scripts.admin_national_manager
+ADD COLUMN role VARCHAR(50);
+
+-- Update Rose's role to admin
+UPDATE asdatabase_scripts.admin_national_manager
+SET role = 'admin'
+WHERE user_id = 1;
+
+-- Update Peter's role to national manager
+UPDATE asdatabase_scripts.admin_national_manager
+SET role = 'national manager'
+WHERE user_id = 2;
+
 
 CREATE TABLE IF NOT EXISTS equipment (
     equipment_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,

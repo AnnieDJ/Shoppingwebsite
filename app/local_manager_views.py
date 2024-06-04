@@ -454,29 +454,41 @@ def view_report(report_id):
 ## View Staff ##
 @local_manager_bp.route('/staff')
 def view_staff():
-    if 'loggedin' in session and session['role'] == 'local_manager':
+    if 'loggedin' in session and session['role'] in ['local_manager', 'national_manager']:
         conn, cursor = db_cursor()
         user_id = session['userid']
         
         try:
-            # Fetch the store_id and store name for the logged-in local manager
-            cursor.execute("""
-                SELECT s.store_id, st.store_name
-                FROM local_manager s
-                JOIN stores st ON s.store_id = st.store_id
-                WHERE s.user_id = %s
-            """, (user_id,))
-            store_info = cursor.fetchone()
-            store_name = store_info['store_name'] if store_info else 'Not Assigned'
-            store_id = store_info['store_id'] if store_info else None
-            
-            cursor.execute("""
-                SELECT s.staff_id, s.user_id, s.store_id, s.title, s.first_name, s.family_name, s.phone_number, s.status, u.email
-                FROM staff s
-                JOIN user u ON s.user_id = u.user_id
-                WHERE s.store_id = %s
-            """, (store_id,))
-            staff = cursor.fetchall()
+            # Fetch the store_id and store name for the logged-in local manager or national manager
+            if session['role'] == 'local_manager':
+                cursor.execute("""
+                    SELECT s.store_id, st.store_name
+                    FROM local_manager s
+                    JOIN stores st ON s.store_id = st.store_id
+                    WHERE s.user_id = %s
+                """, (user_id,))
+                store_info = cursor.fetchone()
+                store_name = store_info['store_name'] if store_info else 'Not Assigned'
+                store_id = store_info['store_id'] if store_info else None
+                
+                cursor.execute("""
+                    SELECT s.staff_id, s.user_id, s.store_id, s.title, s.first_name, s.family_name, s.phone_number, s.status, u.email
+                    FROM staff s
+                    JOIN user u ON s.user_id = u.user_id
+                    WHERE s.store_id = %s
+                """, (store_id,))
+                staff = cursor.fetchall()
+                
+            else:
+                # National Manager: Fetch all staff from all stores
+                cursor.execute("""
+                    SELECT s.staff_id, s.user_id, s.store_id, s.title, s.first_name, s.family_name, s.phone_number, s.status, u.email, st.store_name
+                    FROM staff s
+                    JOIN user u ON s.user_id = u.user_id
+                    JOIN stores st ON s.store_id = st.store_id
+                """)
+                staff = cursor.fetchall()
+                store_name = 'All Stores'
         
         except Exception as e:
             print("An error occurred:", e)
@@ -494,7 +506,7 @@ def view_staff():
 ## Update Staff ##
 @local_manager_bp.route('/update_staff/<int:staff_id>', methods=['GET', 'POST'])
 def update_staff(staff_id):
-    if 'loggedin' in session and session['role'] == 'local_manager':
+    if 'loggedin' in session and session['role'] in ['local_manager', 'national_manager']:
         conn, cursor = db_cursor()
         
         if request.method == 'POST':

@@ -1,15 +1,16 @@
-{% extends "base.html" %} {% block title %}Local Manager View Staff List{%
+{% extends "base.html" %} {% block title %}National Manager - View Staff{%
 endblock %} {% block content %}
+
 <div
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
-  <h1 class="h2">Staff List - {{ store_name }} Store</h1>
+  <h1 class="h2">Local Manager and Staff List - All Stores</h1>
 </div>
 
-<div class="table-responsive">
-  <table class="table table-striped" id="staffTable">
-    <thead>
-      <tr>
+  <div class="table-responsive">
+    <table class="table table-striped" id="staffTable">
+      <thead>
+          <tr>
         <th onclick="sortTable(0)" scope="col">
           Staff ID &#x25B2;&#x25BC;<input
             type="text"
@@ -18,7 +19,7 @@ endblock %} {% block content %}
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(2)" scope="col">
+        <th onclick="sortTable(1)" scope="col">
           Title &#x25B2;&#x25BC;<input
             type="text"
             id="filterTitle"
@@ -26,7 +27,7 @@ endblock %} {% block content %}
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(3)" scope="col">
+        <th onclick="sortTable(2)" scope="col">
           First Name &#x25B2;&#x25BC;<input
             type="text"
             id="filterFirstName"
@@ -34,7 +35,7 @@ endblock %} {% block content %}
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(4)" scope="col">
+        <th onclick="sortTable(3)" scope="col">
           Family Name &#x25B2;&#x25BC;<input
             type="text"
             id="filterFamilyName"
@@ -42,7 +43,7 @@ endblock %} {% block content %}
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(5)" scope="col">
+        <th onclick="sortTable(4)" scope="col">
           Email &#x25B2;&#x25BC;<input
             type="text"
             id="filterEmail"
@@ -58,6 +59,22 @@ endblock %} {% block content %}
             placeholder="Filter"
           />
         </th>
+        <th onclick="sortTable(7)" scope="col">
+          Role &#x25B2;&#x25BC;<input
+            type="text"
+            id="filterRole"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th onclick="sortTable(8)" scope="col">
+          Store Name &#x25B2;&#x25BC;<input
+            type="text"
+            id="filterStoreName"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
         <th onclick="sortTable(6)" scope="col">
           Status &#x25B2;&#x25BC;<input
             type="text"
@@ -66,17 +83,7 @@ endblock %} {% block content %}
             placeholder="Filter"
           />
         </th>
-        {% if session['role'] == 'national_manager' %}
-        <th onclick="sortTable(7)" scope="col">
-          Store Name &#x25B2;&#x25BC;<input
-            type="text"
-            id="filterStoreName"
-            class="form-control form-control-sm"
-            placeholder="Filter"
-          />
-        </th>
-        {% endif %}
-        <th onclick="sortTable(7)" scope="col">
+        <th onclick="sortTable(9)" scope="col">
           Actions &#x25B2;&#x25BC;<input
             type="text"
             id="filterActions"
@@ -86,33 +93,33 @@ endblock %} {% block content %}
           />
         </th>
       </tr>
-    </thead>
-    <tbody></tbody>
-    <tbody id="staffTableBody">
-      {% for member in staff %}
-      <tr>
-        <td>{{ member.staff_id }}</td>
-        <td>{{ member.title }}</td>
-        <td>{{ member.first_name }}</td>
-        <td>{{ member.family_name }}</td>
-        <td>{{ member.email }}</td>
-        <td>{{ member.phone_number }}</td>
-        <td>{{ member.status }}</td>
-        {% if session['role'] == 'national_manager' %}
-        <td>{{ member.store_name }}</td>
-        {% endif %}
-        <td>
-          <a
-            href="{{ url_for('local_manager.update_staff', staff_id=member.staff_id) }}"
-            class="btn btn-sm btn-warning"
-            >Update</a
-          >
-        </td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody>
+        {% for member in staff %}
+        <tr>
+          <td>{{ member.staff_id }}</td>
+          <td>{{ member.title }}</td>
+          <td>{{ member.first_name }}</td>
+          <td>{{ member.family_name }}</td>
+          <td>{{ member.email }}</td>
+          <td>{{ member.phone_number }}</td>
+          <td>{{ member.role }}</td>
+          <td>{{ member.store_name }}</td>
+          <td>{{ member.status }}</td>
+          <td>
+            <a
+              href="{{ url_for('national_manager.update_staff', staff_id=member.staff_id, role=member.role) }}"
+              class="btn btn-sm btn-warning"
+              >Update</a
+            >
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
 </div>
+
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {

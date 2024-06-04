@@ -29,10 +29,28 @@
   border-color: #4a8b32;
 }
 
-.main-content {
-  margin-left: 250px;
-  margin-right: 20px; /* Adds right margin */
-  padding: 20px; /* Adds padding inside the content area */
+:root {
+    --primary-color: #248c00; /* Green color as primary */
+    --secondary-color: #f3f577; /* Light yellow color as secondary */
+}
+
+.btn-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    color: black;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(74, 139, 50, 0.25);
 }
 
 .logout-container {
@@ -86,14 +104,6 @@
   margin-left: 250px; /* Adjust based on your sidebar width */
 }
 
-.custom-btn {
-  background-color: #4a8b32 !important;
-  border-color: #4a8b32 !important;
-}
-
-.services-icon {
-  font-size: 40px !important; /* Adjust the size as needed */
-}
 /* Additional styles for improved design */
 
 /* Background enhancement */
@@ -143,6 +153,44 @@
 /* Add margin to tables */
 table {
   width: 100%; /* Ensure the table fits within the container */
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.table thead {
+  background: #4a8b32;
+  color: #ffffff;
+}
+
+.table th,
+.table td {
+  padding: 12px 15px;
+  text-align: left;
+}
+
+.table th input {
+  width: 100%;
+  padding: 5px;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid #dddddd;
+}
+
+.table tbody tr:last-of-type {
+  border-bottom: 2px solid #4a8b32;
+}
+
+/* Consistent button styling */
+.btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+}
+
+.btn-warning:hover {
+  background-color: #e0a800;
+  border-color: #d39e00;
 }
 
 /* If using Bootstrap, you can adjust the container or row class */
@@ -151,3 +199,23 @@ table {
   padding-right: 20px;
   margin-right: auto;
 }
+
+.cost::before {
+          content: "$";
+      }
+
+.cost::after {
+          content: "/day";
+      }
+
+.cart_equipment_id::before {
+            content: "#";
+      }
+
+.cart_cost::before {
+          content: "$";
+      }
+
+.total::after {
+          content: "day";
+      }

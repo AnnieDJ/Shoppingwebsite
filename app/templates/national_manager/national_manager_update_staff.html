@@ -1,11 +1,8 @@
-{% extends "base.html" %} {% block title %}Local Manager Update Staff{% endblock %} {% block
+{% extends "base.html" %} {% block title %}National Manager Update Staff{% endblock %} {% block
 content %}
-<div class="container mt-5">
+
+ <div class="container mt-5">
   <h2>Update Staff</h2>
-
-  <a href="{{ url_for('local_manager.view_staff') }}" class="btn btn-secondary mb-3">Back to Staff List </a>
-
-
   <form method="POST">
     <div class="form-group">
       <label for="title">Title</label>
@@ -24,17 +21,33 @@ content %}
       <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ staff.phone_number }}" required>
     </div>
     <div class="form-group">
-      <label for="email">Email (view only)</label>
-      <input type="email" class="form-control" id="email" name="email" value="{{ staff.email }}" readonly>
-    </div>
-    <div class="form-group">
       <label for="status">Status</label>
       <select class="form-control" id="status" name="status">
         <option value="active" {% if staff.status == 'active' %}selected{% endif %}>Active</option>
         <option value="inactive" {% if staff.status == 'inactive' %}selected{% endif %}>Inactive</option>
       </select>
     </div>
-    <button type="submit" class="btn btn-primary">Update Staff</button>
+    <button type="submit" class="btn btn-primary">Update {% if role == 'Staff' %}Staff{% else %}Location Manager{% endif %}</button>
   </form>
+  <a href="{{ url_for('national_manager.staff_management') }}" class="btn btn-secondary mt-3">Go Back</a>
 </div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: '{{ message }}'
+          });
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  });
+</script>
+
 {% endblock %}
