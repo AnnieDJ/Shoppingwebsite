@@ -85,3 +85,44 @@ def change_password():
         flash(f"An error occurred: {e}", 'danger')
 
     return redirect(url_for('admin.admin_profile'))
+
+
+## Admin View All Staff and Managers ##
+@admin_bp.route('/staff_management')
+@login_required
+def staff_management():
+    if 'loggedin' in session and session['role'] == 'admin':
+        conn, cursor = db_cursor()
+        
+        try:
+            cursor.execute("""
+                SELECT s.staff_id, s.user_id, s.store_id, s.title, s.first_name, s.family_name, s.phone_number, 
+                u.email, s.status, 'Staff' as role, st.store_name
+                FROM staff s
+                JOIN user u ON s.user_id = u.user_id
+                JOIN stores st ON s.store_id = st.store_id
+                UNION ALL
+                SELECT l.local_manager_id as staff_id, l.user_id, l.store_id, l.title, l.first_name, l.family_name, 
+                l.phone_number, u.email, l.status, 'Local Manager' as role, st.store_name
+                FROM local_manager l
+                JOIN user u ON l.user_id = u.user_id
+                JOIN stores st ON l.store_id = st.store_id
+                UNION ALL
+                SELECT a.admin_manager_id as staff_id, a.user_id, NULL as store_id, a.title, a.first_name, a.family_name, 
+                a.phone_number, u.email, a.status, a.role as role, 'N/A' as store_name
+                FROM admin_national_manager a
+                JOIN user u ON a.user_id = u.user_id
+            """)
+            staff = cursor.fetchall()
+        
+        except Exception as e:
+            print("An error occurred:", e)
+            flash("A database error occurred. Please try again.")
+            return redirect(url_for('admin.dashboard'))
+        finally:
+            cursor.close()
+            conn.close()
+            
+        return render_template('admin_view_staff.html', staff=staff)
+    else:
+        return redirect(url_for('home.login'))
