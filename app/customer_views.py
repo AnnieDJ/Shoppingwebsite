@@ -138,3 +138,21 @@ def equipment():
         'code': 401,
         'message': 'Not Authorized'
     })
+@customer_bp.route('/search')
+def search():
+    if 'loggedin' in session and session['role'] == 'customer':
+        query = request.args.get('query')
+        conn, cursor = db_cursor()
+        cursor.execute(f"SELECT * FROM equipment WHERE name LIKE '%{query}%'")
+        equipments = cursor.fetchall()
+        cursor.close()
+        return jsonify({
+            'code': 200,
+            'message': 'Success',
+            'data': equipments
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
+

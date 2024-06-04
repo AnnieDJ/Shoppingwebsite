@@ -160,40 +160,36 @@ block content %} {% if session.get('loggedin') %}
     );
     res.data.forEach(function (product) {
       productHtml += `
-                <div class="col-md-4 mb-4">
-                  <div class="card">
-                    <img src="/static/${
-                      product.Image
-                    }" class="card-img-top" alt="${product.name}">
-                    <div class="card-body">
-                      <h5 class="card-title"><span>${
-                        product.name
-                      }</span> <span class="product-cost">$${
-        product.cost
-      }</span></h5>
-                      <p class="card-text">${product.description}</p>
-                      
-                      <button class="btn btn-primary add-to-cart" data-product='${JSON.stringify(
-                        product
-                      )}'>Add to Cart</button>
-                      <button class="btn btn-info view-details" data-product='${JSON.stringify(
-                        product
-                      )}'>View Details</button>
-                    </div>
-                  </div>
-                </div>
-              `;
+          <div class="col-md-4 mb-4">
+            <div class="card">
+              <img src="/static/${product.Image}" class="card-img-top" alt="${
+        product.name
+      }">
+              <div class="card-body">
+                <h5 class="card-title">${product.name}</h5>
+                <p class="card-text">${product.description}</p>
+                <p class="card-text">${product.price}</p>
+                <button class="btn btn-primary add-to-cart" data-product='${JSON.stringify(
+                  product
+                )}'>Add to Cart</button>
+                <button class="btn btn-info view-details" data-product='${JSON.stringify(
+                  product
+                )}'>View Details</button>
+              </div>
+            </div>
+          </div>
+        `;
     });
     $("#productList").html(productHtml);
 
     $(".view-details").on("click", function () {
       var product = $(this).data("product");
       $(".modal-body").html(`
-                <img src="/static/${product.Image}" class="img-fluid mb-3" alt="${product.name}">
-                <h5 class="card-title"><span>${product.name}</span> <span class="product-cost">$${product.cost}</span></h5>
-                <p>${product.description}</p>
-                
-              `);
+          <img src="/static/${product.Image}" class="img-fluid mb-3" alt="${product.name}">
+          <h5>${product.name}</h5>
+          <p>${product.description}</p>
+          <p>${product.price}</p>
+        `);
       $("#productModal").modal("show");
     });
 
@@ -220,6 +216,68 @@ block content %} {% if session.get('loggedin') %}
     $(".dropdown-item").on("click", function () {
       var store = $(this).data("store");
       loadProducts(store);
+    });
+  });
+
+  const searchInput = document.getElementById("searchInput");
+  const searchButton = document.getElementById("searchButton");
+  searchButton.addEventListener("click", async () => {
+    const res = await fetch(`/customer/search?query=${searchInput.value}`).then(
+      (res) => res.json()
+    );
+
+    var productHtml = "";
+    res.data.forEach(function (product) {
+      productHtml += `
+          <div class="col-md-4 mb-4">
+            <div class="card">
+              <img src="/static/${product.Image}" class="card-img-top" alt="${
+        product.name
+      }">
+              <div class="card-body">
+                <h5 class="card-title">${product.name}</h5>
+                <p class="card-text">${product.description}</p>
+                <p class="card-text">${product.price}</p>
+                <button class="btn btn-primary add-to-cart" data-product='${JSON.stringify(
+                  product
+                )}'>Add to Cart</button>
+                <button class="btn btn-info view-details" data-product='${JSON.stringify(
+                  product
+                )}'>View Details</button>
+              </div>
+            </div>
+          </div>
+        `;
+    });
+    $("#productList").html(productHtml);
+
+    $(".view-details").on("click", function () {
+      var product = $(this).data("product");
+      $(".modal-body").html(`
+          <img src="/static/${product.Image}" class="img-fluid mb-3" alt="${product.name}">
+          <h5>${product.name}</h5>
+          <p>${product.description}</p>
+          <p>${product.price}</p>
+        `);
+      $("#productModal").modal("show");
+    });
+
+    $(".add-to-cart").on("click", function () {
+      var product = $(this).data("product");
+      if (localStorage.getItem("cart")) {
+        const cart = JSON.parse(localStorage.getItem("cart"));
+        if (cart.includes(product.equipment_id)) {
+          alert("Product already in cart!");
+          return;
+        }
+
+        cart.push(product.equipment_id);
+        localStorage.setItem("cart", JSON.stringify(cart));
+      } else {
+        localStorage.setItem("cart", JSON.stringify([product.equipment_id]));
+      }
+
+      alert("Product added to cart!");
     });
   });
 </script>

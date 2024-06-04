@@ -1,7 +1,31 @@
 {% extends "base.html" %} {% block title %}Customer Dashboard{% endblock %} {%
 block content %}
+<style>
+  .cost::before {
+    content: "$";
+  }
+
+  .cost::after {
+    content: "/day";
+  }
+
+  .cart_equipment_id::before {
+    content: "#";
+  }
+
+  .cart_cost::before {
+    content: "$";
+  }
+
+  .total::after {
+    content: "day";
+  }
+</style>
+
 <div class="container" style="width: 80%; margin-top: 20px">
-  <div id="content" class="card" style="padding: 30px"></div>
+  <div id="content" class="card" style="padding: 30px">
+    <h5>Lincoln Store</h5>
+  </div>
 </div>
 
 <script>
@@ -38,7 +62,7 @@ block content %}
       .toISOString()
       .split("T")[0];
     dom.nextElementSibling.max = new Date(
-      new Date(dom.value).getTime() + 14 * 24 * 60 * 60 * 1000
+      new Date(dom.value).getTime() + 360 * 24 * 60 * 60 * 1000
     )
       .toISOString()
       .split("T")[0];
@@ -48,6 +72,8 @@ block content %}
         new Date(dom.value).getTime()) /
       (24 * 60 * 60 * 1000);
     amount();
+    refresh();
+    G();
   }
 
   function end(dom) {
@@ -56,17 +82,93 @@ block content %}
         new Date(dom.previousElementSibling.value).getTime()) /
       (24 * 60 * 60 * 1000);
     amount();
+    refresh();
+    G();
   }
 
   function transaction() {
-    localStorage.clear();
+    if (validate()) {
+      localStorage.clear();
+      location.reload();
+      alert("successfully purchased");
+    }
+  }
+
+  function del_cart(id) {
+    const cart = JSON.parse(localStorage.getItem("cart"));
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(cart.filter((item) => item !== id))
+    );
+    alert("removed from cart");
     location.reload();
   }
+
+  const validate = () => {
+    const CardID = document.getElementById("CardID").value;
+    const CVC = document.getElementById("CVC").value;
+
+    if (CardID.length !== 16) {
+      alert("Card ID must be 16 numbers.");
+      return false;
+    } else if (CVC.length !== 3) {
+      alert("Please input a three-digit CVC number.");
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  const refresh = () => {
+    const order_item = document.getElementById("order_item");
+    order_item.innerHTML = "";
+    res.data.forEach((item) => {
+      order_item.innerHTML += `
+                  <tr>
+                      <td>${item.equipment_id}</td>
+                      <td>${item.name}</td>
+                      <td>${
+                        document.getElementById("startDate" + item.equipment_id)
+                          .value
+                      }</td>
+                      <td>${
+                        document.getElementById("endDate" + item.equipment_id)
+                          .value
+                      }</td>
+                      <td class="cart_cost">${item.cost}</td>
+                  </tr>
+              `;
+    });
+  };
+
+  const computed = () => {
+    const totals = document.getElementById("total_num").textContent;
+    const total_num = parseInt(totals.replace("total: ", ""));
+    if (total_num >= 30 && total_num < 180) return 5;
+    else if (total_num >= 180 && total_num < 360) return 10;
+    else if (total_num >= 360) return 15;
+    else return 0;
+  };
+
+  const G = () => {
+    const amount = document.getElementById("amount").textContent;
+    const value = parseInt(amount.replace("amount: ", ""));
+    const Before = document.getElementById("Before");
+    const Discount = document.getElementById("Discount");
+    const Total = document.getElementById("Total");
+    Before.textContent = `Before tax: ${value}`;
+    Discount.textContent = `Discount: ${computed()}%`;
+    Total.textContent = `Total: ${(
+      value *
+      (1 + 0.15) *
+      (1 - computed() / 100)
+    ).toFixed(2)}`;
+  };
 
   (async function () {
     const formData = new FormData();
     formData.append("ids", JSON.parse(localStorage.getItem("cart")));
-    const res = await fetch("/customer/equipment", {
+    window.res = await fetch("/customer/equipment", {
       method: "POST",
       body: formData,
     }).then((res) => res.json());
@@ -88,7 +190,7 @@ block content %}
       content.innerHTML += `
                   <div class="card" style="height: 75px; margin-top: 15px; display: flex; flex-direction: row; align-items: center; justify-content: space-between">
                       <div style="display: flex; align-items: center;">
-                          <div style="padding: 5px 10px; font-weight: bold;">${
+                          <div class="cart_equipment_id" style="padding: 5px 10px; font-weight: bold;">${
                             entry.equipment_id
                           }</div>
                           <div style="padding: 5px 10px; font-weight: bold;">${
@@ -99,7 +201,7 @@ block content %}
                                 entry.Image
                               }">
                           </div>
-                          <div style="padding: 5px 10px; font-weight: bold;">${
+                          <div class="cart_cost" style="padding: 5px 10px; font-weight: bold;">${
                             entry.cost
                           }</div>
                       </div>
@@ -121,13 +223,17 @@ block content %}
           .toISOString()
           .split("T")[0]
       }" max="${
-        new Date(new Date().getTime() + 14 * 24 * 60 * 60 * 1000)
+        new Date(new Date().getTime() + 360 * 24 * 60 * 60 * 1000)
           .toISOString()
           .split("T")[0]
       }" oninput="end(this)" type="date" placeholder="End Date">
                           <strong data-price="${
                             entry.cost
                           }" class="total" style="padding: 5px 10px;">1</strong>
+  
+                          <button onclick="del_cart(${
+                            entry.equipment_id
+                          })" class="btn btn-danger">delete</button>
                       </div>
                   </div>
               `;
@@ -147,7 +253,7 @@ block content %}
               </div>
   
               <div>
-                  <div></div>
+                  <div id="total_num"></div>
                   <div id="amount"></div>
               </div>
           `;
@@ -156,21 +262,82 @@ block content %}
 
     content.innerHTML += `<button type="button" style="margin-top: 20px;" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Checkout</button>
               <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" style="max-width: 75%;">
+                  <div class="modal-content">
+                  <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Checkout List</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div style="display: flex; justify-content: space-between;">
+                      <div>
+                        <div>Username: ${response.data.username}</div>
+                        <div>Name: ${response.data.username}</div>
+                        <div>Email: ${response.data.email}</div>
+                        <div>Birthday: ${new Date(
+                          response.data.date_of_birth
+                        ).toLocaleDateString()}</div>
+                      </div>
+                      <div style="border: 1px solid black; padding: 10px;">
+                        <div>Creation Date</div>
+                        <div>${new Date().toLocaleDateString()}</div>
+                      </div>
+                    </div>
+                    <div style="margin-top: 20px; border: 1px solid black; padding: 10px;">
+                      <table class="table table-striped">
+                          <thead>
+                             <tr>
+                               <th>Equipment ID</th>
+                               <th>Name</th>
+                               <th>Start Time</th>
+                               <th>End Time</th>
+                               <th>Cost(per)</th>
+                             </tr>
+                          </thead>
+                          <tbody id="order_item">
+  
+                          </tbody>
+                      </table>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+                      <div style="border: 1px solid black; padding: 10px;">
+                        <div>Pick Up</div>
+                        <div>Date:</div>
+                        <div>Store:</div>
+                      </div>
+  
+                      <div style="border: 1px solid black; padding: 10px;">
+                        <div id="Before">Before tax:</div>
+                        <div>GST 15%</div>
+                        <div id="Discount">Discount:</div>
+                        <div id="Total">Total:</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button data-bs-toggle="modal" type="button" data-bs-target="#exampleModalToggle2" class="btn btn-primary">Confirm</button>
+                  </div>
+                  </div>
+                  </div>
+               </div>
+  
+              <div class="modal fade" id="exampleModalToggle2" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
                   <div class="modal-dialog">
                   <div class="modal-content">
                   <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Checkout</h5>
+                  <h5 class="modal-title" id="exampleModalToggleLabel2">Checkout</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                   </div>
                   <div class="modal-body">
                     <form>
                       <div class="mb-3">
                         <label for="CardID" class="col-form-label">CardID:</label>
-                        <input type="text" class="form-control" id="CardID">
+                        <input type="number" class="form-control" id="CardID">
                       </div>
                       <div class="mb-3">
                         <label for="CVC" class="col-form-label">CVC:</label>
-                        <input class="form-control" id="CVC">
+                        <input type="number" class="form-control" id="CVC">
                       </div>
                     </form>
                   </div>
@@ -182,6 +349,9 @@ block content %}
                   </div>
                </div>
           `;
+
+    refresh();
+    G();
   })();
 </script>
 {% endblock %}

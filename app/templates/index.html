@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+ 
+<head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -42,10 +43,10 @@
 
     <nav class="navbar navbar-expand-lg bg-body-tertiary nav">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/static">AgriHire Solutions</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
+        <a class="navbar-brand" href="/static">
+          <img src="/static/logo.png" alt="AgriHire Solutions" style="height: 80px; width:80px;">
+        </a>
+        
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
           <ul class="navbar-nav">
             <li class="nav-item"><a class="nav-link active px-3" aria-current="page" href="#">Home</a></li>
@@ -165,19 +166,22 @@
       }
     </script>
     <!-- hero section start -->
-    <section id="hero" class="position-relative overflow-hidden">
-      <div class="container">
-        <div class="row justify-content-center">
-          <div class="col-md-12">
-            <img
-              src="static/banner7.jpg"
-              class="img-fluid"
-              alt="Banner Image"
-            />
-          </div>
-        </div>
+    <!-- Section: Hero -->
+<section id="hero" class="position-relative overflow-hidden" style="height: 100vh;"> <!-- 设置高度为视口高度 -->
+  <div class="container-fluid p-0"> <!-- 使用 container-fluid 并去除内边距 -->
+    <div class="row justify-content-center m-0"> <!-- 去除默认的外边距 -->
+      <div class="col-12 p-0"> <!-- 使用全部12个格子并去除内边距 -->
+        <!-- Image: 绝对定位覆盖整个section -->
+        <img src="static/banner7.jpg" 
+     class="img-fluid" 
+     style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: center center;" 
+     alt="Banner Image">
+
       </div>
-    </section>
+    </div>
+  </div>
+</section>
+
 
     <!-- process section start  -->
     <section id="process" style="background-color: #f2f2f2; margin-top: 60px">
