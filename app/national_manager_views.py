@@ -4,6 +4,7 @@ from flask import Blueprint,render_template, request, redirect, url_for, session
 import re
 from . import hashing
 from .utils import db_cursor, login_required
+import uuid
 
 
 national_manager_bp = Blueprint('national_manager', __name__, template_folder='templates/national_manager')
@@ -168,17 +169,19 @@ def update_staff(staff_id, role):
         else:
             if role == 'Staff':
                 cursor.execute("""
-                    SELECT s.staff_id, s.user_id, s.title, s.first_name, s.family_name, s.phone_number, u.email, s.status
+                    SELECT s.staff_id, s.user_id, s.title, s.first_name, s.family_name, s.phone_number, u.email, s.status, st.store_name
                     FROM staff s
                     JOIN user u ON s.user_id = u.user_id
+                    JOIN stores st ON s.store_id = st.store_id
                     WHERE s.staff_id = %s
                 """, (staff_id,))
             else:
                 cursor.execute("""
                     SELECT l.local_manager_id as staff_id, l.user_id, l.title, l.first_name, l.family_name, l.phone_number, 
-                    u.email, l.status
+                    u.email, l.status, st.store_name
                     FROM local_manager l
                     JOIN user u ON l.user_id = u.user_id
+                    JOIN stores st ON l.store_id = st.store_id
                     WHERE l.local_manager_id = %s
                 """, (staff_id,))
             
@@ -189,5 +192,123 @@ def update_staff(staff_id, role):
                 return redirect(url_for('national_manager.staff_management'))
             
             return render_template('national_manager_update_staff.html', staff=staff, role=role)
+    else:
+        return redirect(url_for('home.login'))
+    
+    
+## Add New Staff or Local Manager ##
+@national_manager_bp.route('/add_staff', methods=['GET', 'POST'])
+@login_required
+def add_staff():
+    if request.method == 'POST':
+        title = request.form['title']
+        first_name = request.form['first_name']
+        family_name = request.form['family_name']
+        email = request.form['email']
+        phone_number = request.form['phone_number']
+        date_of_birth = request.form['date_of_birth']
+        status = request.form['status']
+        store_id = request.form['store_id']
+        role = request.form['role']
+        
+        username = email.split('@')[0]
+        default_password = 'default_password123'  # Change this to a secure default password
+        salt = uuid.uuid4().hex
+        hashed_password = hashing.hash_value(default_password, salt=salt)
+
+        conn, cursor = db_cursor()
+        
+        try:
+            cursor.execute(
+                'INSERT INTO user (username, email, date_of_birth, password_hash, salt, role) VALUES (%s, %s, %s, %s, %s, %s)',
+                (username, email, date_of_birth, hashed_password, salt, role.lower())
+            )
+            user_id = cursor.lastrowid
+            
+            if role == 'Staff':
+                cursor.execute(
+                    'INSERT INTO staff (user_id, store_id, title, first_name, family_name, phone_number, status) '
+                    'VALUES (%s, %s, %s, %s, %s, %s, %s)',
+                    (user_id, store_id, title, first_name, family_name, phone_number, status)
+                )
+            else:
+                cursor.execute(
+                    'INSERT INTO local_manager (user_id, store_id, title, first_name, family_name, phone_number, status) '
+                    'VALUES (%s, %s, %s, %s, %s, %s, %s)',
+                    (user_id, store_id, title, first_name, family_name, phone_number, status)
+                )
+            conn.commit()
+            flash('New staff member added successfully! Default password is: ' + default_password, 'success')
+            return redirect(url_for('national_manager.staff_management'))
+        except MySQLError as e:
+            conn.rollback()
+            flash(f"An error occurred: {e}", 'danger')
+        finally:
+            cursor.close()
+            conn.close()
+    
+    conn, cursor = db_cursor()
+    cursor.execute('SELECT store_id, store_name FROM stores')
+    stores = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    
+    return render_template('national_manager_add_staff.html', stores=stores)
+
+
+## Delete Staff and Local Managers ##
+@national_manager_bp.route('/delete_staff/<int:staff_id>/<string:role>', methods=['GET', 'POST'])
+@login_required
+def delete_staff(staff_id, role):
+    if 'loggedin' in session and session['role'] == 'national_manager':
+        conn, cursor = db_cursor()
+        
+        if request.method == 'POST':
+            try:
+                if role == 'Staff':
+                    cursor.execute("SELECT user_id FROM staff WHERE staff_id = %s", (staff_id,))
+                else:
+                    cursor.execute("SELECT user_id FROM local_manager WHERE local_manager_id = %s", (staff_id,))
+                user_id = cursor.fetchone()['user_id']
+                
+                if role == 'Staff':
+                    cursor.execute("DELETE FROM staff WHERE staff_id = %s", (staff_id,))
+                else:
+                    cursor.execute("DELETE FROM local_manager WHERE local_manager_id = %s", (staff_id,))
+                    
+                cursor.execute("DELETE FROM user WHERE user_id = %s", (user_id,))
+                
+                conn.commit()
+                flash("Deleted successfully.", 'success')
+            except MySQLError as e:
+                conn.rollback()
+                print("An error occurred:", e)
+                flash("A database error occurred. Please try again.", 'danger')
+            finally:
+                cursor.close()
+                conn.close()
+            return redirect(url_for('national_manager.staff_management'))
+        
+        else:
+            if role == 'Staff':
+                cursor.execute("""
+                    SELECT s.staff_id, s.first_name, s.family_name
+                    FROM staff s
+                    WHERE s.staff_id = %s
+                """, (staff_id,))
+            else:
+                cursor.execute("""
+                    SELECT l.local_manager_id as staff_id, l.first_name, l.family_name
+                    FROM local_manager l
+                    WHERE l.local_manager_id = %s
+                """, (staff_id,))
+            
+            staff = cursor.fetchone()
+            
+            if not staff:
+                flash("Not found.", 'danger')
+                return redirect(url_for('national_manager.staff_management'))
+            
+            return render_template('national_manager_delete_staff.html', staff=staff, role=role)
     else:
         return redirect(url_for('home.login'))

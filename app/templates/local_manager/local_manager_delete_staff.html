@@ -1,0 +1,20 @@
+{% extends "base.html" %} {% block title %}Local Manager Delete Staff{% endblock
+%} {% block content %}
+<div class="container mt-5">
+  <h2>Delete Staff</h2>
+
+  <p>
+    Are you sure you want to delete staff member: {{ staff.first_name }} {{
+    staff.family_name }}?
+  </p>
+  <form action="/delete_staff" method="post">
+    <input type="hidden" name="staff_id" value="{{ staff.id }}" />
+    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+    <a
+      href="{{ url_for('local_manager.view_staff') }}"
+      class="btn btn-secondary"
+      >Cancel</a
+    >
+  </form>
+</div>
+{% endblock %}

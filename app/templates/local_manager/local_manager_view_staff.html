@@ -4,6 +4,9 @@ endblock %} {% block content %}
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
   <h1 class="h2">Staff List - {{ store_name }} Store</h1>
+  <a href="{{ url_for('local_manager.add_staff') }}" class="btn btn-primary"
+    >Add New Staff</a
+  >
 </div>
 
 <div class="table-responsive">
@@ -18,15 +21,19 @@ endblock %} {% block content %}
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(2)" scope="col">
-          Title &#x25B2;&#x25BC;<input
-            type="text"
-            id="filterTitle"
-            class="form-control form-control-sm"
-            placeholder="Filter"
-          />
+        <th onclick="sortTable(1)" scope="col">
+          Title &#x25B2;&#x25BC;
+          <select id="filterTitle" class="form-control form-control-sm">
+            <option value="">All</option>
+            <option value="Mr">Mr</option>
+            <option value="Mrs">Mrs</option>
+            <option value="Miss">Miss</option>
+            <option value="Ms">Ms</option>
+            <option value="Dr">Dr</option>
+            <option value="Other">Other</option>
+          </select>
         </th>
-        <th onclick="sortTable(3)" scope="col">
+        <th onclick="sortTable(2)" scope="col">
           First Name &#x25B2;&#x25BC;<input
             type="text"
             id="filterFirstName"
@@ -34,7 +41,7 @@ endblock %} {% block content %}
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(4)" scope="col">
+        <th onclick="sortTable(3)" scope="col">
           Family Name &#x25B2;&#x25BC;<input
             type="text"
             id="filterFamilyName"
@@ -42,7 +49,7 @@ endblock %} {% block content %}
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(5)" scope="col">
+        <th onclick="sortTable(4)" scope="col">
           Email &#x25B2;&#x25BC;<input
             type="text"
             id="filterEmail"
@@ -66,16 +73,6 @@ endblock %} {% block content %}
             placeholder="Filter"
           />
         </th>
-        {% if session['role'] == 'national_manager' %}
-        <th onclick="sortTable(7)" scope="col">
-          Store Name &#x25B2;&#x25BC;<input
-            type="text"
-            id="filterStoreName"
-            class="form-control form-control-sm"
-            placeholder="Filter"
-          />
-        </th>
-        {% endif %}
         <th onclick="sortTable(7)" scope="col">
           Actions &#x25B2;&#x25BC;<input
             type="text"
@@ -98,15 +95,11 @@ endblock %} {% block content %}
         <td>{{ member.email }}</td>
         <td>{{ member.phone_number }}</td>
         <td>{{ member.status }}</td>
-        {% if session['role'] == 'national_manager' %}
-        <td>{{ member.store_name }}</td>
-        {% endif %}
         <td>
-          <a
-            href="{{ url_for('local_manager.update_staff', staff_id=member.staff_id) }}"
-            class="btn btn-sm btn-warning"
-            >Update</a
-          >
+         <td>
+          <a href="{{ url_for('local_manager.update_staff', staff_id=member.staff_id) }}" class="btn btn-sm btn-warning">Update</a>
+          <a href="{{ url_for('local_manager.delete_staff', staff_id=member.staff_id) }}" class="btn btn-sm btn-danger">Delete</a>
+        </td>
         </td>
       </tr>
       {% endfor %}

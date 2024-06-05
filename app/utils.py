@@ -137,9 +137,11 @@ def fetch_orders(cursor, store_id, limit=None):
 
 def fetch_payments(cursor, store_id, limit=None):
     query = """
-    SELECT p.payment_id, p.order_id, p.user_id, p.payment_type, p.payment_status, p.amount, p.payment_date
+    SELECT p.payment_id, p.order_id, p.user_id, p.payment_type, p.payment_status, p.amount, p.payment_date, 
+        c.first_name AS customer_first_name, c.family_name AS customer_family_name
     FROM payments p
     JOIN orders o ON p.order_id = o.order_id
+    LEFT JOIN customer c ON o.user_id = c.user_id
     WHERE o.store_id = %s
     ORDER BY p.payment_date DESC
     """
@@ -149,3 +151,18 @@ def fetch_payments(cursor, store_id, limit=None):
     else:
         cursor.execute(query, (store_id,))
     return cursor.fetchall()
+
+def fetch_and_store_local_manager_store_id(user_id):
+    conn, cursor = db_cursor()
+    try:
+        cursor.execute("""
+            SELECT store_id
+            FROM local_manager
+            WHERE user_id = %s
+        """, (user_id,))
+        store_info = cursor.fetchone()
+        if store_info:
+            session['store_id'] = store_info['store_id']
+    finally:
+        cursor.close()
+        conn.close()
