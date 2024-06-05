@@ -1,0 +1,21 @@
+{% extends "base.html" %} {% block title %}National Manager - Delete Staff{%
+endblock %} {% block content %}
+<div class="container mt-5">
+  <h2>Delete Staff</h2>
+
+  <p>
+    Are you sure you want to delete staff member: {{ staff.first_name }} {{
+    staff.family_name }}?
+  </p>
+  <form method="POST">
+    <input type="hidden" name="staff_id" value="{{ staff.staff_id }}" />
+    <input type="hidden" name="role" value="{{ role }}" />
+    <button type="submit" class="btn btn-danger">Confirm Delete</button>
+    <a
+      href="{{ url_for('national_manager.staff_management') }}"
+      class="btn btn-secondary"
+      >Cancel</a
+    >
+  </form>
+</div>
+{% endblock %}

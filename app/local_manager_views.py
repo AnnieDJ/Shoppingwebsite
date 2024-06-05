@@ -8,6 +8,7 @@ from .utils import db_cursor
 from flask_hashing  import Hashing
 from . import hashing
 from .utils import db_cursor, login_required
+import uuid 
 
 local_manager_bp = Blueprint('local_manager', __name__, template_folder='templates/local_manager')
 
@@ -549,4 +550,116 @@ def update_staff(staff_id):
             return render_template('local_manager_update_staff.html', staff=staff)
     else:
         return redirect(url_for('home.login'))
+    
 
+## Add New Staff ##
+@local_manager_bp.route('/add_staff', methods=['GET', 'POST'])
+@login_required
+def add_staff():
+    conn, cursor = db_cursor()
+    user_id = session['userid']
+
+    # Fetch the store_id and store name for the logged-in local manager
+    cursor.execute("""
+        SELECT l.store_id, st.store_name
+        FROM local_manager l
+        JOIN stores st ON l.store_id = st.store_id
+        WHERE l.user_id = %s
+    """, (user_id,))
+    store_info = cursor.fetchone()
+    store_name = store_info['store_name'] if store_info else 'Not Assigned'
+    store_id = store_info['store_id'] if store_info else None
+
+    if request.method == 'POST':
+        title = request.form['title']
+        first_name = request.form['first_name']
+        family_name = request.form['family_name']
+        email = request.form['email']
+        phone_number = request.form['phone_number']
+        date_of_birth = request.form['date_of_birth']
+        status = request.form['status']
+        role = 'Staff'
+
+        # Use the local manager's store_id
+        store_id = store_info['store_id']
+
+        username = email.split('@')[0]
+        default_password = 'default_password123'  # Change this to a secure default password
+        salt = uuid.uuid4().hex
+        hashed_password = hashing.hash_value(default_password, salt=salt)
+
+        try:
+            cursor.execute(
+                'INSERT INTO user (username, email, date_of_birth, password_hash, salt, role) VALUES (%s, %s, %s, %s, %s, %s)',
+                (username, email, date_of_birth, hashed_password, salt, role.lower())
+            )
+            user_id = cursor.lastrowid
+
+            cursor.execute(
+                'INSERT INTO staff (user_id, store_id, title, first_name, family_name, phone_number, status) '
+                'VALUES (%s, %s, %s, %s, %s, %s, %s)',
+                (user_id, store_id, title, first_name, family_name, phone_number, status)
+            )
+            conn.commit()
+            flash('New staff member added successfully! Default password is: ' + default_password, 'success')
+            return redirect(url_for('local_manager.view_staff'))
+        except MySQLError as e:
+            conn.rollback()
+            flash(f"An error occurred: {e}", 'danger')
+        finally:
+            cursor.close()
+            conn.close()
+
+    cursor.close()
+    conn.close()
+
+    return render_template('local_manager_add_staff.html', store_name=store_name, store_id=store_id)
+
+
+## Delete staff - hard delete ##    
+@local_manager_bp.route('/delete_staff/<int:staff_id>', methods=['GET'])
+@login_required
+def delete_staff(staff_id):
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()
+        cursor.execute("""
+            SELECT staff_id, first_name, family_name
+            FROM staff
+            WHERE staff_id = %s AND store_id = %s
+        """, (staff_id, session['store_id']))
+        staff = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        
+        if not staff:
+            flash('Staff not found or you do not have permission to delete this staff.', 'danger')
+            return redirect(url_for('local_manager.view_staff'))
+        
+        return render_template('local_manager_delete_staff.html', staff=staff)
+    else:
+        return redirect(url_for('local_manager.dashboard'))
+
+
+@local_manager_bp.route('/confirm_delete_staff', methods=['POST'])
+@login_required
+def confirm_delete_staff():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        staff_id = request.form.get('staff_id')
+        if not staff_id:
+            flash('Invalid staff ID', 'danger')
+            return redirect(url_for('local_manager.view_staff'))
+
+        conn, cursor = db_cursor()
+        try:
+            cursor.execute("DELETE FROM staff WHERE staff_id = %s AND store_id = %s", (staff_id, session['store_id']))
+            conn.commit()
+            flash("Staff has been successfully deleted.", 'success')
+        except Exception as e:
+            print("An error occurred:", e)
+            flash("A database error occurred. Please try again.", 'danger')
+        finally:
+            cursor.close()
+            conn.close()
+        return redirect(url_for('local_manager.view_staff'))
+    else:
+        return redirect(url_for('local_manager.dashboard'))

@@ -7,7 +7,14 @@ content %}
   <form method="POST">
     <div class="form-group">
       <label for="title">Title</label>
-      <input type="text" class="form-control" id="title" name="title" value="{{ staff.title }}" required>
+      <select class="form-control" id="title" name="title" required>
+        <option value="Mr" {% if staff.title == 'Mr' %}selected{% endif %}>Mr</option>
+        <option value="Mrs" {% if staff.title == 'Mrs' %}selected{% endif %}>Mrs</option>
+        <option value="Miss" {% if staff.title == 'Miss' %}selected{% endif %}>Miss</option>
+        <option value="Ms" {% if staff.title == 'Ms' %}selected{% endif %}>Ms</option>
+        <option value="Dr" {% if staff.title == 'Dr' %}selected{% endif %}>Dr</option>
+        <option value="Other" {% if staff.title == 'Other' %}selected{% endif %}>Other</option>
+      </select>
     </div>
     <div class="form-group">
       <label for="first_name">First Name</label>
@@ -22,7 +29,7 @@ content %}
       <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ staff.phone_number }}" required>
     </div>
     <div class="form-group">
-      <label for="email">Email (view only)</label>
+      <label for="email">Email (read only)</label>
       <input type="email" class="form-control" id="email" name="email" value="{{ staff.email }}" readonly>
     </div>
     <div class="form-group">
