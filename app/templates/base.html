@@ -84,7 +84,9 @@
   <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary nav">
       <div class="container-fluid">
+
         <a class="navbar-brand" href="/logout">
+
           <img src="/static/logo.png" alt="AgriHire Solutions" style="height: 80px; width:80px;">
         </a>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
@@ -135,10 +137,7 @@
             <a class="nav-link" href="{{ url_for('staff.daily_returns') }}">Daily Returns</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('staff.view_rentals') }}">Rentals</a>
-          </li>
-         <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('staff.view_orders') }}">Orders</a>
+            <a class="nav-link" href="{{ url_for('staff.final_orders') }}">Full Order List</a>
           </li>
          <li class="nav-item">
         <a class="nav-link" href="{{ url_for('staff.view_customers') }}">Customers</a>
@@ -156,6 +155,7 @@
               <a class="nav-link" href="/logout">Logout</a>
             </li> 
           </ul>
+          
       </div>
     </div>
 
@@ -177,6 +177,9 @@
             </li>
             {% elif session.get('role') == 'national_manager' %}
             <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('national_manager.dashboard') }}">Dashboard</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="/profile">Profile</a>
             </li>
             <li class="nav-item">
@@ -184,7 +187,7 @@
             </li>
             {% elif session.get('role') == 'admin' %}
             <li class="nav-item">
-              <a class="nav-link" href="/dashboard">Dashboard</a>
+              <a class="nav-link" href="{{ url_for('admin.dashboard') }}">Dashboard</a>
             </li>
            
 
