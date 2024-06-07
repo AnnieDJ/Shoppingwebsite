@@ -146,17 +146,12 @@ CREATE TABLE IF NOT EXISTS payments (
     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
     
-CREATE TABLE IF NOT EXISTS promotions (
-    promotion_id INT AUTO_INCREMENT PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
-    creator_id INT NOT NULL,
-    store_id INT,
-    FOREIGN KEY (creator_id) REFERENCES user(user_id),
-    FOREIGN KEY (store_id) REFERENCES stores(store_id)
+CREATE TABLE discount (
+    discount_id INT PRIMARY KEY,
+    days INT NOT NULL,
+    discount_pricing DECIMAL(5, 2) NOT NULL
 );
+
     
 CREATE TABLE IF NOT EXISTS news (
     news_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -299,3 +294,7 @@ bale size upto 1.68m", "Round Baler", "2015-01-01", 340, "5242875419", "Availabl
 ;
 
 -- login password: A12345678
+INSERT INTO discount (discount_id, days, discount_pricing) VALUES
+(1, 30, 0.06),
+(2, 180, 0.1),
+(3, 360, 0.15);
