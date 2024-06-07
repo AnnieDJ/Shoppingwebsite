@@ -9,6 +9,7 @@ from flask_hashing  import Hashing
 from . import hashing
 from .utils import db_cursor, login_required
 
+
 local_manager_bp = Blueprint('local_manager', __name__, template_folder='templates/local_manager')
 
 

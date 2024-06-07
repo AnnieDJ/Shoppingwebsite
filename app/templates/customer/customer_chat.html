@@ -1,0 +1,45 @@
+{% extends "base.html" %} {% block title %}Customer Dashboard{% endblock %} {%
+block content %} {% if session.get('loggedin') %}
+<body>
+  <h1>Chat Room</h1>
+  <div id="chat">
+    <div id="messages"></div>
+    <input type="text" id="message" placeholder="Enter your message" />
+    <button id="send">Send</button>
+  </div>
+  <script>
+    $(document).ready(function () {
+      var socket = io();
+      var room = "default_room"; // You can change the room based on your logic
+      var receiver_id = 2; // Example receiver ID, replace with actual ID
+
+      socket.emit("join", { room: room });
+
+      socket.on("message", function (data) {
+        $("#messages").append("<p>" + data + "</p>");
+      });
+
+      $("#send").click(function () {
+        var message = $("#message").val();
+        socket.emit("message", {
+          room: room,
+          message: message,
+          receiver_id: receiver_id,
+        });
+        $("#message").val("");
+      });
+
+      $(window).on("beforeunload", function () {
+        socket.emit("leave", { room: room });
+      });
+
+      // Load previous messages
+      $.getJSON(`/messages/${receiver_id}`, function (data) {
+        data.forEach(function (msg) {
+          $("#messages").append("<p>" + msg.content + "</p>");
+        });
+      });
+    });
+  </script>
+</body>
+{% endblock %}
