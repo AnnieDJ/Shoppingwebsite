@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block title %}Admin Dashboard{% endblock %} {%
 block content %}
-
+<div class="custom-welcome">Welcome back, {{ session.get('username') }}!</div>
 <div
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
@@ -55,10 +55,7 @@ block content %}
 
       <!-- Staff Management Card -->
       <div class="col-12 col-lg-6">
-        <a
-          href="{{ url_for('admin.staff_management') }}"
-          class="text-decoration-none"
-        >
+        <a href="{{ url_for('admin.view_all') }}" class="text-decoration-none">
           <div class="card widget-card border-light shadow-sm">
             <div
               class="card-header bg-transparent p-4 border-light-subtle text-center"

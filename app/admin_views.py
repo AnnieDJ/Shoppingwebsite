@@ -88,33 +88,72 @@ def change_password():
 
 
 ## Admin View All Staff and Managers ##
-@admin_bp.route('/staff_management')
+@admin_bp.route('/view_all')
 @login_required
-def staff_management():
+def view_all():
     if 'loggedin' in session and session['role'] == 'admin':
         conn, cursor = db_cursor()
         
         try:
             cursor.execute("""
-                SELECT s.staff_id, s.user_id, s.store_id, s.title, s.first_name, s.family_name, s.phone_number, 
-                u.email, s.status, 'Staff' as role, st.store_name
-                FROM staff s
-                JOIN user u ON s.user_id = u.user_id
-                JOIN stores st ON s.store_id = st.store_id
-                UNION ALL
-                SELECT l.local_manager_id as staff_id, l.user_id, l.store_id, l.title, l.first_name, l.family_name, 
-                l.phone_number, u.email, l.status, 'Local Manager' as role, st.store_name
-                FROM local_manager l
-                JOIN user u ON l.user_id = u.user_id
-                JOIN stores st ON l.store_id = st.store_id
-                UNION ALL
-                SELECT a.admin_manager_id as staff_id, a.user_id, NULL as store_id, a.title, a.first_name, a.family_name, 
-                a.phone_number, u.email, a.status, a.role as role, 'N/A' as store_name
-                FROM admin_national_manager a
-                JOIN user u ON a.user_id = u.user_id
+                SELECT
+                    u.user_id,
+                    u.username,
+                    u.email,
+                    s.title,
+                    CONCAT(s.first_name, ' ', s.family_name) AS full_name,
+                    s.phone_number,
+                    s.store_id
+                FROM
+                    user u
+                JOIN
+                    staff s ON u.user_id = s.user_id
+                WHERE
+                    u.role = 'staff'
+                ORDER BY
+                    s.first_name, s.family_name
             """)
-            staff = cursor.fetchall()
-        
+            staff_members = cursor.fetchall()
+
+            cursor.execute("""
+                SELECT
+                    u.user_id,
+                    u.username,
+                    u.email,
+                    l.title,
+                    CONCAT(l.first_name, ' ', l.family_name) AS full_name,
+                    l.phone_number,
+                    l.store_id
+                FROM
+                    user u
+                JOIN
+                    local_manager l ON u.user_id = l.user_id
+                WHERE
+                    u.role = 'local_manager'
+                ORDER BY
+                    l.first_name, l.family_name
+            """)
+            local_managers = cursor.fetchall()
+
+            cursor.execute("""
+                SELECT
+                    u.user_id,
+                    u.username,
+                    u.email,
+                    n.title,
+                    CONCAT(n.first_name, ' ', n.family_name) AS full_name,
+                    n.phone_number
+                FROM
+                    user u
+                JOIN
+                    admin_national_manager n ON u.user_id = n.user_id
+                WHERE
+                    u.role = 'national_manager'
+                ORDER BY
+                    n.first_name, n.family_name
+            """)
+            national_managers = cursor.fetchall()
+
         except Exception as e:
             print("An error occurred:", e)
             flash("A database error occurred. Please try again.")
@@ -123,8 +162,215 @@ def staff_management():
             cursor.close()
             conn.close()
             
-        return render_template('admin_view_staff.html', staff=staff)
+        return render_template('admin_view_all.html', staff_members=staff_members, local_managers=local_managers, national_managers=national_managers)
     else:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home.login'))
+    
+@admin_bp.route('/edit_staff/<int:user_id>', methods=['GET'])
+@login_required
+def edit_staff(user_id):
+    if 'loggedin' in session and session['role'] == 'admin':
+        conn, cursor = db_cursor()
+        cursor.execute("""
+            SELECT u.user_id, s.title, s.phone_number, u.email, s.store_id
+            FROM user u
+            JOIN staff s ON u.user_id = s.user_id
+            WHERE u.user_id = %s
+        """, (user_id,))
+        staff_member = cursor.fetchone()
+        cursor.close()
+        if staff_member:
+            return render_template('admin_edit_staff.html', staff_member=staff_member)
+        else:
+            flash('Staff member not found.', 'warning')
+            return redirect(url_for('admin.view_all'))
+    else:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home.login'))
+
+@admin_bp.route('/edit_local_manager/<int:user_id>', methods=['GET'])
+@login_required
+def edit_local_manager(user_id):
+    if 'loggedin' in session and session['role'] == 'admin':
+        conn, cursor = db_cursor()
+        cursor.execute("""
+            SELECT u.user_id, l.title, l.phone_number, u.email, l.store_id
+            FROM user u
+            JOIN local_manager l ON u.user_id = l.user_id
+            WHERE u.user_id = %s
+        """, (user_id,))
+        local_manager = cursor.fetchone()
+        cursor.close()
+        if local_manager:
+            return render_template('admin_edit_local_manager.html', local_manager=local_manager)
+        else:
+            flash('Local manager not found.', 'warning')
+            return redirect(url_for('admin.view_all'))
+    else:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home.login'))
+
+@admin_bp.route('/edit_national_manager/<int:user_id>', methods=['GET'])
+@login_required
+def edit_national_manager(user_id):
+    if 'loggedin' in session and session['role'] == 'admin':
+        conn, cursor = db_cursor()
+        cursor.execute("""
+            SELECT u.user_id, n.title, n.phone_number, u.email
+            FROM user u
+            JOIN admin_national_manager n ON u.user_id = n.user_id
+            WHERE u.user_id = %s
+        """, (user_id,))
+        national_manager = cursor.fetchone()
+        cursor.close()
+        if national_manager:
+            return render_template('admin_edit_national_manager.html', national_manager=national_manager)
+        else:
+            flash('National manager not found.', 'warning')
+            return redirect(url_for('admin.view_all'))
+    else:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home.login'))
+
+@admin_bp.route('/update_staff/<int:user_id>', methods=['POST'])
+@login_required
+def update_staff(user_id):
+    if 'loggedin' in session and session['role'] == 'admin':
+        title = request.form['title']
+        phone_number = request.form['phone_number']
+        email = request.form['email']
+        store_id = request.form['store_id']
+
+        conn, cursor = db_cursor()
+        try:
+            cursor.execute("""
+                UPDATE staff s JOIN user u ON s.user_id = u.user_id
+                SET s.title = %s, s.phone_number = %s, u.email = %s, s.store_id = %s
+                WHERE s.user_id = %s
+            """, (title, phone_number, email, store_id, user_id))
+            conn.commit()
+            flash('Staff member updated successfully.', 'success')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Failed to update staff member: {str(e)}', 'danger')
+        finally:
+            cursor.close()
+        return redirect(url_for('admin.view_all'))
+    else:
+        flash('Unauthorized to perform this action.', 'danger')
+        return redirect(url_for('home.login'))
+
+@admin_bp.route('/update_local_manager/<int:user_id>', methods=['POST'])
+@login_required
+def update_local_manager(user_id):
+    if 'loggedin' in session and session['role'] == 'admin':
+        title = request.form['title']
+        phone_number = request.form['phone_number']
+        email = request.form['email']
+        store_id = request.form['store_id']
+
+        conn, cursor = db_cursor()
+        try:
+            cursor.execute("""
+                UPDATE local_manager l JOIN user u ON l.user_id = u.user_id
+                SET l.title = %s, l.phone_number = %s, u.email = %s, l.store_id = %s
+                WHERE l.user_id = %s
+            """, (title, phone_number, email, store_id, user_id))
+            conn.commit()
+            flash('Local manager updated successfully.', 'success')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Failed to update local manager: {str(e)}', 'danger')
+        finally:
+            cursor.close()
+        return redirect(url_for('admin.view_all'))
+    else:
+        flash('Unauthorized to perform this action.', 'danger')
+        return redirect(url_for('home.login'))
+
+@admin_bp.route('/update_national_manager/<int:user_id>', methods=['POST'])
+@login_required
+def update_national_manager(user_id):
+    if 'loggedin' in session and session['role'] == 'admin':
+        title = request.form['title']
+        phone_number = request.form['phone_number']
+        email = request.form['email']
+
+        conn, cursor = db_cursor()
+        try:
+            cursor.execute("""
+                UPDATE admin_national_manager n JOIN user u ON n.user_id = u.user_id
+                SET n.title = %s, n.phone_number = %s, u.email = %s
+                WHERE n.user_id = %s
+            """, (title, phone_number, email, user_id))
+            conn.commit()
+            flash('National manager updated successfully.', 'success')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Failed to update national manager: {str(e)}', 'danger')
+        finally:
+            cursor.close()
+        return redirect(url_for('admin.view_all'))
+    else:
+        flash('Unauthorized to perform this action.', 'danger')
         return redirect(url_for('home.login'))
     
 
+@admin_bp.route('/delete_staff/<int:user_id>', methods=['POST'])
+@login_required
+def delete_staff(user_id):
+    if 'loggedin' in session and session['role'] == 'admin':
+        conn, cursor = db_cursor()
+        try:
+            cursor.execute("DELETE FROM staff WHERE user_id = %s", (user_id,))
+            conn.commit()
+            flash('Staff member deleted successfully.', 'success')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Failed to delete staff member: {str(e)}', 'danger')
+        finally:
+            cursor.close()
+        return redirect(url_for('admin.view_all'))
+    else:
+        flash('Unauthorized to perform this action.', 'danger')
+        return redirect(url_for('home.login'))
+
+@admin_bp.route('/delete_local_manager/<int:user_id>', methods=['POST'])
+@login_required
+def delete_local_manager(user_id):
+    if 'loggedin' in session and session['role'] == 'admin':
+        conn, cursor = db_cursor()
+        try:
+            cursor.execute("DELETE FROM local_manager WHERE user_id = %s", (user_id,))
+            conn.commit()
+            flash('Local manager deleted successfully.', 'success')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Failed to delete local manager: {str(e)}', 'danger')
+        finally:
+            cursor.close()
+        return redirect(url_for('admin.view_all'))
+    else:
+        flash('Unauthorized to perform this action.', 'danger')
+        return redirect(url_for('home.login'))
+
+@admin_bp.route('/delete_national_manager/<int:user_id>', methods=['POST'])
+@login_required
+def delete_national_manager(user_id):
+    if 'loggedin' in session and session['role'] == 'admin':
+        conn, cursor = db_cursor()
+        try:
+            cursor.execute("DELETE FROM admin_national_manager WHERE user_id = %s", (user_id,))
+            conn.commit()
+            flash('National manager deleted successfully.', 'success')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Failed to delete national manager: {str(e)}', 'danger')
+        finally:
+            cursor.close()
+        return redirect(url_for('admin.view_all'))
+    else:
+        flash('Unauthorized to perform this action.', 'danger')
+        return redirect(url_for('home.login'))
+    

@@ -1,0 +1,61 @@
+{% extends "base.html" %} {% block title %} National Manager Update Local
+Manager {% endblock %} {% block content %}
+<div class="container">
+  <h1>Edit Local Manager</h1>
+  <form
+    action="{{ url_for('national_manager.update_local_manager', user_id=local_manager.user_id) }}"
+    method="post"
+  >
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input
+        type="text"
+        class="form-control"
+        id="title"
+        name="title"
+        value="{{ local_manager.title }}"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="phone_number">Phone Number</label>
+      <input
+        type="text"
+        class="form-control"
+        id="phone_number"
+        name="phone_number"
+        value="{{ local_manager.phone_number }}"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input
+        type="email"
+        class="form-control"
+        id="email"
+        name="email"
+        value="{{ local_manager.email }}"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="store_id">Store ID</label>
+      <input
+        type="text"
+        class="form-control"
+        id="store_id"
+        name="store_id"
+        value="{{ local_manager.store_id }}"
+        required
+      />
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a
+      href="{{ url_for('national_manager.view_staff') }}"
+      class="btn btn-secondary"
+      >Cancel</a
+    >
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %} {% block title %} Admin Update National Manager {%
+endblock %} {% block content %}
+<div class="container">
+  <h1>Edit National Manager</h1>
+  <form
+    action="{{ url_for('admin.update_national_manager', user_id=national_manager.user_id) }}"
+    method="post"
+  >
+    <div class="form-group">
+      <label for="title">Title</label>
+      <input
+        type="text"
+        class="form-control"
+        id="title"
+        name="title"
+        value="{{ national_manager.title }}"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="phone_number">Phone Number</label>
+      <input
+        type="text"
+        class="form-control"
+        id="phone_number"
+        name="phone_number"
+        value="{{ national_manager.phone_number }}"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input
+        type="email"
+        class="form-control"
+        id="email"
+        name="email"
+        value="{{ national_manager.email }}"
+        required
+      />
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a href="{{ url_for('admin.view_all') }}" class="btn btn-secondary"
+      >Cancel</a
+    >
+  </form>
+</div>
+{% endblock %}
