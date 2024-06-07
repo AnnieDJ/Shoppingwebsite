@@ -1,27 +1,5 @@
 {% extends "base.html" %} {% block title %}Customer Dashboard{% endblock %} {%
 block content %}
-<style>
-  .cost::before {
-    content: "$";
-  }
-
-  .cost::after {
-    content: "/day";
-  }
-
-  .cart_equipment_id::before {
-    content: "#";
-  }
-
-  .cart_cost::before {
-    content: "$";
-  }
-
-  .total::after {
-    content: "day";
-  }
-</style>
-
 <div class="container" style="width: 80%; margin-top: 20px">
   <div id="content" class="card" style="padding: 30px">
     <h5>Lincoln Store</h5>
@@ -88,9 +66,75 @@ block content %}
 
   function transaction() {
     if (validate()) {
-      localStorage.clear();
-      location.reload();
-      alert("successfully purchased");
+      const store_id = localStorage.getItem("store_id");
+      const total_cost = document
+        .getElementById("Before")
+        .textContent.replace("Before tax: $", "");
+      const tax = "0.15";
+      const discount = (
+        parseInt(
+          document
+            .getElementById("Discount")
+            .textContent.replace("Discount: ", "")
+            .replace("%", "")
+        ) / 100
+      ).toString();
+      const final_price = document
+        .getElementById("Total")
+        .textContent.replace("Total: $", "");
+      const status = "Pending";
+      const creation_date = new Date().toLocaleDateString();
+      const order_items = Array.from(document.querySelectorAll(".total")).map(
+        (entry) => ({
+          equipment_id: entry.dataset.id,
+          price: entry.dataset.price,
+          quantity: entry.textContent,
+        })
+      );
+      const payment_type = "Credit Card";
+      const payment_status = "Processed";
+      const amount = document
+        .getElementById("total_num")
+        .textContent.replace("total: ", "");
+
+      const formData = new FormData();
+      formData.append(
+        "order",
+        JSON.stringify({
+          store_id,
+          total_cost,
+          tax,
+          discount,
+          final_price,
+          status,
+          creation_date,
+        })
+      );
+      formData.append("order_items", JSON.stringify(order_items));
+      formData.append(
+        "payment",
+        JSON.stringify({
+          payment_type,
+          payment_status,
+          amount,
+          payment_date: creation_date,
+        })
+      );
+
+      fetch("/customer/payment", {
+        method: "POST",
+        body: formData,
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          if (res.code === 200) {
+            localStorage.clear();
+            location.reload();
+            alert("successfully purchased");
+          } else {
+            alert("failed to purchase");
+          }
+        });
     }
   }
 
@@ -108,11 +152,13 @@ block content %}
     const CardID = document.getElementById("CardID").value;
     const CVC = document.getElementById("CVC").value;
 
-    if (CardID.length !== 16) {
-      alert("Card ID must be 16 numbers.");
-      return false;
-    } else if (CVC.length !== 3) {
-      alert("Please input a three-digit CVC number.");
+    if (
+      CardID.length < 16 ||
+      CVC.length < 3 ||
+      CardID.length > 16 ||
+      CVC.length > 3
+    ) {
+      alert("Please enter valid card details");
       return false;
     } else {
       return true;
@@ -156,9 +202,9 @@ block content %}
     const Before = document.getElementById("Before");
     const Discount = document.getElementById("Discount");
     const Total = document.getElementById("Total");
-    Before.textContent = `Before tax: ${value}`;
+    Before.textContent = `Before tax: $${value}`;
     Discount.textContent = `Discount: ${computed()}%`;
-    Total.textContent = `Total: ${(
+    Total.textContent = `Total: $${(
       value *
       (1 + 0.15) *
       (1 - computed() / 100)
@@ -227,9 +273,9 @@ block content %}
           .toISOString()
           .split("T")[0]
       }" oninput="end(this)" type="date" placeholder="End Date">
-                          <strong data-price="${
-                            entry.cost
-                          }" class="total" style="padding: 5px 10px;">1</strong>
+                          <strong data-id="${entry.equipment_id}" data-price="${
+        entry.cost
+      }" class="total" style="padding: 5px 10px;">1</strong>
   
                           <button onclick="del_cart(${
                             entry.equipment_id
@@ -302,8 +348,10 @@ block content %}
                     <div style="display: flex; justify-content: space-between; margin-top: 20px;">
                       <div style="border: 1px solid black; padding: 10px;">
                         <div>Pick Up</div>
-                        <div>Date:</div>
-                        <div>Store:</div>
+                        <div>Date: ${new Date().toLocaleDateString()}</div>
+                        <div>Store: ${localStorage.getItem(
+                          "store_address"
+                        )}</div>
                       </div>
   
                       <div style="border: 1px solid black; padding: 10px;">

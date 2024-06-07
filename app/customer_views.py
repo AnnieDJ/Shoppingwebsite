@@ -100,7 +100,7 @@ def change_password():
 def store(name):
     if 'loggedin' in session and session['role'] == 'customer':
         conn, cursor = db_cursor()
-        cursor.execute("SELECT * FROM equipment JOIN stores ON equipment.store_id = stores.store_id WHERE stores.store_name = %s", (name,))
+        cursor.execute("SELECT * FROM equipment JOIN stores ON equipment.store_id = stores.store_id WHERE stores.store_name = %s AND equipment.status = 'Available'", (name,))
         equipments = cursor.fetchall()
         cursor.close()
         return jsonify({
@@ -113,6 +113,7 @@ def store(name):
         'message': 'Not Authorized'
     })
 
+
 @customer_bp.route('/cart')
 def cart():
     if 'loggedin' in session and session['role'] == 'customer':
@@ -120,11 +121,65 @@ def cart():
     return redirect(url_for('home.login'))
 
 
+@customer_bp.route('/order_list')
+def order_list():
+    if 'loggedin' in session and session['role'] == 'customer':
+        status = request.args.get('status')
+        print(bool(status))
+        conn, cursor = db_cursor()
+        if status:
+            cursor.execute(f"SELECT * FROM orders WHERE user_id = {session['userid']} AND status = '{status}'")
+        else:
+            cursor.execute(f"SELECT * FROM orders WHERE user_id = {session['userid']}")
+        orders = cursor.fetchall()
+        for order in orders:
+            cursor.execute(f"SELECT store_name FROM stores WHERE store_id = {order['store_id']}")
+            order['store_name'] = cursor.fetchone()['store_name']
+        cursor.close()
+        return render_template('customer_order_list.html', orders=orders)
+    return redirect(url_for('home.login'))
+
+
+@customer_bp.route('/order_detail/<int:order_id>')
+def order_detail(order_id):
+    if 'loggedin' in session and session['role'] == 'customer':
+        conn, cursor = db_cursor()
+        cursor.execute(f"SELECT * FROM order_items WHERE order_id = {order_id}")
+        items = cursor.fetchall()
+        cursor.close()
+        return render_template('customer_order_detail.html', items=items)
+    return redirect(url_for('home.login'))
+
+
+@customer_bp.route('/order_detail/cancel/<int:order_id>')
+def cancel_order(order_id):
+    if 'loggedin' in session and session['role'] == 'customer':
+        conn, cursor = db_cursor()
+        cursor.execute(f"UPDATE orders SET status = 'Canceled' WHERE order_id = {order_id}")
+        conn.commit()
+        cursor.execute(f"SELECT equipment_id FROM order_items WHERE order_id = {order_id}")
+        for entry in cursor.fetchall():
+            cursor.execute(f"UPDATE equipment SET status = 'Available' WHERE equipment_id = {entry['equipment_id']}")
+            conn.commit()
+        cursor.execute(f"UPDATE payments SET payment_status = 'Refunded' WHERE order_id = {order_id}")
+        conn.commit()
+        cursor.close()
+        return jsonify({
+            'code': 200,
+            'message': 'Success',
+            'data': True
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
+
+
 @customer_bp.route('/equipment', methods=['POST'])
 def equipment():
     if 'loggedin' in session and session['role'] == 'customer':
         session.get('')
-        ids = request.form.get('ids')
+        ids = request.form.get('ids') or '999999999999999999'
         conn, cursor = db_cursor()
         cursor.execute(f"SELECT * FROM equipment WHERE equipment_id in ({ids})")
         equipments = cursor.fetchall()
@@ -138,6 +193,8 @@ def equipment():
         'code': 401,
         'message': 'Not Authorized'
     })
+
+
 @customer_bp.route('/search')
 def search():
     if 'loggedin' in session and session['role'] == 'customer':
@@ -156,3 +213,49 @@ def search():
         'message': 'Not Authorized'
     })
 
+
+@customer_bp.route('/payment', methods=['POST'])
+def payment():
+    if 'loggedin' in session and session['role'] == 'customer':
+        order = eval(request.form.get('order'))
+        order_items = eval(request.form.get('order_items'))
+        payment = eval(request.form.get('payment'))
+        conn, cursor = db_cursor()
+        cursor.execute(f"INSERT INTO orders (user_id, store_id, total_cost, tax, discount, final_price, status, creation_date) VALUES ('{session['userid']}', '{order['store_id']}', '{order['total_cost']}', '{order['tax']}', '{order['discount']}', '{order['final_price']}', '{order['status']}', '{order['creation_date']}')")
+        conn.commit()
+        cursor.execute(f"SELECT order_id FROM orders WHERE user_id = '{session['userid']}' AND store_id = '{order['store_id']}' AND total_cost = '{order['total_cost']}' AND tax = '{order['tax']}' AND discount = '{order['discount']}' AND final_price = '{order['final_price']}' AND status = '{order['status']}' AND creation_date = '{order['creation_date']}'")
+        order_id = cursor.fetchone()['order_id']
+        for item in order_items:
+            cursor.execute(f"INSERT INTO order_items (order_id, equipment_id, quantity, price) VALUES ('{order_id}', '{item['equipment_id']}', '{item['quantity']}', '{item['price']}')")
+            cursor.execute(f"UPDATE equipment SET status = 'Rented' WHERE equipment_id = '{item['equipment_id']}'")
+            conn.commit()
+        cursor.execute(f"INSERT INTO payments (order_id, user_id, payment_type, payment_status, amount, payment_date) VALUES ('{order_id}', '{session['userid']}', '{payment['payment_type']}', '{payment['payment_status']}', '{payment['amount']}', '{payment['payment_date']}')")
+        conn.commit()
+        cursor.close()
+        return jsonify({
+            'code': 200,
+            'message': 'Success',
+            'data': ''
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
+
+
+@customer_bp.route('/view_news')
+@login_required
+def view_news():
+    if 'loggedin' in session and session['role'] in ['customer']:
+        conn, cursor = db_cursor()
+        cursor.execute("""
+            SELECT news_id, title, content, publish_date, creator_id, store_id
+            FROM news
+            ORDER BY publish_date DESC
+        """)
+        news_items = cursor.fetchall()
+        cursor.close()
+        return render_template('customer_view_news.html', news_items=news_items)
+    else:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home.login'))

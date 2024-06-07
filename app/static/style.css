@@ -14,7 +14,7 @@
 
 .nav {
   background: linear-gradient(to right, darkgreen, darkgreen);
-  color: rgb(246, 245, 245);
+  color: white;
   text-align: center;
   top: 0;
   width: 100%;
@@ -58,7 +58,7 @@
 }
 
 .navbar-brand {
-  color: #ffffff !important; /* Set brand text color to white */
+  color: white !important;
   font-weight: bold !important;
   font-size: 24px !important;
 }
@@ -110,7 +110,7 @@
 
 /* Table enhancements */
 .table-card {
-  background: #ffffff;
+  background: white;
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
@@ -118,7 +118,7 @@
 
 .table-card .card-header {
   background: darkgreen;
-  color: #ffffff;
+  color: white;
   border-radius: 10px 10px 0 0;
 }
 
@@ -153,14 +153,14 @@
 /* Add margin to tables */
 table {
   width: 100%; /* Ensure the table fits within the container */
-  background: #ffffff;
+  background: white;
   border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .table thead {
   background: darkgreen;
-  color: #ffffff;
+  color: white;
 }
 
 .table th,
@@ -175,7 +175,7 @@ table {
 }
 
 .table tbody tr {
-  border-bottom: 1px solid #dddddd;
+  border-bottom: 1px solid white;
 }
 
 .table tbody tr:last-of-type {
@@ -198,24 +198,4 @@ table {
 .row {
   padding-right: 20px;
   margin-right: auto;
-}
-
-.cost::before {
-  content: "$";
-}
-
-.cost::after {
-  content: "/day";
-}
-
-.cart_equipment_id::before {
-  content: "#";
-}
-
-.cart_cost::before {
-  content: "$";
-}
-
-.total::after {
-  content: "day";
 }

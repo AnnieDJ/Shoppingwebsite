@@ -1,0 +1,36 @@
+{% extends "base.html" %} {% block title %}View News{% endblock %} {% block
+content %}
+<div class="container">
+  <h1>News</h1>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>News ID</th>
+        <th>Title</th>
+        <th>Content</th>
+        <th>Publish Date</th>
+        <th>Creator</th>
+        <th>Store</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for news in news_items %}
+      <tr>
+        <td>{{ news.news_id }}</td>
+        <td>{{ news.title }}</td>
+        <td>{{ news.content }}</td>
+        <td>{{ news.publish_date.strftime('%Y-%m-%d') }}</td>
+        <td>{{ news.creator_id }}</td>
+        <td>{{ news.store_id }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="7">No news found.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

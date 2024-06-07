@@ -126,3 +126,5 @@ def staff_management():
         return render_template('admin_view_staff.html', staff=staff)
     else:
         return redirect(url_for('home.login'))
+    
+

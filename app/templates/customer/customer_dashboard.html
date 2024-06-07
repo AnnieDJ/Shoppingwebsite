@@ -1,5 +1,9 @@
 {% extends "base.html" %} {% block title %}Customer Dashboard{% endblock %} {%
 block content %} {% if session.get('loggedin') %}
+<link
+  href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0-alpha3/css/bootstrap.min.css"
+  rel="stylesheet"
+/>
 <style>
   .custom-welcome p {
     margin-bottom: 5px;
@@ -13,7 +17,7 @@ block content %} {% if session.get('loggedin') %}
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 600px; /* Ensure height is not cutting off content */
+    height: 500px; /* Ensure height is not cutting off content */
     margin: 15px auto; /* Increased margin and centered */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Added subtle shadow for better visibility */
     border: 1px solid #ccc; /* Ensure visibility against all backgrounds */
@@ -45,7 +49,8 @@ block content %} {% if session.get('loggedin') %}
   }
   .card-text {
     font-family: "Arial", sans-serif;
-    font-size: 16px;
+    font-size: 28px;
+    font-weight: bold;
   }
   .btn-primary.add-to-cart {
     background-color: orangered; /* Green */
@@ -89,6 +94,8 @@ start browsing available machinery {% endif %}
             <a
               class="dropdown-item"
               href="#"
+              data-id="{{ store.store_id }}"
+              data-address="{{ store.address }}"
               data-store="{{ store.store_name }}"
               >{{ store.store_name }}</a
             >
@@ -148,6 +155,59 @@ start browsing available machinery {% endif %}
   </div>
 </div>
 
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Message Center</h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <h2>Message History</h2>
+        <!-- Area where messages are displayed -->
+        <div id="messageHistory" style="max-height: 300px; overflow-y: auto">
+          <!-- Messages will be dynamically loaded here -->
+        </div>
+
+        <h2>Send New Message</h2>
+        <form id="messageForm">
+          <div class="mb-3">
+            <textarea
+              class="form-control mb-2"
+              id="message-text"
+              name="content"
+              placeholder="Type your message here"
+            ></textarea>
+            <button
+              type="button"
+              class="btn btn-primary"
+              onclick="sendMessage()"
+            >
+              Send Message
+            </button>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
   async function loadProducts(store) {
     var productHtml = "";
@@ -162,10 +222,10 @@ start browsing available machinery {% endif %}
         product.name
       }">
               <div class="card-body">
-                <h5 class="card-title">${
-                  product.name
-                }</h5><p class="card-text">$${product.cost}</p>
-                <p class="card-text">${product.description}</p>
+                <h5 class="card-title">${product.name}/${
+        product.category
+      }</h5><p class="card-text">$${product.cost}</p>
+                
                 
                 <button class="btn btn-primary add-to-cart" data-product='${JSON.stringify(
                   product
@@ -184,10 +244,7 @@ start browsing available machinery {% endif %}
       var product = $(this).data("product");
       $(".modal-body").html(`
           <img src="/static/${product.Image}" class="img-fluid mb-3" alt="${product.name}">
-          <div class="product-details">
-            <h5 class="product-name">${product.name}</h5>
-            <p class="product-cost">$${product.cost}</p>
-        </div>
+          <h5>${product.name}</h5><p>$${product.cost}</p>
           <p>${product.description}</p>
           
         `);
@@ -216,6 +273,11 @@ start browsing available machinery {% endif %}
   $(document).ready(function () {
     $(".dropdown-item").on("click", function () {
       var store = $(this).data("store");
+      var store_id = $(this).data("id");
+      var store_address = $(this).data("address");
+      localStorage.setItem("store_id", store_id);
+      localStorage.setItem("store_name", store);
+      localStorage.setItem("store_address", store_address);
       loadProducts(store);
     });
   });
@@ -280,6 +342,49 @@ start browsing available machinery {% endif %}
 
       alert("Product added to cart!");
     });
+  });
+
+  // Function to handle sending messages
+  function loadMessages() {
+    fetch("/messages", { method: "GET" })
+      .then((response) => response.json())
+      .then((data) => {
+        const messageHistory = document.getElementById("messageHistory");
+        const messagesHtml = data
+          .map(
+            (msg) => `
+          <div><b>${msg.timestamp}</b> - <b>${msg.sender_id}</b>: ${msg.content}</div>
+        `
+          )
+          .join("");
+        messageHistory.innerHTML = messagesHtml;
+      })
+      .catch((error) => console.error("Error loading messages:", error));
+  }
+
+  function sendMessage() {
+    const messageContent = document.getElementById("message-text");
+    const formData = new FormData();
+    formData.append("content", messageContent.value);
+
+    fetch("/messages", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+        loadMessages(); // Reload messages to include the new one
+        messageContent.value = ""; // Clear the textarea after sending
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  }
+
+  const exampleModal = document.getElementById("exampleModal");
+  exampleModal.addEventListener("show.bs.modal", (event) => {
+    loadMessages(); // Load messages every time the modal is opened
   });
 </script>
 {% endblock %}

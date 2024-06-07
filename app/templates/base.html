@@ -55,12 +55,36 @@
       table {
         width: 100%;
       }
+
+      .cost::before {
+        content: "$";
+      }
+      
+      .cost::after {
+        content: "/day";
+      }
+      
+      .cart_equipment_id::before {
+        content: "#";
+      }
+      
+      .cart_cost::before {
+        content: "$";
+      }
+      
+      .total::after {
+        content: "day";
+      }
+      td[percent]::after {
+        content: "%";
+    }
+
     </style>
   </head>
   <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary nav">
       <div class="container-fluid">
-        <a class="navbar-brand" href="/static">
+        <a class="navbar-brand" href="/logout">
           <img src="/static/logo.png" alt="AgriHire Solutions" style="height: 80px; width:80px;">
         </a>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
@@ -68,8 +92,12 @@
 
             {% if session.get('role') == 'customer' %}
             <li class="nav-item">
-              <a class="nav-link" href="/order-list">Order List</a>
+              <a class="nav-link" href="{{ url_for('customer.dashboard') }}">Dashboard</a>
+              </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/customer/order_list">Order List</a>
             </li>
+
             <li class="nav-item">
               <a
                 class="nav-link"
@@ -82,9 +110,13 @@
             </li>
 
             <li class="nav-item">
-              <a class="nav-link" href="/customer/massgaes">Massages</a>
-            </li>
+              <!-- Anchor tag within the list item now triggers the modal and includes custom data attribute -->
+              <a class="nav-link px-3" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal">Messages</a>
+          </li>
           
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('customer.view_news') }}">News</a>
+        </li>
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
             </li>
@@ -134,6 +166,12 @@
             <li class="nav-item">
             <a class="nav-link" href="{{ url_for('local_manager.view_profile') }}">Profile</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('local_manager.view_news') }}">News</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('local_manager.view_discount') }}">Discount</a>
+      </li>
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
             </li>
@@ -148,9 +186,12 @@
             <li class="nav-item">
               <a class="nav-link" href="/dashboard">Dashboard</a>
             </li>
+           
+
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
             </li>
+            
             {% endif %}
           </ul>
         </div>
@@ -182,7 +223,7 @@
         ></button>
       </div>
       <div class="toast-body">
-        <!-- Message will dynamically be inserted here -->
+        
       </div>
     </div>
   </div>
