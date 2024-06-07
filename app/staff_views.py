@@ -8,7 +8,7 @@ from .utils import db_cursor
 from flask_hashing import Hashing
 from . import hashing
 from .utils import db_cursor, login_required
-from .utils import db_cursor, fetch_checklist_entries, fetch_returns, fetch_rentals, fetch_orders, fetch_payments
+from .utils import db_cursor, fetch_checklist_entries, fetch_returns, fetch_rentals, fetch_orders, fetch_payments, fetch_final_orders
 
 staff_bp = Blueprint('staff', __name__, template_folder='templates/staff')
 
@@ -21,17 +21,22 @@ def dashboard():
         conn, cursor = db_cursor()
         user_id = session['userid']  # Assuming 'userid' is stored in session upon login
         
-         
+        try:
         # Fetch the store_id and store name for the logged-in staff member
-        cursor.execute("""
-            SELECT s.store_id, st.store_name
-            FROM staff s
-            JOIN stores st ON s.store_id = st.store_id
-            WHERE s.user_id = %s
-        """, (user_id,))
-        store_info = cursor.fetchone()
-        store_name = store_info['store_name'] if store_info else 'Not Assigned'
-        store_id = store_info['store_id'] if store_info else None
+            cursor.execute("""
+                SELECT s.store_id, st.store_name
+                FROM staff s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            store_name = store_info['store_name'] if store_info else 'Not Assigned'
+            store_id = store_info['store_id'] if store_info else None
+        
+        except MySQLError as e:
+            print(f"Error fetching store info: {e}")
+            flash("A database error occurred. Please try again.", "danger")
+            return redirect(url_for('home.login'))
         
         if store_id:
             today = date.today().strftime('%Y-%m-%d')
@@ -40,8 +45,17 @@ def dashboard():
             top_rentals = fetch_rentals(cursor, store_id, limit=5)
             top_orders = fetch_orders(cursor, store_id, limit=5)
             top_payments = fetch_payments(cursor, store_id, limit=5)
+            top_final_orders = fetch_final_orders(cursor, store_id, limit=5)
+            
+            print("Top Bookings:", top_bookings)
+            print("Top Returns:", top_returns)
+            print("Top Rentals:", top_rentals)
+            print("Top Orders:", top_orders)
+            print("Top Payments:", top_payments)
+            print("Top Final Orders:", top_final_orders)
+            
         else:
-            top_bookings, top_returns, top_rentals, top_orders, top_payments = [], [], [], [], []
+            top_bookings, top_returns, top_rentals, top_orders, top_payments, top_final_orders = [], [], [], [], [], []
 
         cursor.close()
         conn.close()
@@ -49,7 +63,7 @@ def dashboard():
         # Choose the right template based on the role
         template_name = 'local_manager_dashboard.html' if session['role'] == 'local_manager' else 'staff_dashboard.html'
         return render_template(template_name, top_bookings=top_bookings, top_returns=top_returns, top_rentals=top_rentals, 
-                               top_orders=top_orders, top_payments=top_payments, store_name=store_name)
+                               top_orders=top_orders, top_payments=top_payments, final_orders=final_orders, store_name=store_name)
     else:
         return redirect(url_for('home.login'))
     
@@ -228,6 +242,78 @@ def view_orders():
         return render_template('order_list.html', orders=orders, store_name=store_name)
     else:
         return redirect(url_for('staff.dashboard'))
+
+
+## Final Orders ## 
+@staff_bp.route('/final_orders')
+@login_required
+def final_orders():
+    if 'loggedin' in session and session['role'] == 'staff':
+        conn, cursor = db_cursor()
+        user_id = session['userid']
+
+        try:
+            cursor.execute("""
+                SELECT s.store_id, st.store_name
+                FROM staff s
+                JOIN stores st ON s.store_id = st.store_id
+                WHERE s.user_id = %s
+            """, (user_id,))
+            store_info = cursor.fetchone()
+            if not store_info:
+                flash("No store information found for the current user.", "danger")
+                return redirect(url_for('staff.dashboard'))
+            
+            store_name = store_info['store_name']
+            store_id = store_info['store_id']
+
+            final_orders = fetch_final_orders(cursor, store_id)
+
+        except MySQLError as e:
+            print(f"A database error occurred: {e}")
+            flash("A database error occurred. Please try again.", "danger")
+            return redirect(url_for('staff.dashboard'))
+        
+        except Exception as e:
+            print(f"An unexpected error occurred: {e}")
+            flash("An unexpected error occurred. Please try again.", "danger")
+            return redirect(url_for('staff.dashboard'))
+        
+        finally:
+            cursor.close()
+            conn.close()
+
+        return render_template('final_order_list.html', final_orders=final_orders, store_name=store_name)
+    else:
+        return redirect(url_for('staff.dashboard'))
+
+
+
+def fetch_final_orders(cursor, store_id, limit=None):
+    query = """
+    SELECT o.order_id, r.rental_id, p.payment_id, o.user_id as customer_id, r.start_date, o.total_cost, 
+        o.status, p.payment_status
+    FROM orders o
+    LEFT JOIN order_items oi ON o.order_id = oi.order_id
+    LEFT JOIN rentals r ON oi.equipment_id = r.equipment_id AND o.user_id = r.user_id
+    LEFT JOIN payments p ON o.order_id = p.order_id
+    WHERE o.store_id = %s
+    ORDER BY o.creation_date DESC
+    """
+    result = []  # Initialize result variable
+    try:
+        if limit:
+            query += " LIMIT %s"
+            cursor.execute(query, (store_id, limit))
+        else:
+            cursor.execute(query, (store_id,))
+        result = cursor.fetchall()
+    except Exception as e:
+        print(f"Error executing fetch_final_orders query: {e}")
+    print("fetch_final_orders result:", result)  # Add logging to check the result
+    return result
+
+
 
 
 ## View Payments ##

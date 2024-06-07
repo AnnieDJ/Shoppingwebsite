@@ -1,0 +1,212 @@
+{% extends "base.html" %} {% block title %}Admin - View Staff{% endblock %} {%
+block content %}
+
+<div
+  class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+>
+  <h1 class="h2">Admin - View All Staff</h1>
+  <a href="{{ url_for('admin.add_staff') }}" class="btn btn-primary"
+    >Add New Staff</a
+  >
+</div>
+
+<div class="table-responsive">
+  <table class="table table-striped" id="staffTable">
+    <thead>
+      <tr>
+        <th onclick="sortTable(0)" scope="col">
+          ID &#x25B2;&#x25BC;
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+            onkeyup="filterTable('staffTable', 0)"
+          />
+        </th>
+        <th onclick="sortTable(1)" scope="col">
+          Title &#x25B2;&#x25BC;
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+            onkeyup="filterTable('staffTable', 1)"
+          />
+        </th>
+        <th onclick="sortTable(2)" scope="col">
+          First Name &#x25B2;&#x25BC;
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+            onkeyup="filterTable('staffTable', 2)"
+          />
+        </th>
+        <th onclick="sortTable(3)" scope="col">
+          Family Name &#x25B2;&#x25BC;
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+            onkeyup="filterTable('staffTable', 3)"
+          />
+        </th>
+        <th onclick="sortTable(4)" scope="col">
+          Email &#x25B2;&#x25BC;
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+            onkeyup="filterTable('staffTable', 4)"
+          />
+        </th>
+        <th onclick="sortTable(5)" scope="col">
+          Phone Number &#x25B2;&#x25BC;
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+            onkeyup="filterTable('staffTable', 5)"
+          />
+        </th>
+        <th onclick="sortTable(6)" scope="col">
+          Role &#x25B2;&#x25BC;
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+            onkeyup="filterTable('staffTable', 6)"
+          />
+        </th>
+        <th onclick="sortTable(7)" scope="col">
+          Store Name &#x25B2;&#x25BC;
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+            onkeyup="filterTable('staffTable', 7)"
+          />
+        </th>
+        <th onclick="sortTable(8)" scope="col">
+          Status &#x25B2;&#x25BC;
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+            onkeyup="filterTable('staffTable', 8)"
+          />
+        </th>
+        <th>
+          Actions
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+            onkeyup="filterTable('staffTable', 9)"
+            disabled
+          />
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for member in staff %}
+      <tr>
+        <td>{{ member.user_id }}</td>
+        <td>{{ member.title }}</td>
+        <td>{{ member.first_name }}</td>
+        <td>{{ member.family_name }}</td>
+        <td>{{ member.email }}</td>
+        <td>{{ member.phone_number }}</td>
+        <td>{{ member.role }}</td>
+        <td>{{ member.store_name }}</td>
+        <td>{{ member.status }}</td>
+        <td>
+          <a
+            href="{{ url_for('admin.update_staff', user_id=member.user_id, role=member.role) }}"
+            class="btn btn-sm btn-warning"
+            >Update</a
+          >
+          <a
+            href="{{ url_for('admin.delete_staff', user_id=member.user_id, role=member.role) }}"
+            class="btn btn-sm btn-danger"
+            >Delete</a
+          >
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  function filterTable(tableId, column) {
+    var table, tr, td, i, filterInput, filter;
+    table = document.getElementById(tableId);
+    tr = table.getElementsByTagName("tr");
+
+    // Get the input field for the corresponding column
+    filterInput = table
+      .getElementsByTagName("th")
+      [column].getElementsByTagName("input")[0];
+    filter = filterInput.value.toUpperCase();
+
+    for (i = 1; i < tr.length; i++) {
+      tr[i].style.display = "none";
+      td = tr[i].getElementsByTagName("td")[column];
+      if (td) {
+        if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        }
+      }
+    }
+  }
+
+  function sortTable(n) {
+    var table,
+      rows,
+      switching,
+      i,
+      x,
+      y,
+      shouldSwitch,
+      dir,
+      switchcount = 0;
+    table = document.getElementById("staffTable");
+    switching = true;
+    dir = "asc";
+
+    while (switching) {
+      switching = false;
+      rows = table.rows;
+
+      for (i = 1; i < rows.length - 1; i++) {
+        shouldSwitch = false;
+        x = rows[i].getElementsByTagName("TD")[n];
+        y = rows[i + 1].getElementsByTagName("TD")[n];
+
+        if (dir == "asc") {
+          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+            shouldSwitch = true;
+            break;
+          }
+        } else if (dir == "desc") {
+          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+            shouldSwitch = true;
+            break;
+          }
+        }
+      }
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        switchcount++;
+      } else {
+        if (switchcount == 0 && dir == "asc") {
+          dir = "desc";
+          switching = true;
+        }
+      }
+    }
+  }
+</script>
+
+{% endblock %}

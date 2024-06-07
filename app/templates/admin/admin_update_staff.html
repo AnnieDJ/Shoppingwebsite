@@ -1,11 +1,8 @@
-{% extends "base.html" %} 
-{% block title %}National Manager Update Staff{% endblock %} 
-{% block content %}
+{% extends "base.html" %} {% block title %}Admin Update Staff{% endblock %} {% block content %}
 
 <div class="container mt-5">
   <h2>Update Staff</h2>
-   <form method="POST" action="{{ url_for('national_manager.update_staff', user_id=staff.user_id, role=staff.role) }}">
-    
+  <form method="POST">
     <div class="form-group">
       <label for="title">Title</label>
       <select class="form-control" id="title" name="title" required>
@@ -41,13 +38,6 @@
       </select>
     </div>
     <div class="form-group">
-      <label for="role">Role</label>
-      <select class="form-control" id="role" name="role" required>
-        <option value="staff" {% if staff.role == 'staff' %}selected{% endif %}>Staff</option>
-        <option value="local_manager" {% if staff.role == 'local_manager' %}selected{% endif %}>Local Manager</option>
-      </select>
-    </div>
-    <div class="form-group">
       <label for="store_id">Store</label>
       <select class="form-control" id="store_id" name="store_id">
         {% for store in stores %}
@@ -57,26 +47,19 @@
         {% endfor %}
       </select>
     </div>
-    <button type="submit" class="btn btn-primary">Update {% if role == 'staff' %}Staff{% else %}Location Manager{% endif %}</button>
+    <div class="form-group">
+      <label for="role">Role</label>
+      <select class="form-control" id="role" name="role">
+        <option value="staff" {% if staff.role == 'staff' %}selected{% endif %}>Staff</option>
+        <option value="local_manager" {% if staff.role == 'local_manager' %}selected{% endif %}>Local Manager</option>
+        <option value="national_manager" {% if staff.role == 'national_manager' %}selected{% endif %}>National Manager</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Update Staff</button>
   </form>
-  <a href="{{ url_for('national_manager.staff_management') }}" class="btn btn-secondary mt-3">Go Back</a>
+  <a href="{{ url_for('admin.staff_management') }}" class="btn btn-secondary mt-3">Go Back</a>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    {% with messages = get_flashed_messages(with_categories=true) %}
-      {% if messages %}
-        {% for category, message in messages %}
-          Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: '{{ message }}'
-          });
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-  });
-</script>
 
 {% endblock %}
+
