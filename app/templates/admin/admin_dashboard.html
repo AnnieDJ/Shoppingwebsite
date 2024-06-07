@@ -55,7 +55,10 @@ block content %}
 
       <!-- Staff Management Card -->
       <div class="col-12 col-lg-6">
-        <a href="/staff_management.html" class="text-decoration-none">
+        <a
+          href="{{ url_for('admin.staff_management') }}"
+          class="text-decoration-none"
+        >
           <div class="card widget-card border-light shadow-sm">
             <div
               class="card-header bg-transparent p-4 border-light-subtle text-center"

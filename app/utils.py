@@ -84,7 +84,9 @@ def fetch_checklist_entries(cursor, store_id, date, limit=None):
         cursor.execute(query, (date, store_id, limit))
     else:
         cursor.execute(query, (date, store_id))
-    return cursor.fetchall()
+    results = cursor.fetchall()
+    print("fetch_checklist_entries results:", results)  # Add logging to check the result
+    return results
 
 def fetch_returns(cursor, store_id, date, limit=None):
     query = """
@@ -103,7 +105,10 @@ def fetch_returns(cursor, store_id, date, limit=None):
         cursor.execute(query, (date, store_id, limit))
     else:
         cursor.execute(query, (date, store_id))
-    return cursor.fetchall()
+    results = cursor.fetchall()
+    print("fetch_returns results:", results)  # Add logging to check the result
+    return results
+
 
 def fetch_rentals(cursor, store_id, limit=None):
     query = """
@@ -134,6 +139,29 @@ def fetch_orders(cursor, store_id, limit=None):
     else:
         cursor.execute(query, (store_id,))
     return cursor.fetchall()
+
+
+def fetch_final_orders(cursor, store_id, limit=None):
+    query = """
+    SELECT o.order_id, r.rental_id, p.payment_id, o.user_id as customer_id, r.start_date, o.total_cost, 
+        o.status, p.payment_status
+    FROM orders o
+    LEFT JOIN order_items oi ON o.order_id = oi.order_id
+    LEFT JOIN rentals r ON oi.equipment_id = r.equipment_id AND o.user_id = r.user_id
+    LEFT JOIN payments p ON o.order_id = p.order_id
+    WHERE o.store_id = %s
+    ORDER BY o.creation_date DESC
+    """
+    if limit:
+        query += " LIMIT %s"
+        cursor.execute(query, (store_id, limit))
+    else:
+        cursor.execute(query, (store_id,))
+        result = cursor.fetchall()
+    print("fetch_final_orders result:", result)  # Add logging to check the result
+    return cursor.fetchall()
+
+
 
 def fetch_payments(cursor, store_id, limit=None):
     query = """
@@ -166,3 +194,20 @@ def fetch_and_store_local_manager_store_id(user_id):
     finally:
         cursor.close()
         conn.close()
+
+
+def fetch_staff(cursor, store_id, limit=None):
+    query = """
+    SELECT s.staff_id, s.user_id, s.store_id, s.title, s.first_name, s.family_name, s.phone_number, s.status,
+           u.username, u.email, u.role
+    FROM staff s
+    JOIN user u ON s.user_id = u.user_id
+    WHERE s.store_id = %s
+    ORDER BY s.first_name ASC
+    """
+    if limit:
+        query += " LIMIT %s"
+        cursor.execute(query, (store_id, limit))
+    else:
+        cursor.execute(query, (store_id,))
+    return cursor.fetchall()
