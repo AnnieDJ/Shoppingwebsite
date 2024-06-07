@@ -1,0 +1,94 @@
+{% extends "base.html" %} {% block title %}Add New Staff{% endblock %} {% block
+content %}
+<div class="container mt-5">
+  <h2>Add New Staff</h2>
+  <form action="{{ url_for('local_manager.add_staff') }}" method="post">
+    <div class="form-group">
+      <label for="title">Title</label>
+      <select class="form-control" id="title" name="title" required>
+        <option value="Mr">Mr</option>
+        <option value="Mrs">Mrs</option>
+        <option value="Miss">Miss</option>
+        <option value="Ms">Ms</option>
+        <option value="Dr">Dr</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="first_name">First Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="first_name"
+        name="first_name"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="family_name">Family Name</label>
+      <input
+        type="text"
+        class="form-control"
+        id="family_name"
+        name="family_name"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input
+        type="email"
+        class="form-control"
+        id="email"
+        name="email"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="phone_number">Phone Number</label>
+      <input
+        type="text"
+        class="form-control"
+        id="phone_number"
+        name="phone_number"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="date_of_birth">Date of Birth</label>
+      <input
+        type="date"
+        class="form-control"
+        id="date_of_birth"
+        name="date_of_birth"
+        required
+      />
+    </div>
+    <div class="form-group">
+      <label for="status">Status</label>
+      <select class="form-control" id="status" name="status" required>
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="store_id">Store</label>
+      <input
+        type="text"
+        class="form-control"
+        id="store_name"
+        name="store_name"
+        value="{{ store_name }}"
+        readonly
+      />
+      <input
+        type="hidden"
+        id="store_id"
+        name="store_id"
+        value="{{ store_id }}"
+      />
+    </div>
+    <button type="submit" class="btn btn-primary">Add Staff</button>
+  </form>
+</div>
+{% endblock %}

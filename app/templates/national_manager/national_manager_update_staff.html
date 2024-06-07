@@ -1,12 +1,21 @@
-{% extends "base.html" %} {% block title %}National Manager Update Staff{% endblock %} {% block
-content %}
+{% extends "base.html" %} 
+{% block title %}National Manager Update Staff{% endblock %} 
+{% block content %}
 
- <div class="container mt-5">
+<div class="container mt-5">
   <h2>Update Staff</h2>
-  <form method="POST">
+   <form method="POST" action="{{ url_for('national_manager.update_staff', user_id=staff.user_id, role=staff.role) }}">
+    
     <div class="form-group">
       <label for="title">Title</label>
-      <input type="text" class="form-control" id="title" name="title" value="{{ staff.title }}" required>
+      <select class="form-control" id="title" name="title" required>
+        <option value="Mr" {% if staff.title == 'Mr' %}selected{% endif %}>Mr</option>
+        <option value="Mrs" {% if staff.title == 'Mrs' %}selected{% endif %}>Mrs</option>
+        <option value="Miss" {% if staff.title == 'Miss' %}selected{% endif %}>Miss</option>
+        <option value="Ms" {% if staff.title == 'Ms' %}selected{% endif %}>Ms</option>
+        <option value="Dr" {% if staff.title == 'Dr' %}selected{% endif %}>Dr</option>
+        <option value="Other" {% if staff.title == 'Other' %}selected{% endif %}>Other</option>
+      </select>
     </div>
     <div class="form-group">
       <label for="first_name">First Name</label>
@@ -15,6 +24,10 @@ content %}
     <div class="form-group">
       <label for="family_name">Family Name</label>
       <input type="text" class="form-control" id="family_name" name="family_name" value="{{ staff.family_name }}" required>
+    </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" class="form-control" id="email" name="email" value="{{ staff.email }}" required>
     </div>
     <div class="form-group">
       <label for="phone_number">Phone Number</label>
@@ -27,11 +40,27 @@ content %}
         <option value="inactive" {% if staff.status == 'inactive' %}selected{% endif %}>Inactive</option>
       </select>
     </div>
-    <button type="submit" class="btn btn-primary">Update {% if role == 'Staff' %}Staff{% else %}Location Manager{% endif %}</button>
+    <div class="form-group">
+      <label for="role">Role</label>
+      <select class="form-control" id="role" name="role" required>
+        <option value="staff" {% if staff.role == 'staff' %}selected{% endif %}>Staff</option>
+        <option value="local_manager" {% if staff.role == 'local_manager' %}selected{% endif %}>Local Manager</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="store_id">Store</label>
+      <select class="form-control" id="store_id" name="store_id">
+        {% for store in stores %}
+        <option value="{{ store.store_id }}" {% if store.store_id == staff.store_id %}selected{% endif %}>
+          {{ store.store_name }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Update {% if role == 'staff' %}Staff{% else %}Location Manager{% endif %}</button>
   </form>
   <a href="{{ url_for('national_manager.staff_management') }}" class="btn btn-secondary mt-3">Go Back</a>
 </div>
-
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>

@@ -4,7 +4,8 @@ endblock %} {% block content %}
 <div
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
-  <h1 class="h2">Local Manager and Staff List - All Stores</h1>
+  <h1 class="h2">All Staff List - All Stores</h1>
+  <a href="{{ url_for('national_manager.add_staff') }}" class="btn btn-primary">Add New Staff</a>
 </div>
 
   <div class="table-responsive">
@@ -107,11 +108,8 @@ endblock %} {% block content %}
           <td>{{ member.store_name }}</td>
           <td>{{ member.status }}</td>
           <td>
-            <a
-              href="{{ url_for('national_manager.update_staff', staff_id=member.staff_id, role=member.role) }}"
-              class="btn btn-sm btn-warning"
-              >Update</a
-            >
+           <a href="{{ url_for('national_manager.update_staff', user_id=member.user_id, role=member.role.lower()) }}" class="btn btn-sm btn-warning">Update</a>
+          <a href="{{ url_for('national_manager.delete_staff', user_id=member.user_id, role=member.role.lower()) }}" class="btn btn-sm btn-danger">Delete</a>
           </td>
         </tr>
         {% endfor %}

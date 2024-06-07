@@ -41,6 +41,9 @@ CREATE TABLE IF NOT EXISTS staff (
 ALTER TABLE staff ADD COLUMN status TINYINT DEFAULT 1;
 ALTER TABLE staff MODIFY COLUMN status ENUM('active', 'inactive') DEFAULT 'active';
 
+-- 07/07 -- add new column -- 
+ALTER TABLE staff ADD COLUMN role ENUM('staff') NOT NULL DEFAULT 'staff';
+
 CREATE TABLE IF NOT EXISTS local_manager (
     local_manager_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     user_id INT NOT NULL,
@@ -55,8 +58,8 @@ CREATE TABLE IF NOT EXISTS local_manager (
 
 ALTER TABLE local_manager ADD COLUMN status ENUM('active', 'inactive') DEFAULT 'active';
 
-
-
+-- 07/07 -- add new column -- 
+ALTER TABLE local_manager ADD COLUMN role ENUM('local_manager') NOT NULL DEFAULT 'local_manager';
     
 CREATE TABLE IF NOT EXISTS admin_national_manager (
     admin_manager_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
@@ -72,15 +75,8 @@ CREATE TABLE IF NOT EXISTS admin_national_manager (
 ALTER TABLE asdatabase_scripts.admin_national_manager
 ADD COLUMN role VARCHAR(50);
 
--- Update Rose's role to admin
-UPDATE asdatabase_scripts.admin_national_manager
-SET role = 'admin'
-WHERE user_id = 1;
-
--- Update Peter's role to national manager
-UPDATE asdatabase_scripts.admin_national_manager
-SET role = 'national manager'
-WHERE user_id = 2;
+-- 07/07 -- add new column -- 
+ALTER TABLE admin_national_manager ADD COLUMN status ENUM('active', 'inactive') DEFAULT 'active';
 
 
 CREATE TABLE IF NOT EXISTS equipment (

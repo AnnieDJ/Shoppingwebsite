@@ -13,7 +13,7 @@ block content %} {% if session.get('loggedin') %}
   <thead>
     <tr>
       <th>Rental ID</th>
-      <th>User Name</th>
+      <th>Customer Name</th>
       <th>Equipment Name</th>
       <th>Start Date</th>
       <th>End Date</th>
@@ -25,7 +25,7 @@ block content %} {% if session.get('loggedin') %}
     {% for booking in top_bookings %}
     <tr>
       <td>{{ booking.rental_id }}</td>
-      <td>{{ booking.username }}</td>
+      <td>{{ booking.firstname }}{{ booking.lastname }}</td>
       <td>{{ booking.equipment_name }}</td>
       <td>{{ booking.start_date }}</td>
       <td>{{ booking.end_date }}</td>
@@ -37,7 +37,7 @@ block content %} {% if session.get('loggedin') %}
 </table>
 
 <!-- Display top 5 returns -->
-<h4><i class="fa fa-handshake"></i> Returns</h4>
+<h4><i class="fa fa-handshake"></i> Daily Returns</h4>
 <a href="{{ url_for('staff.daily_returns') }}" class="btn btn-success"
   >View More</a
 >
@@ -63,103 +63,134 @@ block content %} {% if session.get('loggedin') %}
     </tr>
     {% endfor %}
   </tbody>
-  </table>
+</table>
 
-  <!-- Display top 5 rentals -->
-  <h4><i class="fa fa-truck"></i> Rentals</h4>
-  <a href="{{ url_for('staff.view_rentals') }}" class="btn btn-success"
-    >View More</a
-  >
+<!-- Display top 5 final orders -->
+<h4><i class="fa fa-cart-shopping"></i> Full Order List</h4>
+<a href="{{ url_for('staff.final_orders') }}" class="btn btn-success"
+  >View More</a
+>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Rental ID</th>
+      <th>Payment ID</th>
+      <th>Customer ID</th>
+      <th>Start Date</th>
+      <th>Total Cost</th>
+      <th>Status</th>
+      <th>Payment Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for final_order in top_final_orders %}
+    <tr>
+      <td>{{ final_order.order_id }}</td>
+      <td>{{ final_order.rental_id }}</td>
+      <td>{{ final_order.payment_id }}</td>
+      <td>{{ final_order.customer_id }}</td>
+      <td>{{ final_order.start_date }}</td>
+      <td>{{ final_order.total_cost }}</td>
+      <td>{{ final_order.status }}</td>
+      <td>{{ final_order.payment_status }}</td>
+    </tr>
+    {% endfor %}
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Rental ID</th>
-        <th>User</th>
-        <th>Equipment</th>
-        <th>Start Date</th>
-        <th>End Date</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for rental in top_rentals %}
-      <tr>
-        <td>{{ rental.rental_id }}</td>
-        <td>{{ rental.username }}</td>
-        <td>{{ rental.equipment_name }}</td>
-        <td>{{ rental.start_date }}</td>
-        <td>{{ rental.end_date }}</td>
-        <td>{{ rental.status }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <!-- Display top 5 rentals -->
+    <h4><i class="fa fa-truck"></i> Rentals</h4>
+    <a href="{{ url_for('staff.view_rentals') }}" class="btn btn-success"
+      >View More</a
+    >
 
-  <!-- Display top 5 orders -->
-  <h4><i class="fa fa-shopping-cart"></i> Orders</h4>
-  <a href="{{ url_for('staff.view_orders') }}" class="btn btn-success"
-    >View More</a
-  >
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Rental ID</th>
+          <th>Customer Name</th>
+          <th>Equipment</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for rental in top_rentals %}
+        <tr>
+          <td>{{ rental.rental_id }}</td>
+          <td>{{ rental.firstname }}{{ rental.familyname }}</td>
+          <td>{{ rental.equipment_name }}</td>
+          <td>{{ rental.start_date }}</td>
+          <td>{{ rental.end_date }}</td>
+          <td>{{ rental.status }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Order ID</th>
-        <th>User ID</th>
-        <th>Cost</th>
-        <th>Discount %</th>
-        <th>Final Cost</th>
-        <th>Status</th>
-        <th>Order Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for order in top_orders %}
-      <tr>
-        <td>{{ order.order_id }}</td>
-        <td>{{ order.user_id }}</td>
-        <td>{{ order.total_cost }}</td>
-        <td>{{ (order.discount / order.total_cost * 100) | int }} %</td>
-        <td>{{ order.final_price }}</td>
-        <td>{{ order.status }}</td>
-        <td>{{ order.creation_date }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <!-- Display top 5 orders -->
+    <h4><i class="fa fa-shopping-cart"></i> Orders</h4>
+    <a href="{{ url_for('staff.view_orders') }}" class="btn btn-success"
+      >View More</a
+    >
 
-  <!-- Display top 5 payments -->
-  <h4><i class="fa fa-dollar-sign"></i> Payments</h4>
-  <a href="{{ url_for('staff.view_payments') }}" class="btn btn-success"
-    >View More</a
-  >
-  <table class="table">
-    <thead>
-      <tr>
-        <th>Payment ID</th>
-        <th>Order ID</th>
-        <th>User ID</th>
-        <th>Payment Type</th>
-        <th>Payment Status</th>
-        <th>Amount</th>
-        <th>Payment Date</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for payment in top_payments %}
-      <tr>
-        <td>{{ payment.payment_id }}</td>
-        <td>{{ payment.order_id }}</td>
-        <td>{{ payment.user_id }}</td>
-        <td>{{ payment.payment_type }}</td>
-        <td>{{ payment.payment_status }}</td>
-        <td>{{ payment.amount }}</td>
-        <td>{{ payment.payment_date}}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer Name</th>
+          <th>Cost</th>
+          <th>Discount %</th>
+          <th>Final Cost</th>
+          <th>Status</th>
+          <th>Order Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in top_orders %}
+        <tr>
+          <td>{{ order.order_id }}</td>
+          <td>{{ order.firstname }}{{ order.familyname }}</td>
+          <td>{{ order.total_cost }}</td>
+          <td>{{ (order.discount / order.total_cost * 100) | int }} %</td>
+          <td>{{ order.final_price }}</td>
+          <td>{{ order.status }}</td>
+          <td>{{ order.creation_date }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
-  {% endblock %}
+    <!-- Display top 5 payments -->
+    <h4><i class="fa fa-dollar-sign"></i> Payments</h4>
+    <a href="{{ url_for('staff.view_payments') }}" class="btn btn-success"
+      >View More</a
+    >
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer Name</th>
+          <th>Payment Type</th>
+          <th>Payment Status</th>
+          <th>Amount</th>
+          <th>Payment Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for payment in top_payments %}
+        <tr>
+          <td>{{ payment.order_id }}</td>
+          <td>{{ payment.firstname }}{{ payment.familyname }}</td>
+          <td>{{ payment.payment_type }}</td>
+          <td>{{ payment.payment_status }}</td>
+          <td>{{ payment.amount }}</td>
+          <td>{{ payment.payment_date}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% endblock %}
+  </tbody>
 </table>

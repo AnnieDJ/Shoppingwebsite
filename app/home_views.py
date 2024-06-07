@@ -90,6 +90,7 @@ def login():
                 session['userid'] = user_id
                 session['username'] = user['username']
                 session['role'] = user['role']
+                
 
                 if role == 'customer':
                     return redirect(url_for('customer.dashboard'))

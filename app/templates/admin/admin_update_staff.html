@@ -1,9 +1,7 @@
-{% extends "base.html" %} {% block title %}Local Manager Update Staff{% endblock %} {% block
-content %}
+{% extends "base.html" %} {% block title %}Admin Update Staff{% endblock %} {% block content %}
+
 <div class="container mt-5">
   <h2>Update Staff</h2>
-
-
   <form method="POST">
     <div class="form-group">
       <label for="title">Title</label>
@@ -25,12 +23,12 @@ content %}
       <input type="text" class="form-control" id="family_name" name="family_name" value="{{ staff.family_name }}" required>
     </div>
     <div class="form-group">
-      <label for="phone_number">Phone Number</label>
-      <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ staff.phone_number }}" required>
+      <label for="email">Email</label>
+      <input type="email" class="form-control" id="email" name="email" value="{{ staff.email }}" required>
     </div>
     <div class="form-group">
-      <label for="email">Email (read only)</label>
-      <input type="email" class="form-control" id="email" name="email" value="{{ staff.email }}" readonly>
+      <label for="phone_number">Phone Number</label>
+      <input type="text" class="form-control" id="phone_number" name="phone_number" value="{{ staff.phone_number }}" required>
     </div>
     <div class="form-group">
       <label for="status">Status</label>
@@ -39,9 +37,29 @@ content %}
         <option value="inactive" {% if staff.status == 'inactive' %}selected{% endif %}>Inactive</option>
       </select>
     </div>
+    <div class="form-group">
+      <label for="store_id">Store</label>
+      <select class="form-control" id="store_id" name="store_id">
+        {% for store in stores %}
+        <option value="{{ store.store_id }}" {% if store.store_id == staff.store_id %}selected{% endif %}>
+          {{ store.store_name }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="role">Role</label>
+      <select class="form-control" id="role" name="role">
+        <option value="staff" {% if staff.role == 'staff' %}selected{% endif %}>Staff</option>
+        <option value="local_manager" {% if staff.role == 'local_manager' %}selected{% endif %}>Local Manager</option>
+        <option value="national_manager" {% if staff.role == 'national_manager' %}selected{% endif %}>National Manager</option>
+      </select>
+    </div>
     <button type="submit" class="btn btn-primary">Update Staff</button>
   </form>
-  <a href="{{ url_for('local_manager.view_staff') }}" class="btn btn-secondary mb-3">Go Back</a>
-
+  <a href="{{ url_for('admin.staff_management') }}" class="btn btn-secondary mt-3">Go Back</a>
 </div>
+
+
 {% endblock %}
+

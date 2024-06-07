@@ -1,71 +1,64 @@
-{% extends "base.html" %} {% block title %}Local Manager View Staff List{%
-endblock %} {% block content %}
+{% extends "base.html" %} {% block title %}Final Order List{% endblock %} {%
+block content %}
 <div
   class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
 >
-  <h1 class="h2">Staff List - {{ store_name }} Store</h1>
-  <a href="{{ url_for('local_manager.add_staff') }}" class="btn btn-primary"
-    >Add New Staff</a
-  >
+  <h1 class="h2">Final Order List - {{ store_name }} Store</h1>
 </div>
 
 <div class="table-responsive">
-  <table class="table table-striped" id="staffTable">
+  <table class="table table-striped" id="finalOrderTable">
     <thead>
       <tr>
-        <th onclick="sortTable(0)" scope="col">
-          Staff ID &#x25B2;&#x25BC;<input
+        <th onclick="sortTable(0)">
+          Order ID &#x25B2;&#x25BC;<input
             type="text"
-            id="filterStaffID"
+            id="filterOrderID"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(1)" scope="col">
-          Title &#x25B2;&#x25BC;
-          <select id="filterTitle" class="form-control form-control-sm">
-            <option value="">All</option>
-            <option value="Mr">Mr</option>
-            <option value="Mrs">Mrs</option>
-            <option value="Miss">Miss</option>
-            <option value="Ms">Ms</option>
-            <option value="Dr">Dr</option>
-            <option value="Other">Other</option>
-          </select>
-        </th>
-        <th onclick="sortTable(2)" scope="col">
-          First Name &#x25B2;&#x25BC;<input
+        <th onclick="sortTable(1)">
+          Rental ID &#x25B2;&#x25BC;<input
             type="text"
-            id="filterFirstName"
+            id="filterRentalID"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(3)" scope="col">
-          Family Name &#x25B2;&#x25BC;<input
+        <th onclick="sortTable(2)">
+          Payment ID &#x25B2;&#x25BC;<input
             type="text"
-            id="filterFamilyName"
+            id="filterPaymentID"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(4)" scope="col">
-          Email &#x25B2;&#x25BC;<input
+        <th onclick="sortTable(3)">
+          Customer ID &#x25B2;&#x25BC;<input
             type="text"
-            id="filterEmail"
+            id="filterCustomerID"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(5)" scope="col">
-          Phone Number &#x25B2;&#x25BC;<input
-            type="text"
-            id="filterPhoneNumber"
+        <th onclick="sortTable(4)">
+          Start Date &#x25B2;&#x25BC;<input
+            type="date"
+            id="filterStartDate"
             class="form-control form-control-sm"
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(6)" scope="col">
+        <th onclick="sortTable(5)">
+          Total Cost &#x25B2;&#x25BC;<input
+            type="text"
+            id="filterTotalCost"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+          />
+        </th>
+        <th onclick="sortTable(6)">
           Status &#x25B2;&#x25BC;<input
             type="text"
             id="filterStatus"
@@ -73,34 +66,31 @@ endblock %} {% block content %}
             placeholder="Filter"
           />
         </th>
-        <th onclick="sortTable(7)" scope="col">
-          Actions &#x25B2;&#x25BC;<input
+        <th onclick="sortTable(7)">
+          Payment Status &#x25B2;&#x25BC;<input
             type="text"
-            id="filterActions"
+            id="filterPaymentStatus"
             class="form-control form-control-sm"
             placeholder="Filter"
-            disabled
           />
         </th>
       </tr>
     </thead>
     <tbody></tbody>
-    <tbody id="staffTableBody">
-      {% for member in staff %}
+    <tbody id="finalOrdersTableBody">
+      {% for final_order in final_orders %}
       <tr>
-        <td>{{ member.staff_id }}</td>
-        <td>{{ member.title }}</td>
-        <td>{{ member.first_name }}</td>
-        <td>{{ member.family_name }}</td>
-        <td>{{ member.email }}</td>
-        <td>{{ member.phone_number }}</td>
-        <td>{{ member.status }}</td>
-        <td>
-         <td>
-          <a href="{{ url_for('local_manager.update_staff', staff_id=member.staff_id) }}" class="btn btn-sm btn-warning">Update</a>
-          <a href="{{ url_for('local_manager.delete_staff', staff_id=member.staff_id) }}" class="btn btn-sm btn-danger">Delete</a>
-        </td>
-        </td>
+        <td>{{ final_order.order_id }}</td>
+        <td>{{ final_order.rental_id }}</td>
+        <td>{{ final_order.payment_id }}</td>
+        <td>{{ final_order.customer_id }}</td>
+        <td>{{ final_order.start_date }}</td>
+        <td>{{ final_order.total_cost }}</td>
+        <td>{{ final_order.status }}</td>
+        <td>{{ final_order.payment_status }}</td>
+      </tr>
+      <tr>
+        <td colspan="7">No bookings found</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -109,13 +99,12 @@ endblock %} {% block content %}
 
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    const filterInputs = document.querySelectorAll("thead input, thead select");
-    const tableBody = document.getElementById("staffTableBody");
+    const filterInputs = document.querySelectorAll("thead input");
+    const tableBody = document.getElementById("finalOrdersTableBody");
     const rows = tableBody.getElementsByTagName("tr");
 
     filterInputs.forEach((input) => {
       input.addEventListener("input", filterTable);
-      input.addEventListener("change", filterTable);
     });
 
     function filterTable() {
@@ -146,7 +135,7 @@ endblock %} {% block content %}
       shouldSwitch,
       dir,
       switchcount = 0;
-    table = document.getElementById("staffTable");
+    table = document.getElementById("finalOrderTable");
     switching = true;
     dir = "asc"; // Initial direction is ascending
     while (switching) {
