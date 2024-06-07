@@ -99,17 +99,18 @@ def staff_management():
         
         try:
             cursor.execute("""
-                SELECT s.staff_id, s.user_id, s.store_id, s.title, s.first_name, s.family_name, s.phone_number, 
-                u.email, s.status, 'Staff' as role, st.store_name
-                FROM staff s
-                JOIN user u ON s.user_id = u.user_id
-                JOIN stores st ON s.store_id = st.store_id
-                UNION ALL
-                SELECT l.local_manager_id as staff_id, l.user_id, l.store_id, l.title, l.first_name, l.family_name, 
-                l.phone_number, u.email, l.status, 'Local Manager' as role, st.store_name
-                FROM local_manager l
-                JOIN user u ON l.user_id = u.user_id
-                JOIN stores st ON l.store_id = st.store_id
+                SELECT u.user_id, u.username, u.email, u.role, 
+                       COALESCE(s.title, l.title) AS title, 
+                       COALESCE(s.first_name, l.first_name) AS first_name, 
+                       COALESCE(s.family_name, l.family_name) AS family_name, 
+                       COALESCE(s.phone_number, l.phone_number) AS phone_number, 
+                       COALESCE(s.status, l.status, 'active') AS status, 
+                       COALESCE(st.store_name, 'N/A') AS store_name
+                FROM user u
+                LEFT JOIN staff s ON u.user_id = s.user_id
+                LEFT JOIN local_manager l ON u.user_id = l.user_id
+                LEFT JOIN stores st ON u.store_id = st.store_id
+                WHERE u.role IN ('staff', 'local_manager')
             """)
             staff = cursor.fetchall()
         

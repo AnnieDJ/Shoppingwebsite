@@ -11,94 +11,104 @@ endblock %} {% block content %}
   <div class="table-responsive">
     <table class="table table-striped" id="staffTable">
       <thead>
-          <tr>
+      <tr>
         <th onclick="sortTable(0)" scope="col">
-          Staff ID &#x25B2;&#x25BC;<input
+          ID &#x25B2;&#x25BC;
+          <input
             type="text"
-            id="filterStaffID"
             class="form-control form-control-sm"
             placeholder="Filter"
+            onkeyup="filterTable('staffTable', 0)"
           />
         </th>
         <th onclick="sortTable(1)" scope="col">
-          Title &#x25B2;&#x25BC;<input
+          Title &#x25B2;&#x25BC;
+          <input
             type="text"
-            id="filterTitle"
             class="form-control form-control-sm"
             placeholder="Filter"
+            onkeyup="filterTable('staffTable', 1)"
           />
         </th>
         <th onclick="sortTable(2)" scope="col">
-          First Name &#x25B2;&#x25BC;<input
+          First Name &#x25B2;&#x25BC;
+          <input
             type="text"
-            id="filterFirstName"
             class="form-control form-control-sm"
             placeholder="Filter"
+            onkeyup="filterTable('staffTable', 2)"
           />
         </th>
         <th onclick="sortTable(3)" scope="col">
-          Family Name &#x25B2;&#x25BC;<input
+          Family Name &#x25B2;&#x25BC;
+          <input
             type="text"
-            id="filterFamilyName"
             class="form-control form-control-sm"
             placeholder="Filter"
+            onkeyup="filterTable('staffTable', 3)"
           />
         </th>
         <th onclick="sortTable(4)" scope="col">
-          Email &#x25B2;&#x25BC;<input
+          Email &#x25B2;&#x25BC;
+          <input
             type="text"
-            id="filterEmail"
             class="form-control form-control-sm"
             placeholder="Filter"
+            onkeyup="filterTable('staffTable', 4)"
           />
         </th>
         <th onclick="sortTable(5)" scope="col">
-          Phone Number &#x25B2;&#x25BC;<input
+          Phone Number &#x25B2;&#x25BC;
+          <input
             type="text"
-            id="filterPhoneNumber"
             class="form-control form-control-sm"
             placeholder="Filter"
-          />
-        </th>
-        <th onclick="sortTable(7)" scope="col">
-          Role &#x25B2;&#x25BC;<input
-            type="text"
-            id="filterRole"
-            class="form-control form-control-sm"
-            placeholder="Filter"
-          />
-        </th>
-        <th onclick="sortTable(8)" scope="col">
-          Store Name &#x25B2;&#x25BC;<input
-            type="text"
-            id="filterStoreName"
-            class="form-control form-control-sm"
-            placeholder="Filter"
+            onkeyup="filterTable('staffTable', 5)"
           />
         </th>
         <th onclick="sortTable(6)" scope="col">
-          Status &#x25B2;&#x25BC;<input
+          Role &#x25B2;&#x25BC;
+          <input
             type="text"
-            id="filterStatus"
             class="form-control form-control-sm"
             placeholder="Filter"
+            onkeyup="filterTable('staffTable', 6)"
           />
         </th>
-        <th onclick="sortTable(9)" scope="col">
-          Actions &#x25B2;&#x25BC;<input
+        <th onclick="sortTable(7)" scope="col">
+          Store Name &#x25B2;&#x25BC;
+          <input
             type="text"
-            id="filterActions"
             class="form-control form-control-sm"
             placeholder="Filter"
+            onkeyup="filterTable('staffTable', 7)"
+          />
+        </th>
+        <th onclick="sortTable(8)" scope="col">
+          Status &#x25B2;&#x25BC;
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+            onkeyup="filterTable('staffTable', 8)"
+          />
+        </th>
+        <th>
+          Actions
+          <input
+            type="text"
+            class="form-control form-control-sm"
+            placeholder="Filter"
+            onkeyup="filterTable('staffTable', 9)"
             disabled
           />
         </th>
       </tr>
-      </thead>
+    </thead>
       <tbody>
         {% for member in staff %}
         <tr>
-          <td>{{ member.staff_id }}</td>
+          <td>{{ member.user_id }}</td>
           <td>{{ member.title }}</td>
           <td>{{ member.first_name }}</td>
           <td>{{ member.family_name }}</td>
@@ -108,9 +118,17 @@ endblock %} {% block content %}
           <td>{{ member.store_name }}</td>
           <td>{{ member.status }}</td>
           <td>
-           <a href="{{ url_for('national_manager.update_staff', user_id=member.user_id, role=member.role.lower()) }}" class="btn btn-sm btn-warning">Update</a>
-          <a href="{{ url_for('national_manager.delete_staff', user_id=member.user_id, role=member.role.lower()) }}" class="btn btn-sm btn-danger">Delete</a>
-          </td>
+          <a
+            href="{{ url_for('national_manager.update_staff', user_id=member.user_id, role=member.role) }}"
+            class="btn btn-sm btn-warning"
+            >Update</a
+          >
+          <a
+            href="{{ url_for('national_manager.delete_staff', user_id=member.user_id, role=member.role) }}"
+            class="btn btn-sm btn-danger"
+            >Delete</a
+          >
+        </td>
         </tr>
         {% endfor %}
       </tbody>
@@ -120,35 +138,28 @@ endblock %} {% block content %}
 
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const filterInputs = document.querySelectorAll("thead input, thead select");
-    const tableBody = document.getElementById("staffTableBody");
-    const rows = tableBody.getElementsByTagName("tr");
+  function filterTable(tableId, column) {
+    var table, tr, td, i, filterInput, filter;
+    table = document.getElementById(tableId);
+    tr = table.getElementsByTagName("tr");
 
-    filterInputs.forEach((input) => {
-      input.addEventListener("input", filterTable);
-      input.addEventListener("change", filterTable);
-    });
+    filterInput = table
+      .getElementsByTagName("th")
+      [column].getElementsByTagName("input")[0];
+    filter = filterInput.value.toUpperCase();
 
-    function filterTable() {
-      for (let row of rows) {
-        let showRow = true;
-        filterInputs.forEach((input) => {
-          const column = input.parentElement.cellIndex;
-          const filter = input.value.toLowerCase();
-          const cell = row.getElementsByTagName("td")[column];
-          const text = cell.textContent.toLowerCase();
-
-          if (filter && text.indexOf(filter) === -1) {
-            showRow = false;
-          }
-        });
-        row.style.display = showRow ? "" : "none";
+    for (i = 1; i < tr.length; i++) {
+      tr[i].style.display = "none";
+      td = tr[i].getElementsByTagName("td")[column];
+      if (td) {
+        if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+          tr[i].style.display = "";
+        }
       }
     }
-  });
+  }
 
-  function sortTable(column) {
+  function sortTable(n) {
     var table,
       rows,
       switching,
@@ -160,14 +171,17 @@ endblock %} {% block content %}
       switchcount = 0;
     table = document.getElementById("staffTable");
     switching = true;
-    dir = "asc"; // Initial direction is ascending
+    dir = "asc";
+
     while (switching) {
       switching = false;
       rows = table.rows;
+
       for (i = 1; i < rows.length - 1; i++) {
         shouldSwitch = false;
-        x = rows[i].getElementsByTagName("TD")[column];
-        y = rows[i + 1].getElementsByTagName("TD")[column];
+        x = rows[i].getElementsByTagName("TD")[n];
+        y = rows[i + 1].getElementsByTagName("TD")[n];
+
         if (dir == "asc") {
           if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
             shouldSwitch = true;
@@ -193,5 +207,6 @@ endblock %} {% block content %}
     }
   }
 </script>
+
 
 {% endblock %}
