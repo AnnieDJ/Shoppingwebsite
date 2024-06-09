@@ -6,49 +6,54 @@
   <button onclick="sendMessage()">Send</button>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
+  // 全局作用域中声明sendMessage函数
+  function sendMessage() {
+    var messageInput = document.getElementById("message");
+    var message = messageInput.value;
+    messageInput.value = ""; // Clear input after getting the value
+
+    $.ajax({
+      type: "POST",
+      url: "/send_message",
+      contentType: "application/json",
+      data: JSON.stringify({
+        username: "{{ username }}",
+        role: "{{ role }}",
+        message: message,
+      }),
+      success: function (response) {
+        console.log(response);
+        fetchMessages();
+      },
+      error: function (error) {
+        console.error("Error sending message:", error);
+      },
+    });
+  }
+
+  function fetchMessages() {
+    $.ajax({
+      type: "GET",
+      url: "/get_messages",
+      success: function (messages) {
+        var messagesUl = document.getElementById("messages");
+        messagesUl.innerHTML = ""; // Clear previous messages
+        messages.forEach(function (msg) {
+          var item = document.createElement("li");
+          item.textContent = `${msg.role}-${msg.username}: ${msg.message}`; // 确保使用正确的字段
+          messagesUl.appendChild(item);
+        });
+        window.scrollTo(0, document.body.scrollHeight);
+      },
+      error: function (error) {
+        console.error("Error fetching messages:", error);
+      },
+    });
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
-    const username = "{{ username }}";
-    const role = "{{ role }}";
-
-    function sendMessage() {
-      var messageInput = document.getElementById("message");
-      var message = messageInput.value;
-      messageInput.value = ""; // Clear input after getting the value
-
-      $.ajax({
-        type: "POST",
-        url: "/send_message",
-        contentType: "application/json",
-        data: JSON.stringify({
-          username: username,
-          role: role,
-          message: message,
-        }),
-        success: function (response) {
-          console.log(response);
-          fetchMessages();
-        },
-      });
-    }
-
-    function fetchMessages() {
-      $.ajax({
-        type: "GET",
-        url: "/get_messages",
-        success: function (messages) {
-          var messagesUl = document.getElementById("messages");
-          messagesUl.innerHTML = "";
-          messages.forEach(function (msg) {
-            var item = document.createElement("li");
-            item.textContent = msg;
-            messagesUl.appendChild(item);
-          });
-          window.scrollTo(0, document.body.scrollHeight);
-        },
-      });
-    }
-
     setInterval(fetchMessages, 2000);
   });
 </script>

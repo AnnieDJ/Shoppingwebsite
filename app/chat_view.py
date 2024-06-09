@@ -14,6 +14,6 @@ chat_bp = Blueprint('chat', __name__, template_folder='templates/chat')
 # Assuming you have a chat blueprint setup
 @chat_bp.route('/chat')
 def index():
-    username = session.get('username', 'Guest')  # 如果 session 中没有 username，默认为 'Guest'
-    role = session.get('role', 'NoRole')         # 如果 session 中没有 role，默认为 'NoRole'
+    username = session.get('username', 'Guest')  
+    role = session.get('role', 'NoRole')         
     return render_template('chatview.html',username=username,role=role)

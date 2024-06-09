@@ -524,3 +524,36 @@ def add_discount():
     else:
         flash('Unauthorized to perform this action.', 'danger')
         return redirect(url_for('home.login'))
+
+@local_manager_bp.route('/financial_report')
+@login_required
+def financial_report():
+    if 'loggedin' in session:
+        conn, cursor = db_cursor()
+        try:
+            cursor.execute("""
+                SELECT
+                  CASE
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 3 THEN 'Q1'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 6 THEN 'Q2'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 9 THEN 'Q3'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 12 THEN 'Q4'
+                  END AS quarter,
+                  SUM(total_cost) AS total_sales
+                FROM orders
+                WHERE status = 'Completed' AND YEAR(creation_date) = 2024
+                GROUP BY quarter
+            """)
+            results = cursor.fetchall()
+            data = [{'quarter': result['quarter'], 'total_sales': float(result['total_sales'])} for result in results]
+        except Exception as e:
+            flash(f'Failed to retrieve data: {str(e)}', 'danger')
+            data = []
+        finally:
+            cursor.close()
+            conn.close()
+
+        return render_template('local_manager_financial_report.html', data=data)
+    else:
+        flash('Please log in to view this page.', 'info')
+        return redirect(url_for('home.login'))
