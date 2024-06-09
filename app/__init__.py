@@ -25,19 +25,19 @@ def create_app():
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(chat_bp, url_prefix='/chat')
     app.secret_key = 'the first secret key for ava'
-    messages = []  # 全局变量来存储消息
+    messages = []  
 
-    redis_conn = redis.Redis(host='localhost', port=6379, db=0)  # 连接到本地 Redis 服务器
+    redis_conn = redis.Redis(host='localhost', port=6379, db=0)  
 
     @app.route('/send_message', methods=['POST'])
     def send_message():
         content = request.json['message']
-        redis_conn.lpush('chat_messages', content)  # 将消息推送到 Redis 列表的头部
+        redis_conn.lpush('chat_messages', content)  
         return jsonify({"status": "Message sent"})
 
     @app.route('/get_messages', methods=['GET'])
     def fetch_chat_messages():
-        messages = redis_conn.lrange('chat_messages', 0, -1)  # 检索所有消息
+        messages = redis_conn.lrange('chat_messages', 0, -1)  
         messages = [msg.decode('utf-8') for msg in messages]
         return jsonify(messages)
 
