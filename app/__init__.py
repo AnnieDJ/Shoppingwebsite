@@ -1,12 +1,14 @@
-from flask import Flask, session
+from flask import Flask, jsonify,request
 from .home_views import home_bp
 from .customer_views import customer_bp
 from .staff_views import staff_bp
 from .local_manager_views import local_manager_bp
 from .national_manager_views import national_manager_bp
 from .admin_views import admin_bp
+from .chat_view import chat_bp
 from datetime import datetime
-
+import redis
+from threading import Thread
 
 def create_app():
     app = Flask(__name__)
@@ -21,16 +23,23 @@ def create_app():
     app.register_blueprint(local_manager_bp, url_prefix='/local_manager')
     app.register_blueprint(national_manager_bp, url_prefix='/national_manager')
     app.register_blueprint(admin_bp, url_prefix='/admin')
-   
+    app.register_blueprint(chat_bp, url_prefix='/chat')
     app.secret_key = 'the first secret key for ava'
+    messages = []  # 全局变量来存储消息
+
+    redis_conn = redis.Redis(host='localhost', port=6379, db=0)  # 连接到本地 Redis 服务器
+
+    @app.route('/send_message', methods=['POST'])
+    def send_message():
+        content = request.json['message']
+        redis_conn.lpush('chat_messages', content)  # 将消息推送到 Redis 列表的头部
+        return jsonify({"status": "Message sent"})
+
+    @app.route('/get_messages', methods=['GET'])
+    def fetch_chat_messages():
+        messages = redis_conn.lrange('chat_messages', 0, -1)  # 检索所有消息
+        messages = [msg.decode('utf-8') for msg in messages]
+        return jsonify(messages)
 
 
-    # Define context processor to inject 'today' into all templates
-    @app.context_processor
-    def inject_today_date():
-        if 'loggedin' in session:
-            today = datetime.now().strftime("%Y-%m-%d")
-            return {'today': today}
-        return {}
-    
     return app

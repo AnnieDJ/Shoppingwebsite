@@ -91,14 +91,14 @@
         </a>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
           <ul class="navbar-nav">
-
+              
             {% if session.get('role') == 'customer' %}
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('customer.dashboard') }}">Dashboard</a>
               </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/customer/order_list">Order List</a>
-            </li>
+              <li class="nav-item">
+                <a class="nav-link" href="/customer/order_list">Order List</a>
+              </li>
 
             <li class="nav-item">
               <a
@@ -111,13 +111,13 @@
               <a class="nav-link" href="/customer/cart">Cart</a>
             </li>
 
-            <li class="nav-item">
-              <!-- Anchor tag within the list item now triggers the modal and includes custom data attribute -->
-              <a href="{{ url_for('customer.customer_chat') }}">Chat</a>
-          </li>
+           
           
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('customer.view_news') }}">News</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('chat.index') }}">Chat</a>
         </li>
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
@@ -136,6 +136,9 @@
           
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('staff.view_profile') }}">Profile</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('chat.index') }}">Chat</a>
           </li>
            <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
@@ -158,6 +161,9 @@
         <li class="nav-item">
           <a class="nav-link" href="{{ url_for('local_manager.view_discount') }}">Discount</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('chat.index') }}">Chat</a>
+      </li>
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
             </li>
@@ -175,8 +181,9 @@
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('admin.dashboard') }}">Dashboard</a>
             </li>
-           
-
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('chat.index') }}">Chat</a>
+            </li>
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
             </li>

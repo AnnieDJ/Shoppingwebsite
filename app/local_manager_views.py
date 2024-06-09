@@ -410,7 +410,7 @@ def add_news():
 
         conn, cursor = db_cursor()
         try:
-            # 包括 publish_date、creator_id 和 store_id
+            
             cursor.execute("INSERT INTO news (title, content, publish_date, creator_id, store_id) VALUES (%s, %s, %s, %s, %s)", 
                            (title, content, publish_date, creator_id, store_id))
             conn.commit()

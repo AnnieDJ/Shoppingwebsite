@@ -2,10 +2,10 @@
     block content %}
     <div class="container mt-4">
         <div>
-            <button type="button" class="btn btn-primary" onclick="location.href = '/customer/order-list'">Reset</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <button type="button" class="btn btn-primary" onclick="location.href = '/customer/order-list?status=Pending'">Pending</button>
-            <button type="button" class="btn btn-primary" onclick="location.href = '/customer/order-list?status=Completed'">Completed</button>
-            <button type="button" class="btn btn-primary" onclick="location.href = '/customer/order-list?status=Canceled'">Canceled</button>
+            <button type="button" class="btn btn-primary" onclick="location.href = '/customer/order_list'">Reset</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-primary" onclick="location.href = '/customer/order_list?status=Pending'">Pending</button>
+            <button type="button" class="btn btn-primary" onclick="location.href = '/customer/order_list?status=Completed'">Completed</button>
+            <button type="button" class="btn btn-primary" onclick="location.href = '/customer/order_list?status=Canceled'">Canceled</button>
             
         </div>
         <table class="table" style="margin-top: 10px;">
@@ -27,18 +27,16 @@
             <tr>
                 <td>{{ order.order_id }}</td>
                 <td>{{ order.store_name }}</td>
-                <td>{{ order.total_cost }}</td>
+                <td dollar>{{ order.total_cost }}</td>
                 <td percent>{{ order.tax * 100 }}</td>
                 <td percent>{{ order.discount * 100 }}</td>
-                <td>{{ order.final_price }}</td>
+                <td dollar>{{ order.final_price }}</td>
                 <td>{{ order.status }}</td>
                 <td>{{ order.creation_date }}</td>
                 <td>
-                    <button {{ '' if order.status == 'Pending' else 'disabled' }} onclick="cancelOrder({{ order.order_id }})" class="btn btn-primary">Cancel</button>
-                    <button {{ '' if order.status == 'Pending' else 'disabled' }} onclick="" class="btn btn-primary">Extend rental</button>
-                    <button onclick="location.href = '/customer/order-detail/{{ order.order_id }}'" class="btn btn-primary">Dtails</button>
+                    <button {{ '' if order.status == 'Pending' else 'disabled' }} onclick="cancelOrder({{ order.order_id }})" class="btn btn-primary">Cance</button>
+                    <button onclick="location.href = '/customer/order_detail/{{ order.order_id }}'" class="btn btn-primary">Details</button>
                 </td>
-                
             </tr>
             {% endfor %}
             </tbody>
@@ -48,16 +46,17 @@
     <script>
     const cancelOrder = async (orderId) => {
         if (confirm('Are you sure you want to cancel the order?')) {
-            const res = await fetch(`/customer/order-detail/cancel/${orderId}`)
+            const res = await fetch(`/customer/order_detail/cancel/${orderId}`)
                 .then(res => res.json())
             if (res.code === 200) {
-                alert('Cancellation successful')
+                alert('Cancel successful')
                 location.reload()
             } else {
-                alert('Cancellation failed')
+                alert('Cancel failed')
             }
         }
     }
     </script>
     {% endblock %}
+    
     

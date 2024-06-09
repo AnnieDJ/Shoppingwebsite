@@ -1,0 +1,55 @@
+{% extends "base.html" %} {% block content %}
+<div class="chat-container">
+  <h3>Welcome, {{ username }}! Your role is {{ role }}.</h3>
+  <ul id="messages" style="list-style-type: none; padding: 0"></ul>
+  <input id="message" autocomplete="off" />
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const username = "{{ username }}";
+    const role = "{{ role }}";
+
+    function sendMessage() {
+      var messageInput = document.getElementById("message");
+      var message = messageInput.value;
+      messageInput.value = ""; // Clear input after getting the value
+
+      $.ajax({
+        type: "POST",
+        url: "/send_message",
+        contentType: "application/json",
+        data: JSON.stringify({
+          username: username,
+          role: role,
+          message: message,
+        }),
+        success: function (response) {
+          console.log(response);
+          fetchMessages();
+        },
+      });
+    }
+
+    function fetchMessages() {
+      $.ajax({
+        type: "GET",
+        url: "/get_messages",
+        success: function (messages) {
+          var messagesUl = document.getElementById("messages");
+          messagesUl.innerHTML = "";
+          messages.forEach(function (msg) {
+            var item = document.createElement("li");
+            item.textContent = msg;
+            messagesUl.appendChild(item);
+          });
+          window.scrollTo(0, document.body.scrollHeight);
+        },
+      });
+    }
+
+    setInterval(fetchMessages, 2000);
+  });
+</script>
+{% endblock %}

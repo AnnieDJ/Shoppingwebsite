@@ -89,6 +89,9 @@ block content %}
           equipment_id: entry.dataset.id,
           price: entry.dataset.price,
           quantity: entry.textContent,
+          start_time: document.getElementById("startDate" + entry.dataset.id)
+            .value,
+          end_time: document.getElementById("endDate" + entry.dataset.id).value,
         })
       );
       const payment_type = "Credit Card";
@@ -213,11 +216,17 @@ block content %}
 
   (async function () {
     const formData = new FormData();
-    formData.append("ids", JSON.parse(localStorage.getItem("cart")));
+    formData.append(
+      "ids",
+      JSON.parse(
+        localStorage.getItem("continuation") || localStorage.getItem("cart")
+      )
+    );
     window.res = await fetch("/customer/equipment", {
       method: "POST",
       body: formData,
     }).then((res) => res.json());
+    localStorage.removeItem("continuation");
 
     const response = await fetch("/user").then((res) => res.json());
     console.log(response.data);
@@ -254,6 +263,7 @@ block content %}
   
                       <div style="padding: 5px 10px;">
                           <input value="${
+                            localStorage.getItem("start_time") ||
                             new Date().toISOString().split("T")[0]
                           }" oninput="start(this)" id="startDate${
         entry.equipment_id
@@ -261,9 +271,20 @@ block content %}
         new Date().toISOString().split("T")[0]
       }" type="date" placeholder="Start Date">
                           <input value="${
-                            new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
-                              .toISOString()
-                              .split("T")[0]
+                            localStorage.getItem("start_time")
+                              ? new Date(
+                                  new Date(
+                                    localStorage.getItem("start_time")
+                                  ).getTime() +
+                                    24 * 60 * 60 * 1000
+                                )
+                                  .toISOString()
+                                  .split("T")[0]
+                              : new Date(
+                                  new Date().getTime() + 24 * 60 * 60 * 1000
+                                )
+                                  .toISOString()
+                                  .split("T")[0]
                           }" id="endDate${entry.equipment_id}" min="${
         new Date(new Date().getTime() + 24 * 60 * 60 * 1000)
           .toISOString()
@@ -284,6 +305,8 @@ block content %}
                   </div>
               `;
     });
+
+    localStorage.removeItem("start_time");
 
     content.innerHTML += `<div class="card" style="margin-top: 15px; padding: 20px; display: flex; justify-content: space-between; flex-direction: row; align-items: center;">
               <div>

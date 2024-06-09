@@ -58,7 +58,7 @@ def register():
 
                 conn.commit()  # Make sure to commit the transaction
 
-                flash('Registration successful!', 'success')#这个没有
+                flash('Registration successful!', 'success')
                 return redirect(url_for('home.home',msg=msg, modal='none'))  # modal='none' indicates not to open any modal
 
     return render_template('index.html', msg=msg)

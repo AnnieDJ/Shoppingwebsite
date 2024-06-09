@@ -125,7 +125,6 @@ def cart():
 def order_list():
     if 'loggedin' in session and session['role'] == 'customer':
         status = request.args.get('status')
-        print(bool(status))
         conn, cursor = db_cursor()
         if status:
             cursor.execute(f"SELECT * FROM orders WHERE user_id = {session['userid']} AND status = '{status}'")
@@ -146,8 +145,20 @@ def order_detail(order_id):
         conn, cursor = db_cursor()
         cursor.execute(f"SELECT * FROM order_items WHERE order_id = {order_id}")
         items = cursor.fetchall()
+        cursor.execute(f"SELECT status FROM orders WHERE order_id = {order_id}")
+        status = cursor.fetchone()['status']
+        for item in items:
+            cursor.execute(f"SELECT name, store_id, Image FROM equipment WHERE equipment_id = {item['equipment_id']}")
+            data = cursor.fetchone()
+            item['name'] = data['name']
+            item['store_id'] = data['store_id']
+            item['Image'] = data['Image']
+            cursor.execute(f"SELECT store_name, address FROM stores WHERE store_id = {data['store_id']}")
+            data = cursor.fetchone()
+            item['store_name'] = data['store_name']
+            item['address'] = data['address']
         cursor.close()
-        return render_template('customer_order_detail.html', items=items)
+        return render_template('customer_order_detail.html', items=items, status=status)
     return redirect(url_for('home.login'))
 
 
@@ -226,7 +237,7 @@ def payment():
         cursor.execute(f"SELECT order_id FROM orders WHERE user_id = '{session['userid']}' AND store_id = '{order['store_id']}' AND total_cost = '{order['total_cost']}' AND tax = '{order['tax']}' AND discount = '{order['discount']}' AND final_price = '{order['final_price']}' AND status = '{order['status']}' AND creation_date = '{order['creation_date']}'")
         order_id = cursor.fetchone()['order_id']
         for item in order_items:
-            cursor.execute(f"INSERT INTO order_items (order_id, equipment_id, quantity, price) VALUES ('{order_id}', '{item['equipment_id']}', '{item['quantity']}', '{item['price']}')")
+            cursor.execute(f"INSERT INTO order_items (order_id, equipment_id, quantity, price, start_time, end_time) VALUES ('{order_id}', '{item['equipment_id']}', '{item['quantity']}', '{item['price']}', '{item['start_time']}', '{item['end_time']}')")
             cursor.execute(f"UPDATE equipment SET status = 'Rented' WHERE equipment_id = '{item['equipment_id']}'")
             conn.commit()
         cursor.execute(f"INSERT INTO payments (order_id, user_id, payment_type, payment_status, amount, payment_date) VALUES ('{order_id}', '{session['userid']}', '{payment['payment_type']}', '{payment['payment_status']}', '{payment['amount']}', '{payment['payment_date']}')")
@@ -241,6 +252,7 @@ def payment():
         'code': 401,
         'message': 'Not Authorized'
     })
+
 
 
 @customer_bp.route('/view_news')
