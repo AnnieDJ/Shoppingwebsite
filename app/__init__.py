@@ -1,4 +1,4 @@
-from flask import Flask, jsonify,request
+from flask import Flask, jsonify,request,session
 from .home_views import home_bp
 from .customer_views import customer_bp
 from .staff_views import staff_bp
@@ -9,6 +9,7 @@ from .chat_view import chat_bp
 from datetime import datetime
 import redis
 from threading import Thread
+import json
 
 def create_app():
     app = Flask(__name__)
@@ -31,14 +32,19 @@ def create_app():
 
     @app.route('/send_message', methods=['POST'])
     def send_message():
-        content = request.json['message']
-        redis_conn.lpush('chat_messages', content)  
+        data = request.get_json()
+        message_info = {
+            'username': session.get('username', 'Guest'),
+            'role': session.get('role', 'NoRole'),
+            'message': data['message']
+        }
+        redis_conn.lpush('chat_messages', json.dumps(message_info))  
         return jsonify({"status": "Message sent"})
 
     @app.route('/get_messages', methods=['GET'])
     def fetch_chat_messages():
-        messages = redis_conn.lrange('chat_messages', 0, -1)  
-        messages = [msg.decode('utf-8') for msg in messages]
+        messages = redis_conn.lrange('chat_messages', 0, -1) 
+        messages = [json.loads(msg.decode('utf-8')) for msg in messages]  
         return jsonify(messages)
 
 
