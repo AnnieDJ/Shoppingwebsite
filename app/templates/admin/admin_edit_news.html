@@ -1,0 +1,35 @@
+{% extends "base.html" %} {% block title %}Edit News{% endblock %} {% block
+content %}
+<div class="container">
+  <h1>Edit News</h1>
+  <form
+    action="{{ url_for('admin.update_news', news_id=news_item.news_id) }}"
+    method="POST"
+  >
+    <div class="mb-3">
+      <label for="title" class="form-label">Title</label>
+      <input
+        type="text"
+        class="form-control"
+        id="title"
+        name="title"
+        value="{{ news_item.title }}"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="content" class="form-label">Content</label>
+      <textarea
+        class="form-control"
+        id="content"
+        name="content"
+        rows="5"
+        required
+      >
+    {{ news_item.content }}</textarea
+      >
+    </div>
+    <button type="submit" class="btn btn-primary">Update News</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "base.html" %} {% block title %}Add News{% endblock %} {% block
+content %}
+<div class="container">
+  <h1>Add News</h1>
+  <form action="{{ url_for('admin.add_news') }}" method="POST">
+    <div class="mb-3">
+      <label for="title" class="form-label">Title</label>
+      <input
+        type="text"
+        class="form-control"
+        id="title"
+        name="title"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="content" class="form-label">Content</label>
+      <textarea
+        class="form-control"
+        id="content"
+        name="content"
+        rows="5"
+        required
+      ></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="publish_date" class="form-label">Publish Date</label>
+      <input
+        type="date"
+        class="form-control"
+        id="publish_date"
+        name="publish_date"
+        value="{{ today }}"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="creator_id" class="form-label">Creator ID</label>
+      <input
+        type="number"
+        class="form-control"
+        id="creator_id"
+        name="creator_id"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="store_id" class="form-label">Store ID</label>
+      <input
+        type="number"
+        class="form-control"
+        id="store_id"
+        name="store_id"
+        value="{{ session['store_id'] | default(1) }}"
+        required
+      />
+    </div>
+    <button type="submit" class="btn btn-success">Add News</button>
+  </form>
+</div>
+{% endblock %}

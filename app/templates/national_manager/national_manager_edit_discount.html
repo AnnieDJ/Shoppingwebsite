@@ -1,0 +1,37 @@
+{% extends "base.html" %} {% block title %}Edit Discount{% endblock %} {% block
+content %}
+<div class="container">
+  <h1>Edit Discount</h1>
+  <form
+    method="POST"
+    action="{{ url_for('national_manager.update_discount', discount_id=discount.discount_id) }}"
+  >
+    <div class="mb-3">
+      <label for="days" class="form-label">Days</label>
+      <input
+        type="number"
+        class="form-control"
+        id="days"
+        name="days"
+        value="{{ discount.days }}"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label for="discount_pricing" class="form-label"
+        >Discount Pricing (%)</label
+      >
+      <input
+        type="number"
+        class="form-control"
+        id="discount_pricing"
+        name="discount_pricing"
+        step="0.01"
+        value="{{ discount.discount_pricing * 100 }}"
+        required
+      />
+    </div>
+    <button type="submit" class="btn btn-primary">Update Discount</button>
+  </form>
+</div>
+{% endblock %}

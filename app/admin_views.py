@@ -374,3 +374,254 @@ def delete_national_manager(user_id):
         flash('Unauthorized to perform this action.', 'danger')
         return redirect(url_for('home.login'))
     
+
+@admin_bp.route('/view_news')
+@login_required
+def view_news():
+    if 'loggedin' in session and session['role'] in ['admin']:
+        conn, cursor = db_cursor()
+        cursor.execute("""
+            SELECT news_id, title, content, publish_date, creator_id, store_id
+            FROM news
+            ORDER BY publish_date DESC
+        """)
+        news_items = cursor.fetchall()
+        cursor.close()
+        return render_template('admin_view_news.html', news_items=news_items)
+    else:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home.login'))
+
+@admin_bp.route('/edit_news/<int:news_id>', methods=['GET'])
+@login_required
+def edit_news(news_id):
+    if 'loggedin' in session and session['role'] in ['local_manager', 'admin']:
+        conn, cursor = db_cursor()
+        cursor.execute("SELECT news_id, title, content FROM news WHERE news_id = %s", (news_id,))
+        news_item = cursor.fetchone()
+        cursor.close()
+        if news_item:
+            return render_template('admin_edit_news.html', news_item=news_item)
+        else:
+            flash('News item not found.', 'warning')
+            return redirect(url_for('admin.view_news'))
+    else:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home.login'))
+
+@admin_bp.route('/update_news/<int:news_id>', methods=['POST'])
+@login_required
+def update_news(news_id):
+    if 'loggedin' in session and session['role'] in ['local_manager', 'admin']:
+        title = request.form['title']
+        content = request.form['content']
+        
+        conn, cursor = db_cursor()
+        try:
+            cursor.execute("UPDATE news SET title = %s, content = %s WHERE news_id = %s",
+                           (title, content, news_id))
+            conn.commit()
+            flash('News updated successfully.', 'success')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Failed to update news: {str(e)}', 'danger')
+        finally:
+            cursor.close()
+        return redirect(url_for('admin.view_news'))
+    else:
+        flash('Unauthorized to perform this action.', 'danger')
+        return redirect(url_for('home.login'))
+
+@admin_bp.route('/delete_news/<int:news_id>', methods=['POST'])
+@login_required
+def delete_news(news_id):
+    if 'loggedin' in session and session['role'] in ['local_manager', 'admin']:
+        conn, cursor = db_cursor()
+        try:
+            cursor.execute("DELETE FROM news WHERE news_id = %s", (news_id,))
+            conn.commit()
+            flash('News deleted successfully.', 'success')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Failed to delete news: {str(e)}', 'danger')
+        finally:
+            cursor.close()
+        return redirect(url_for('admin.view_news'))
+    else:
+        flash('Unauthorized to perform this action.', 'danger')
+        return redirect(url_for('home.login'))
+
+
+
+from datetime import datetime
+
+@admin_bp.route('/add_news', methods=['GET'])
+@login_required
+def add_news_form():
+    if 'loggedin' in session and session['role'] == 'admin':
+        
+        today = datetime.today().strftime('%Y-%m-%d')  
+        return render_template('admin_add_news.html', today=today)
+    else:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home.login'))
+
+@admin_bp.route('/add_news', methods=['POST'])
+@login_required
+def add_news():
+    if 'loggedin' in session and session['role'] == 'admin':
+        title = request.form['title']
+        content = request.form['content']
+        publish_date = request.form['publish_date']
+        creator_id = request.form['creator_id']
+        store_id = request.form['store_id']
+
+        conn, cursor = db_cursor()
+        try:
+            
+            cursor.execute("INSERT INTO news (title, content, publish_date, creator_id, store_id) VALUES (%s, %s, %s, %s, %s)", 
+                           (title, content, publish_date, creator_id, store_id))
+            conn.commit()
+            flash('News added successfully.', 'success')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Failed to add news: {str(e)}', 'danger')
+        finally:
+            cursor.close()
+        return redirect(url_for('admin.view_news'))
+    else:
+        flash('Unauthorized to perform this action.', 'danger')
+        return redirect(url_for('home.login'))
+
+
+@admin_bp.route('/view_discount')
+@login_required
+def view_discount():
+    if 'loggedin' in session and session['role'] in ['admin']:
+        conn, cursor = db_cursor()
+        # Update the SQL query to include ORDER BY
+        cursor.execute("SELECT * FROM discount ORDER BY days ASC")
+        discounts = cursor.fetchall()
+        cursor.close()
+        return render_template('admin/admin_discount.html', discounts=discounts)
+    return redirect(url_for('home.login'))
+
+ # Redirect if the user is not logged in or not authorized
+@admin_bp.route('/edit_discount/<int:discount_id>')
+@login_required
+def edit_discount(discount_id):
+    if 'loggedin' in session and session['role'] == 'admin':
+        conn, cursor = db_cursor()
+        cursor.execute("SELECT * FROM discount WHERE discount_id = %s", (discount_id,))
+        discount = cursor.fetchone()
+        cursor.close()
+        if discount:
+            return render_template('admin_edit_discount.html', discount=discount)
+        else:
+            flash("Discount not found.")
+            return redirect(url_for('admin.view_discount'))
+    return redirect(url_for('home.login'))
+
+@admin_bp.route('/update_discount/<int:discount_id>', methods=['POST'])
+@login_required
+def update_discount(discount_id):
+    if 'loggedin' in session and session['role'] == 'admin':
+        days = request.form['days']
+        discount_pricing = float(request.form['discount_pricing']) / 100  # Convert percentage to decimal
+
+        conn, cursor = db_cursor()
+        cursor.execute("UPDATE discount SET days = %s, discount_pricing = %s WHERE discount_id = %s",
+                       (days, discount_pricing, discount_id))
+        conn.commit()
+        cursor.close()
+        
+        flash('Discount updated successfully.', 'success')
+        return redirect(url_for('admin.view_discount'))
+    return redirect(url_for('home.login'))
+
+@admin_bp.route('/delete_discount/<int:discount_id>', methods=['POST'])
+@login_required
+def delete_discount(discount_id):
+    if 'loggedin' in session and session['role'] == 'admin':
+        conn, cursor = db_cursor()  # Ensure you obtain a connection and a cursor
+        try:
+            cursor.execute("DELETE FROM discount WHERE discount_id = %s", (discount_id,))
+            conn.commit()
+            flash('Discount deleted successfully.', 'success')
+        except Exception as e:
+            conn.rollback()  # Important to rollback if there's an error
+            flash(f'Failed to delete discount due to: {str(e)}', 'danger')
+        finally:
+            cursor.close()
+        return redirect(url_for('admin.view_discount'))
+    else:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home.login'))
+   
+@admin_bp.route('/add_discount', methods=['GET'])
+@login_required
+def add_discount_form():
+    if 'loggedin' in session and session['role'] == 'admin':
+        # Render a form to input new discount details
+        return render_template('admin_add_discount.html')
+    else:
+        flash('Unauthorized access.', 'danger')
+        return redirect(url_for('home.login'))
+
+
+@admin_bp.route('/add_discount', methods=['POST'])
+@login_required
+def add_discount():
+    if 'loggedin' in session and session['role'] == 'admin':
+        days = request.form['days']
+        # Convert percentage input to a decimal for storage
+        discount_pricing = float(request.form['discount_pricing']) / 100
+        
+        conn, cursor = db_cursor()
+        try:
+            cursor.execute("INSERT INTO discount (days, discount_pricing) VALUES (%s, %s)", (days, discount_pricing))
+            conn.commit()
+            flash('Discount added successfully.', 'success')
+        except Exception as e:
+            conn.rollback()
+            flash(f'Failed to add discount: {str(e)}', 'danger')
+        finally:
+            cursor.close()
+        
+        return redirect(url_for('admin.view_discount'))
+    else:
+        flash('Unauthorized to perform this action.', 'danger')
+        return redirect(url_for('home.login'))
+
+@admin_bp.route('/financial_report')
+@login_required
+def financial_report():
+    if 'loggedin' in session:
+        conn, cursor = db_cursor()
+        try:
+            cursor.execute("""
+                SELECT
+                  CASE
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 3 THEN 'Q1'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 6 THEN 'Q2'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 9 THEN 'Q3'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 12 THEN 'Q4'
+                  END AS quarter,
+                  SUM(total_cost) AS total_sales
+                FROM orders
+                WHERE status = 'Completed' AND YEAR(creation_date) = 2024
+                GROUP BY quarter
+            """)
+            results = cursor.fetchall()
+            data = [{'quarter': result['quarter'], 'total_sales': float(result['total_sales'])} for result in results]
+        except Exception as e:
+            flash(f'Failed to retrieve data: {str(e)}', 'danger')
+            data = []
+        finally:
+            cursor.close()
+            conn.close()
+
+        return render_template('national_manager_financial_report.html', data=data)
+    else:
+        flash('Please log in to view this page.', 'info')
+        return redirect(url_for('home.login'))
