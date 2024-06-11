@@ -7,7 +7,7 @@ block content %} {% if session.get('loggedin') %}
 <style>
   .custom-welcome p {
     margin-bottom: 5px;
-    font-size: 18px;
+    font-size: 22px;
     color: #144603;
     font-weight: normal;
     font-family: "Arial", sans-serif;
@@ -251,22 +251,37 @@ start browsing available machinery {% endif %}
       $("#productModal").modal("show");
     });
 
-    $(".add-to-cart").on("click", function () {
+    $(".add-to-cart").on("click", async function () {
       var product = $(this).data("product");
-      if (localStorage.getItem("cart")) {
+      if (
+        localStorage.getItem("cart") &&
+        localStorage.getItem("cart") !== "[]"
+      ) {
         const cart = JSON.parse(localStorage.getItem("cart"));
         if (cart.includes(product.equipment_id)) {
           alert("Product already in cart!");
           return;
         }
 
-        cart.push(product.equipment_id);
-        localStorage.setItem("cart", JSON.stringify(cart));
+        const formData = new FormData();
+        formData.append("id", product.equipment_id);
+        formData.append("previous_id", cart[cart.length - 1]);
+        const res = await fetch("/customer/is_available", {
+          method: "POST",
+          body: formData,
+        }).then((res) => res.json());
+
+        if (res.data) {
+          cart.push(product.equipment_id);
+          localStorage.setItem("cart", JSON.stringify(cart));
+          alert("Product added to cart!");
+        } else {
+          alert("Only products from one store can be selected");
+        }
       } else {
         localStorage.setItem("cart", JSON.stringify([product.equipment_id]));
+        alert("Product added to cart!");
       }
-
-      alert("Product added to cart!");
     });
   }
 
@@ -320,27 +335,42 @@ start browsing available machinery {% endif %}
           <img src="/static/${product.Image}" class="img-fluid mb-3" alt="${product.name}">
           <h5>${product.name}</h5>
           <p>${product.description}</p>
-          <p>$${product.cost}</p>
+          <p>${product.price}</p>
         `);
       $("#productModal").modal("show");
     });
 
-    $(".add-to-cart").on("click", function () {
+    $(".add-to-cart").on("click", async function () {
       var product = $(this).data("product");
-      if (localStorage.getItem("cart")) {
+      if (
+        localStorage.getItem("cart") &&
+        localStorage.getItem("cart") !== "[]"
+      ) {
         const cart = JSON.parse(localStorage.getItem("cart"));
         if (cart.includes(product.equipment_id)) {
           alert("Product already in cart!");
           return;
         }
 
-        cart.push(product.equipment_id);
-        localStorage.setItem("cart", JSON.stringify(cart));
+        const formData = new FormData();
+        formData.append("id", product.equipment_id);
+        formData.append("previous_id", cart[cart.length - 1]);
+        const res = await fetch("/customer/is_available", {
+          method: "POST",
+          body: formData,
+        }).then((res) => res.json());
+
+        if (res.data) {
+          cart.push(product.equipment_id);
+          localStorage.setItem("cart", JSON.stringify(cart));
+          alert("Product added to cart!");
+        } else {
+          alert("Only products from one store can be selected");
+        }
       } else {
         localStorage.setItem("cart", JSON.stringify([product.equipment_id]));
+        alert("Product added to cart!");
       }
-
-      alert("Product added to cart!");
     });
   });
 

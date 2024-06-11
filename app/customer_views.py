@@ -254,6 +254,42 @@ def payment():
     })
 
 
+@customer_bp.route('/discount')
+def discount():
+    if 'loggedin' in session and session['role'] == 'customer':
+        conn, cursor = db_cursor()
+        cursor.execute("SELECT * FROM discount")
+        discounts = cursor.fetchall()
+        cursor.close()
+        return jsonify({
+            'code': 200,
+            'message': 'Success',
+            'data': discounts
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
+
+
+@customer_bp.route('/is_available', methods=['POST'])
+def is_available():
+    if 'loggedin' in session and session['role'] == 'customer':
+        previous_id = request.form['previous_id']
+        id = request.form['id']
+        conn, cursor = db_cursor()
+        cursor.execute(f"SELECT store_id FROM equipment WHERE equipment_id in {( previous_id, id )}")
+        store_ids = cursor.fetchall()
+        cursor.close()
+        return jsonify({
+            'code': 200,
+            'message': 'Success',
+            'data': True if store_ids[0]['store_id'] == store_ids[1]['store_id'] else False
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
 
 @customer_bp.route('/view_news')
 @login_required

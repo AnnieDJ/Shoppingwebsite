@@ -15,6 +15,7 @@ national_manager_bp = Blueprint('national_manager', __name__, template_folder='t
 @login_required
 def dashboard():
     if 'loggedin' in session and session['role'] == 'national_manager':
+        
         return render_template('national_manager_dashboard.html')
     return redirect(url_for('home.login'))
 
