@@ -52,18 +52,50 @@
     <div class="col-md-1"></div>
     <div class="col-md-3">
       <h2 style="margin-bottom: 20px; margin-top: 30px; border-radius: 5px; padding: 5px;">Change Password</h2>
-      <form id="changePasswordForm" method="POST" action="/customer/change_password" onsubmit="return validatePassword()" class="needs-validation" novalidate>
-        <div class="mb-3">
-          <label for="password" class="form-label">New Password</label>
-          <input type="password" class="form-control" placeholder="New Password" name="password" id="password" minlength="8" maxlength="15" required />
-          <div class="invalid-feedback">Please provide a valid password (min length: 8).</div>
+      <form
+        id="changePasswordForm"
+        method="POST"
+        action="/national_manager/change_password"
+        onsubmit="return validatePassword()"
+        class="needs-validation"
+        novalidate
+      >
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <label for="password">New Password</label>
+            <input
+              type="password"
+              class="form-control"
+              placeholder="New Password"
+              name="password"
+              id="password"
+              minlength="8"
+              maxlength="15"
+              required
+            />
+            <div class="invalid-feedback">
+              Please provide a valid password.
+            </div>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="confirm_password" class="form-label">Confirm New Password</label>
-          <input type="password" class="form-control" placeholder="Confirm New Password" id="confirm_password" minlength="8" maxlength="15" required />
-          <div class="invalid-feedback">Please confirm the password.</div>
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <label for="confirm_password">Confirm New Password</label>
+            <input
+              type="password"
+              class="form-control"
+              placeholder="Confirm New Password"
+              id="confirm_password"
+              minlength="8"
+              maxlength="15"
+              required
+            />
+            <div class="invalid-feedback">Passwords do not match.</div>
+          </div>
         </div>
-        <button type="submit" class="btn btn-primary text-white">Change Password</button>
+        <button type="submit" class="btn btn-primary text-white">
+          Change Password
+        </button>
       </form>
     </div>
   </div>
@@ -139,19 +171,17 @@
     var password = document.getElementById("password").value;
     var confirmPassword = document.getElementById("confirm_password").value;
 
-    if (password.search(/[a-z]/i) < 0) {
-      alert("Your password must contain at least one letter.", "warning");
-      return false;
+    var pattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+
+    if (!pattern.test(password)) {
+        alert("Password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters.");
+        return false;
     }
-    if (password.search(/[0-9]/) < 0) {
-      alert("Your password must contain at least one digit.", "warning");
-      return false;
-    }
-    if (password != confirmPassword) {
-      alert("Passwords do not match.", "warning");
-      return false;
+    if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return false;
     }
     return true;
-  }
+    }
 </script>
 {% endblock %}

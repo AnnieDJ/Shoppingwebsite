@@ -71,8 +71,11 @@ def change_password():
 
     password = request.form['password']
 
-    if re.search('[a-zA-Z]', password) is None or re.search('[0-9]', password) is None:
-        flash("Password must contain at least one letter and one digit.", 'warning')
+    # Check for at least one letter, one digit, one uppercase and lowercase letter, and minimum 8 characters
+    pattern = re.compile(r'^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$')
+
+    if not pattern.match(password):
+        flash("Password must contain at least one number and one uppercase and lowercase letter, and at least 8 or more characters.", 'warning')
         return redirect(url_for('national_manager.national_manager_profile'))
 
     hashed_password = hashing.hash_value(password, salt='ava')
@@ -83,9 +86,13 @@ def change_password():
             'UPDATE user SET password_hash = %s WHERE user_id = %s',
             (hashed_password, session['userid'])
         )
+        conn.commit()  # Ensure the changes are committed to the database
         flash("Your password has been successfully updated.", 'success')
     except MySQLError as e:
         flash(f"An error occurred: {e}", 'danger')
+    finally:
+        cursor.close()
+        conn.close()
 
     return redirect(url_for('national_manager.national_manager_profile'))
 
