@@ -350,11 +350,11 @@ block content %}
 
     content.innerHTML += `<div class="card" style="margin-top: 15px; padding: 20px; display: flex; justify-content: space-between; flex-direction: row; align-items: center;">
           <div>
-              <div style="font-weight: bold">name: ${
+              <div style="font-weight: bold">Userame: ${
                 response.data.username
               }</div>
-              <div style="font-weight: bold">email: ${response.data.email}</div>
-              <div style="font-weight: bold">birthday: ${new Date(
+              <div style="font-weight: bold">Email: ${response.data.email}</div>
+              <div style="font-weight: bold">Date of birth: ${new Date(
                 response.data.date_of_birth
               ).toLocaleDateString()}</div>
           </div>
@@ -379,7 +379,7 @@ block content %}
                 <div style="display: flex; justify-content: space-between;">
                   <div>
                     <div>Username: ${response.data.username}</div>
-                    <div>Name: ${response.data.username}</div>
+                    <div>Name: ${response.data.first_name} ${response.data.family_name}</div>
                     <div>Email: ${response.data.email}</div>
                     <div>Birthday: ${new Date(
                       response.data.date_of_birth

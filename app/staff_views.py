@@ -226,7 +226,12 @@ def order_list():
         for order in orders:
             cursor.execute(f"SELECT store_name FROM stores WHERE store_id = {order['store_id']}")
             order['store_name'] = cursor.fetchone()['store_name']
-            cursor.execute(f"SELECT username, email, date_of_birth FROM user WHERE user_id = {order['user_id']}")
+            cursor.execute(f"""
+                           SELECT user.username, user.email, user.date_of_birth, customer.first_name, customer.family_name 
+                           FROM user 
+                           JOIN customer ON user.user_id = customer.user_id 
+                           WHERE user.user_id = {order['user_id']}
+            """)
             order['user_info'] = cursor.fetchone()
         cursor.close()
         return render_template('staff_order_list.html', orders=orders)

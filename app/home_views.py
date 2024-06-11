@@ -136,7 +136,7 @@ def get_store():
 def get_user():
     conn, cursor = db_cursor()
     user_id = session['userid']
-    cursor.execute(f"SELECT * FROM user WHERE user_id = {user_id}")
+    cursor.execute(f"SELECT * FROM user JOIN customer ON user.user_id = customer.user_id WHERE user.user_id = {user_id}")
     user = cursor.fetchone()
     return jsonify({
         "code": 200,
