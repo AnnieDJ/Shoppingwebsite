@@ -120,7 +120,7 @@ def inventory_management():
     return redirect(url_for('home.login'))
 
 
-# View machinery's details
+# View equipment details
 @staff_bp.route('/equipment/detail')
 def equipment_detail():
     if 'loggedin' in session and session['role'] == 'staff':
@@ -133,6 +133,7 @@ def equipment_detail():
     return redirect(url_for('home.login'))
 
 
+# Update equipment details
 @staff_bp.route('/equipment/update', methods=['POST'])
 def equipment_update():
     if 'loggedin' in session and session['role'] == 'staff':
@@ -157,6 +158,7 @@ def equipment_update():
     })
 
 
+# Add a new equipment
 @staff_bp.route('/equipment/add', methods=['POST'])
 def equipment_add():
     if 'loggedin' in session and session['role'] == 'staff':
@@ -185,6 +187,7 @@ def equipment_add():
     })
 
 
+# Upload equipment image
 @staff_bp.route('/equipment/upload', methods=['POST'])
 def equipment_upload():
     if 'loggedin' in session and session['role'] == 'staff':
@@ -202,6 +205,7 @@ def equipment_upload():
     })
 
 
+# View all orders
 @staff_bp.route('/order_list')
 def order_list():
     if 'loggedin' in session and session['role'] == 'staff':
@@ -229,6 +233,7 @@ def order_list():
     return redirect(url_for('home.login'))
 
 
+# View order details
 @staff_bp.route('/order_detail/<int:order_id>')
 def order_detail(order_id):
     if 'loggedin' in session and session['role'] == 'staff':
@@ -246,6 +251,7 @@ def order_detail(order_id):
     return redirect(url_for('home.login'))
 
 
+# Return equipment
 @staff_bp.route('/equipment/return', methods=['POST'])
 def return_equipment():
     if 'loggedin' in session and session['role'] == 'staff':
@@ -295,6 +301,7 @@ def fetch_order(order_id):
     })
 
 
+# Cancel order and refund
 @staff_bp.route('/refund_order/<int:order_id>')
 def refund_order(order_id):
     if 'loggedin' in session and session['role'] == 'staff':
@@ -315,6 +322,7 @@ def refund_order(order_id):
     })
 
 
+# Equipment repair history
 @staff_bp.route('/equipment_repair')
 def equipment_repair():
     if 'loggedin' in session and session['role'] == 'staff':
@@ -326,6 +334,7 @@ def equipment_repair():
     return redirect(url_for('auth_bp.login'))
 
 
+# Equipment rental history
 @staff_bp.route('/equipment_rent')
 def equipment_rent():
     if 'loggedin' in session and session['role'] == 'staff':
@@ -337,6 +346,7 @@ def equipment_rent():
     return redirect(url_for('auth_bp.login'))
 
 
+# View all equipment category
 def all_category():
     conn, cursor = db_cursor()
     cursor.execute("SELECT category FROM equipment GROUP BY category")

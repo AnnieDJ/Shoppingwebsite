@@ -4,6 +4,7 @@
         <div>
             <button type="button" class="btn btn-primary" onclick="location.href = '/customer/order_list'">Reset</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button type="button" class="btn btn-primary" onclick="location.href = '/customer/order_list?status=Pending'">Pending</button>
+            <button type="button" class="btn btn-primary" onclick="location.href = '/customer/order_list?status=Ongoing'">Ongoing</button>
             <button type="button" class="btn btn-primary" onclick="location.href = '/customer/order_list?status=Completed'">Completed</button>
             <button type="button" class="btn btn-primary" onclick="location.href = '/customer/order_list?status=Canceled'">Canceled</button>
             
@@ -11,15 +12,15 @@
         <table class="table" style="margin-top: 10px;">
             <thead>
             <tr>
-                <th>order_id</th>
-                <th>store_name</th>
-                <th>total_cost</th>
-                <th>tax</th>
-                <th>discount</th>
-                <th>final_price</th>
-                <th>status</th>
-                <th>creation_date</th>
-                <th>operate</th>
+                <th>Order Id</th>
+                <th>Store Name</th>
+                <th>Total Cost</th>
+                <th>Tax</th>
+                <th>Discount</th>
+                <th>Final Price</th>
+                <th>Status</th>
+                <th>Creation Date</th>
+                <th>View Order Details</th>
             </tr>
             </thead>
             <tbody>
@@ -34,8 +35,8 @@
                 <td>{{ order.status }}</td>
                 <td>{{ order.creation_date }}</td>
                 <td>
-                    <button {{ '' if order.status == 'Pending' else 'disabled' }} onclick="cancelOrder({{ order.order_id }})" class="btn btn-primary">Cance</button>
-                    <button onclick="location.href = '/customer/order_detail/{{ order.order_id }}'" class="btn btn-primary">Details</button>
+                    <button {{ '' if order.status == 'Pending' else 'disabled' }} onclick="cancelOrder({{ order.order_id }})" class="btn btn-primary">Cancel Order</button>
+                    <button onclick="location.href = '/customer/order_detail/{{ order.order_id }}'" class="btn btn-primary">Order Details</button>
                 </td>
             </tr>
             {% endfor %}
@@ -49,10 +50,10 @@
             const res = await fetch(`/customer/order_detail/cancel/${orderId}`)
                 .then(res => res.json())
             if (res.code === 200) {
-                alert('Cancel successful')
+                alert('Your order has been canceled!')
                 location.reload()
             } else {
-                alert('Cancel failed')
+                alert('Order failed to cancel! Please try again!')
             }
         }
     }
