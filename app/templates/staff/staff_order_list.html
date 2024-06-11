@@ -1,0 +1,120 @@
+{% extends "base.html" %} {% block title %}Staff Dashboard{% endblock %} {%
+block content %}
+<div class="container mt-4">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <button type="button" class="btn btn-primary" onclick="location.href = '/staff/order_list?status=Pending'">Pending</button>
+            <button type="button" class="btn btn-primary" onclick="location.href = '/staff/order_list?status=Ongoing'">Ongoing</button>
+            <button type="button" class="btn btn-primary" onclick="location.href = '/staff/order_list?status=Completed'">Completed</button>
+            <button type="button" class="btn btn-primary" onclick="location.href = '/staff/order_list?status=Canceled'">Canceled</button>
+            <button type="button" class="btn btn-primary" onclick="location.href = '/staff/order_list'">Reset</button>
+        </div>
+
+        <div class="col-md-6">
+          <form class="d-flex">
+            <input
+              id="searchInput"
+              class="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+            />
+            <button onclick="searchButton()" class="btn btn-outline-success" type="button">
+              Search
+            </button>
+          </form>
+        </div>
+    </div>
+    <table class="table" style="margin-top: 10px;">
+        <thead>
+        <tr>
+            <th>Order Id</th>
+            <th>User Id</th>
+            <th>Store Name</th>
+            <th>Total Cost</th>
+            <th>Tax</th>
+            <th>Discount</th>
+            <th>Final Price</th>
+            <th>Status</th>
+            <th>Creation Date</th>
+            <th>Check Out Equipment</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for order in orders %}
+        <tr>
+            <td>{{ order.order_id }}</td>
+            <td data-bs-toggle="modal" data-bs-target="#exampleModal{{ order.order_id }}" onclick="user_detail(this, {{ order.user_id }})" style="cursor: pointer;">{{ order.user_id }}</td>
+
+            <div class="modal fade" id="exampleModal{{ order.order_id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Customer Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Customer ID: {{ order.user_id }}</p>
+                    <p>Customer Name: {{ order.user_info.username }}</p>
+                    <p>Customer Email: {{ order.user_info.email }}</p>
+                    <p>Customer Date Of Birth: {{ order.user_info.date_of_birth }}</p>
+                </div>
+                </div>
+                </div>
+             </div>
+
+            <td>{{ order.store_name }}</td>
+            <td dollar>{{ order.total_cost }}</td>
+            <td percent>{{ order.tax * 100 }}</td>
+            <td percent>{{ order.discount * 100 }}</td>
+            <td dollar>{{ order.final_price }}</td>
+            <td>{{ order.status }}</td>
+            <td>{{ order.creation_date }}</td>
+            <td>
+                <button {{ '' if order.status == 'Pending' else 'disabled' }} onclick="fetch_order({{ order.order_id }})" class="btn btn-primary">Checkout Equipment</button>
+                <button onclick="location.href = '/staff/order_detail/{{ order.order_id }}'" class="btn btn-primary">Order Details</button>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+const fetch_order = async (order_id) => {
+    if (confirm("Have you verified the customer's ID?")) {
+        const res = await fetch('/staff/fetch_order/'+ order_id)
+        .then(res => res.json());
+
+        if (res.code === 200) {
+            alert('Equipment has been checked out!');
+            location.reload();
+        } else {
+            alert('Equipment failed to check out! Please try again!');
+        }
+    } else {
+        await fetch('/staff/refund_order/'+ order_id)
+        .then(res => res.json());
+        location.reload();
+    }
+}
+
+const searchButton = () => {
+    const args = location.search.split('?')[1]?.split('&').map(e => ({
+        [e.split('=')[0]]: e.split('=')[1]
+    }));
+
+    if (!args) {
+        location.href = '/staff/order_list?search=' + document.getElementById('searchInput').value;
+    } else {
+        if (args[0].search === '' || args[0].search) {
+            args[0].search = document.getElementById('searchInput').value;
+        } else {
+            args[1] = {'search': document.getElementById('searchInput').value}
+        }
+
+        location.href = '/staff/order_list?' + Object.entries(args).map(([_, y]) => `${Object.entries(y)[0][0]}=${Object.entries(y)[0][1]}`).join('&');
+    }
+}
+</script>
+{% endblock %}
