@@ -1,9 +1,9 @@
-{% extends "base.html" %} {% block title %}Staff Dashboard{% endblock %} {%
+{% extends "base.html" %} {% block title %}Equipment Details{% endblock %} {%
 block content %}
 <div style="padding: 20px;">
 
 <div>
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add A New Machinery</button>
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">add</button>
 
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -24,7 +24,7 @@ block content %}
             </div>
             <div class="mb-3">
               <label for="Image" class="col-form-label">Image:</label>
-              <input type="text" class="form-control" id="Image">
+              <input type="file" onchange="equipment_upload(this)" accept="image/*" class="form-control" id="Image">
             </div>
               <div class="mb-3">
               <label for="purchase_date" class="col-form-label">Purchase Date:</label>
@@ -110,8 +110,8 @@ block content %}
                     entry.innerHTML = `<input type="date" value="${date}">`;
                     break
                 case "IMG":
-                    const src = entry.children[0].src;
-                    entry.innerHTML = `<input type="text" value="${src}">`;
+                    const src = entry.children[0].src.replace(location.origin + '/static/', '');
+                    entry.innerHTML = `<input onchange="equipment_upload(this)" data-src="${src}" accept="image/*" type="file">`;
                     break;
                 case "CATEGORY":
                     const category = entry.textContent;
@@ -146,7 +146,7 @@ block content %}
                     }
                     break;
                 case "BUTTON":
-                    entry.innerHTML = `<button class="btn btn-primary" onclick="saveInfo(${serial_number})">Save</button>`
+                    entry.innerHTML = `<button class="btn btn-primary" onclick="saveInfo(${serial_number})">save</button>`
                     break;
                 default:
                     const value = entry.textContent;
@@ -165,12 +165,12 @@ block content %}
                     formData.append("serial_number", serial_number);
                     break;
                 case "IMG":
-                    const src = entry.children[0].value.replace(location.origin + '/static/', '');
+                    const src = entry.children[0].dataset.src;
                     formData.append("Image", src)
                     entry.innerHTML = `<img style="width: 50px; height: 50px;" src="/static/${src}">`;
                     break;
                 case "BUTTON":
-                    entry.innerHTML = `<button class="btn btn-primary" onclick="editInfo(${serial_number})">edit</button>`
+                    entry.innerHTML = `<button class="btn btn-primary" onclick="editInfo(${serial_number})">Edit</button>`
                     break;
                 default:
                     const value = entry.children[0].value;
@@ -186,10 +186,10 @@ block content %}
         }).then(res => res.json())
 
         if (res.code === 200) {
-            alert("Equipment details have been updated successfully!");
+            alert("modify success");
         } else {
             location.reload();
-            alert("Update failed! Please try again!");
+            alert("modify failed");
         }
     }
 
@@ -198,7 +198,7 @@ block content %}
         formData.append("serial_number", document.getElementById("serial_number").value);
         formData.append("name", document.getElementById("name").value);
         formData.append("description", document.getElementById("description").value);
-        formData.append("Image", document.getElementById("Image").value);
+        formData.append("Image", document.getElementById("Image").dataset.src);
         formData.append("purchase_date", document.getElementById("purchase_date").value);
         formData.append("cost", document.getElementById("cost").value);
         formData.append("category", document.getElementById("category").value);
@@ -210,10 +210,27 @@ block content %}
         }).then(res => res.json());
 
         if (res.code === 200) {
-            alert("A new equipment has been added in the inventory!");
-        } else {
+            alert("Add equipment success");
             location.reload();
-            alert("Attempt to add a new equipment failed! Please try again!");
+        } else {
+            alert("Add equipment failed");
+        }
+    }
+
+    const equipment_upload = async (that) => {
+        const file = that.files[0];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch('/staff/equipment/upload', {
+            method: 'POST',
+            body: formData
+        }).then(res => res.json());
+
+        if (res.code === 200) {
+            that.dataset.src = res.data;
+        } else {
+            alert("Upload image failed");
         }
     }
 </script>

@@ -136,9 +136,9 @@ block content %}
           if (res.code === 200) {
             localStorage.clear();
             location.reload();
-            alert("successfully purchased");
+            alert("Your payment has been processed! Thank you for your order!");
           } else {
-            alert("failed to purchase");
+            alert("Payment failed! Please try again!");
           }
         });
     }
@@ -150,7 +150,7 @@ block content %}
       "cart",
       JSON.stringify(cart.filter((item) => item !== id))
     );
-    alert("removed from cart");
+    alert("The equipment has been removed from your cart!");
     location.reload();
   }
 

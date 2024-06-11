@@ -4,13 +4,13 @@
       <table class="table">
           <thead>
           <tr>
-              <th>name</th>
+              <th>Name</th>
               <th>Image</th>
-              <th>start_time</th>
-              <th>end_time</th>
-              <th>days</th>
-              <th>price</th>
-              <th>operate</th>
+              <th>Start Time</th>
+              <th>End Time</th>
+              <th>Days</th>
+              <th>Cost per Day</th>
+              <th>Extend Rental</th>
           </tr>
           </thead>
           <tbody>
@@ -23,7 +23,7 @@
               <td>{{ item.quantity }}</td>
               <td dollar>{{ item.price }}</td>
               <td>
-                  <button {{ '' if status == 'Pending'or status == 'Ongoing' else 'disabled' }} onclick="continuation({{ item.equipment_id }}, '{{ item.end_time }}', {{ item.store_id }}, '{{ item.store_name }}', '{{ item.address }}')" class="btn btn-primary">Lease Extension</button>
+                  <button {{ '' if status == 'Pending'or status == 'Ongoing' else 'disabled' }} onclick="continuation({{ item.equipment_id }}, '{{ item.end_time }}', {{ item.store_id }}, '{{ item.store_name }}', '{{ item.address }}')" class="btn btn-primary">Extend Rental</button>
               </td>
           </tr>
           {% endfor %}
