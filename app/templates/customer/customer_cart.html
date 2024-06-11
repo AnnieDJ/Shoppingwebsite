@@ -350,11 +350,11 @@ block content %}
 
     content.innerHTML += `<div class="card" style="margin-top: 15px; padding: 20px; display: flex; justify-content: space-between; flex-direction: row; align-items: center;">
           <div>
-              <div style="font-weight: bold">Userame: ${
+              <div style="font-weight: bold">Username: ${
                 response.data.username
               }</div>
               <div style="font-weight: bold">Email: ${response.data.email}</div>
-              <div style="font-weight: bold">Date of birth: ${new Date(
+              <div style="font-weight: bold">Date of Birth: ${new Date(
                 response.data.date_of_birth
               ).toLocaleDateString()}</div>
           </div>
@@ -372,7 +372,7 @@ block content %}
               <div class="modal-dialog" style="max-width: 75%;">
               <div class="modal-content">
               <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Checkout List</h5>
+              <h5 class="modal-title" id="exampleModalLabel">Confirm Your Order</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
@@ -398,7 +398,7 @@ block content %}
                            <th>Name</th>
                            <th>Start Time</th>
                            <th>End Time</th>
-                           <th>Cost(per)</th>
+                           <th>Cost per Day</th>
                          </tr>
                       </thead>
                       <tbody id="order_item">
@@ -411,6 +411,7 @@ block content %}
                     <div>Pick Up</div>
                     <div>Date: ${new Date().toLocaleDateString()}</div>
                     <div>Store: ${localStorage.getItem("store_address")}</div>
+                    <div>Please bring your photo ID when pick up equipment.</div>
                   </div>
 
                   <div style="border: 1px solid black; padding: 10px;">
