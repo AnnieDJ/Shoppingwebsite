@@ -66,7 +66,6 @@ def view_profile():
 ## Staff Change Password ##
 @staff_bp.route('/change_password', methods=['POST'])
 @login_required
-@login_required
 def change_password():
     if 'userid' not in session:
         flash("User ID not found in session. Please log in again.", 'danger')

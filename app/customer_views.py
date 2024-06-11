@@ -69,7 +69,6 @@ def customer_profile():
 # allow customer to change password
 @customer_bp.route('/change_password', methods=['POST'])
 @login_required
-@login_required
 def change_password():
     if 'userid' not in session:
         flash("User ID not found in session. Please log in again.", 'danger')

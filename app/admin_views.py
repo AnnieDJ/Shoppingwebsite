@@ -61,7 +61,6 @@ def admin_profile():
 # to allow admin to change password
 @admin_bp.route('/change_password', methods=['POST'])
 @login_required
-@login_required
 def change_password():
     if 'userid' not in session:
         flash("User ID not found in session. Please log in again.", 'danger')
