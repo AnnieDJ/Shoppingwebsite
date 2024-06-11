@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS user (
     role ENUM('customer', 'local_manager','national_manager', 'staff', 'admin') NOT NULL
 );
 
+
 CREATE TABLE IF NOT EXISTS customer (
     customer_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     user_id INT NOT NULL,
@@ -18,14 +19,16 @@ CREATE TABLE IF NOT EXISTS customer (
     address VARCHAR(255),
     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
-    
+
+
 CREATE TABLE IF NOT EXISTS stores (
     store_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     store_name VARCHAR(255) NOT NULL,
     address VARCHAR(255) NOT NULL,
     phone VARCHAR(20) NOT NULL
 );
-		
+
+
 CREATE TABLE IF NOT EXISTS staff (
     staff_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     user_id INT NOT NULL,
@@ -38,11 +41,6 @@ CREATE TABLE IF NOT EXISTS staff (
     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
 
-ALTER TABLE staff ADD COLUMN status TINYINT DEFAULT 1;
-ALTER TABLE staff MODIFY COLUMN status ENUM('active', 'inactive') DEFAULT 'active';
-
--- 07/07 -- add new column -- 
-ALTER TABLE staff ADD COLUMN role ENUM('staff') NOT NULL DEFAULT 'staff';
 
 CREATE TABLE IF NOT EXISTS local_manager (
     local_manager_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
@@ -52,14 +50,10 @@ CREATE TABLE IF NOT EXISTS local_manager (
     first_name VARCHAR(255),
     family_name VARCHAR(255),
     phone_number VARCHAR(20),
-    FOREIGN KEY (user_id) REFERENCES user(user_id),
-    FOREIGN KEY (store_id) REFERENCES stores(store_id)
+    FOREIGN KEY (store_id) REFERENCES stores(store_id),
+    FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
 
-ALTER TABLE local_manager ADD COLUMN status ENUM('active', 'inactive') DEFAULT 'active';
-
--- 07/07 -- add new column -- 
-ALTER TABLE local_manager ADD COLUMN role ENUM('local_manager') NOT NULL DEFAULT 'local_manager';
     
 CREATE TABLE IF NOT EXISTS admin_national_manager (
     admin_manager_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
@@ -70,13 +64,6 @@ CREATE TABLE IF NOT EXISTS admin_national_manager (
     phone_number VARCHAR(20),
     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
-
--- Add the role column to the table
-ALTER TABLE asdatabase_scripts.admin_national_manager
-ADD COLUMN role VARCHAR(50);
-
--- 07/07 -- add new column -- 
-ALTER TABLE admin_national_manager ADD COLUMN status ENUM('active', 'inactive') DEFAULT 'active';
 
 
 CREATE TABLE IF NOT EXISTS equipment (
@@ -94,59 +81,62 @@ CREATE TABLE IF NOT EXISTS equipment (
     Image VARCHAR(255),
     FOREIGN KEY (store_id) REFERENCES stores(store_id)
 );
-    
-CREATE TABLE IF NOT EXISTS rentals (
-    rental_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    equipment_id INT NOT NULL,
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
-    status ENUM('Pending', 'Completed', 'Canceled') NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES user(user_id),
-    FOREIGN KEY (equipment_id) REFERENCES equipment(equipment_id)
-);
-
--- added a new column to verify customer's ID 
-ALTER TABLE rentals ADD COLUMN id_verified BOOLEAN DEFAULT FALSE;
 
 
 CREATE TABLE IF NOT EXISTS orders (
-    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT auto_increment PRIMARY KEY,
     user_id INT NOT NULL,
     store_id INT NOT NULL,
     total_cost DECIMAL(10, 2) NOT NULL,
     tax DECIMAL(10, 2) NOT NULL,
     discount DECIMAL(10, 2) NOT NULL,
     final_price DECIMAL(10, 2) NOT NULL,
-    status ENUM('Pending', 'Completed', 'Canceled') NOT NULL,
+    status ENUM ('Pending', 'Ongoing', 'Completed', 'Canceled') NOT NULL,
     creation_date DATE NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES user(user_id),
-    FOREIGN KEY (store_id) REFERENCES stores(store_id)
+    CONSTRAINT orders_ibfk_1 FOREIGN KEY (user_id) REFERENCES user (user_id),
+    CONSTRAINT orders_ibfk_2 FOREIGN KEY (store_id) REFERENCES stores (store_id)
 );
-    
+
+CREATE INDEX store_id
+    ON orders (store_id);
+
+CREATE INDEX user_id
+    ON orders (user_id);
+
+
 CREATE TABLE IF NOT EXISTS order_items (
     order_item_id INT AUTO_INCREMENT PRIMARY KEY,
     order_id INT NOT NULL,
     equipment_id INT NOT NULL,
     quantity INT NOT NULL,
     price DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id),
-    FOREIGN KEY (equipment_id) REFERENCES equipment(equipment_id)
+    start_time DATE NOT NULL,
+    end_time DATE NOT NULL,
+    CONSTRAINT order_items_ibfk_1 FOREIGN KEY (order_id) REFERENCES orders (order_id),
+    CONSTRAINT order_items_ibfk_2 FOREIGN KEY (equipment_id) REFERENCES equipment (equipment_id)
 );
-    
+
+CREATE INDEX equipment_id
+    ON order_items (equipment_id);
+
+CREATE INDEX order_id
+    ON order_items (order_id);
+
+
 CREATE TABLE IF NOT EXISTS payments (
     payment_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     order_id INT NOT NULL,
     user_id INT NOT NULL,
-    payment_type ENUM('Credit Card', 'Debit Card', 'PayPal', 'Other') NOT NULL,
+    payment_type ENUM('Credit Card') NOT NULL,
     payment_status ENUM('Processed', 'Pending', 'Failed', 'Refunded') NOT NULL,
     amount DECIMAL(10, 2) NOT NULL,
     payment_date DATE NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(order_id),
     FOREIGN KEY (user_id) REFERENCES user(user_id)
 );
-    
-CREATE TABLE discount (
+
+
+CREATE TABLE IF NOT EXISTS discount (
     discount_id INT PRIMARY KEY,
     days INT NOT NULL,
     discount_pricing DECIMAL(5, 2) NOT NULL
@@ -163,86 +153,68 @@ CREATE TABLE IF NOT EXISTS news (
     FOREIGN KEY (creator_id) REFERENCES user(user_id),
     FOREIGN KEY (store_id) REFERENCES stores(store_id)
 );
-    
-CREATE TABLE IF NOT EXISTS messages (
-    message_id INT AUTO_INCREMENT PRIMARY KEY,
-    sender_id INT NOT NULL,
-    receiver_id INT NOT NULL,
-    content TEXT NOT NULL,
-    timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    status ENUM('Sent', 'Received', 'Read') NOT NULL,
-    FOREIGN KEY (sender_id) REFERENCES user(user_id),
-    FOREIGN KEY (receiver_id) REFERENCES user(user_id)
-);
 
--- not sure how many groups of data the tutor is expecting to see at the presentation, for now we will use data from 3 stores, each with 1 local manager, 2 staff members and a few items (to be updated), additionally with 1 customer, 1 admin and 1 national manager for testing and PO meeting.
 
-INSERT INTO user (username, email, password_hash, salt, role, date_of_birth)
-VALUES
+-- To be updated -- We will use data from 3-5 stores, each with 1 local manager, 5 staff members, 4 equipment categories with 10 equipments each, additionally with 20 customers, 1 admin and 1 national manager for presentation.
+
+INSERT INTO user (username, email, password_hash, salt, role, date_of_birth) VALUES
 -- Admin user
-("superadmin", "rose123@gmail.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "admin", "1977-12-12"),
+("superadmin", "rose123@agrihire-solutions.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "admin", "1977-12-12"),
 -- National Manager
-("manager666", "peter123@gmail.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "national_manager", "1980-10-10"),
+("manager666", "peter123@agrihire-solutions.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "national_manager", "1980-10-10"),
 -- Customer user
 ("farmer007", "tim123@gmail.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "customer", "1975-02-02"),
 -- Store 1 users
-("lincoln000", "john123@gmail.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "local_manager", "1985-05-05"),
-("lincoln001", "jack123@gmail.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "staff", "1990-01-01"),
-("lincoln002", "mia123@gmail.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "staff", "1998-06-06"),
+("lincoln000", "john123@agrihire-solutions.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "local_manager", "1985-05-05"),
+("lincoln001", "jack123@agrihire-solutions.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "staff", "1990-01-01"),
+("lincoln002", "mia123@agrihire-solutions.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "staff", "1998-06-06"),
 -- Store 2 users
-("rolleston000", "james123@gmail.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "local_manager", "1980-09-09"),
-("rolleston001", "daniel123@gmail.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "staff", "1993-07-07"),
-("rolleston002", "eva123@gmail.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "staff", "1999-08-08"),
+("rolleston000", "james123@agrihire-solutions.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "local_manager", "1980-09-09"),
+("rolleston001", "daniel123@agrihire-solutions.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "staff", "1993-07-07"),
+("rolleston002", "eva123@agrihire-solutions.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "staff", "1999-08-08"),
 -- Store 3 users
-("ashburton000", "steven123@gmail.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "local_manager", "1983-07-20"),
-("ashburton001", "henry123@gmail.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "staff", "2000-10-10"),
-("ashburton002", "emily123@gmail.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "staff", "1997-11-11")
+("ashburton000", "steven123@agrihire-solutions.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "local_manager", "1983-07-20"),
+("ashburton001", "henry123@agrihire-solutions.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "staff", "2000-10-10"),
+("ashburton002", "emily123@agrihire-solutions.com", "a5a65903076850e9555dd57a46232f4cafa42b92b2b75cd987d601ef3396e609", "e7289be420cba78b9e9338db0c49d98140af341bf524291a205b63253ff5d8ff", "staff", "1997-11-11")
 ;
 
--- Insert data into the admin_national_manager table
-INSERT INTO admin_national_manager (user_id, title, first_name, family_name, phone_number)
-VALUES
-(1, "Ms", "Rose", "Dawson", "0225871234"),
-(2, "Mr", "Peter", "Collins", "0224859438")
-;
-
--- Insert data into the local_manager table
-INSERT INTO local_manager (user_id, store_id, title, first_name, family_name, phone_number)
-VALUES
-(6, 1, "Mr", "John", "Doe", "0255512345"),
-(9, 2, "Mr", "James", "Smith", "0226785555"),
-(12, 3, "Mr", "Steven", "Johnson", "02368524587")
-;
-
--- Insert data into the staff table
-INSERT INTO staff (user_id, store_id, title, first_name, family_name, phone_number)
-VALUES
-(4, 1, "Mr", "Jack", "Jones", "0240012345"),
-(5, 1, "Miss", "Mia", "Roberts", "0265754258"),
-(7, 2, "Mr", "Daniel", "Harrison", "0262542542"),
-(8, 2, "Miss", "Eva", "Parker", "0236542582"),
-(10, 3, "Mr", "Henry", "Reed", "0232574580"),
-(11, 3, "Miss", "Emily", "Brooks", "0232251545")
-;
-
--- Insert data into the customer table
-INSERT INTO customer (user_id, title, first_name, family_name, phone_number, address)
-VALUES
-(3, "Mr", "Tim", "Doe", "0254525411", "11 milkfarm street, greengrass, Canterbury")
-;
-
-INSERT INTO stores (store_id, store_name, address, phone)
-VALUES
+INSERT INTO stores (store_id, store_name, address, phone) VALUES
 (1, "Lincoln", "123 Farm Road, Lincoln", "0254258756"),
 (2, "Rolleston", "456 Greengrass Road, Rolleston", "02354101456"),
 (3, "Ashburton", "789 Harvest Road, Ashuburton", "0262102542")
 ;
 
-INSERT INTO equipment (equipment_id, name, description, category, purchase_date, cost, serial_number, status, store_id, maximum_date, minimum_date, Image)
-VALUES
+-- Insert data into the admin_national_manager table
+INSERT INTO admin_national_manager (user_id, title, first_name, family_name, phone_number) VALUES
+(1, "Ms", "Rose", "Dawson", "0225871234"),
+(2, "Mr", "Peter", "Collins", "0224859438")
+;
+
+-- Insert data into the local_manager table
+INSERT INTO local_manager (user_id, store_id, title, first_name, family_name, phone_number) VALUES
+(4, 1, "Mr", "John", "Doe", "0255512345"),
+(7, 2, "Mr", "James", "Smith", "0226785555"),
+(10, 3, "Mr", "Steven", "Johnson", "02368524587")
+;
+
+-- Insert data into the staff table
+INSERT INTO staff (user_id, store_id, title, first_name, family_name, phone_number) VALUES
+(5, 1, "Mr", "Jack", "Jones", "0240012345"),
+(6, 1, "Miss", "Mia", "Roberts", "0265754258"),
+(8, 2, "Mr", "Daniel", "Harrison", "0262542542"),
+(9, 2, "Miss", "Eva", "Parker", "0236542582"),
+(11, 3, "Mr", "Henry", "Reed", "0232574580"),
+(12, 3, "Miss", "Emily", "Brooks", "0232251545")
+;
+
+-- Insert data into the customer table
+INSERT INTO customer (user_id, title, first_name, family_name, phone_number, address) VALUES
+(3, "Mr", "Tim", "Doe", "0254525411", "11 milkfarm street, greengrass, Canterbury")
+;
+
+
+INSERT INTO equipment (equipment_id, name, description, category, purchase_date, cost, serial_number, status, store_id, maximum_date, minimum_date, Image) VALUES
 (1, "Deutz Fahr", "This 2019 Deutz Fahr 6185 RC shift professional series tractor has only done 2,670 hours and is in great condition and ready to go to work . 50kph front suspension, front linkage and pto, this tractor is a serious contracting machine and with the loader would add incredible versitility to any fleet.", "Tractor", "2015-01-01", 369, "5242875401", "Available", 1, "360", "1", "tractor1.jpg"),
-(2, "3M Tyre", "Sakai SW250 Roller, hydrostatic transmission, vibrating smoother front, and rear drive rollers, 4 cylinder diesel engine. the SW250 offer the same features as SAKAI's larger size models:
-Single lever operated, fully hydrostatic, all drum drive. Both drums vibrate (with off/manual/auto mode selector)Centre-articulated steering mechanism; Rust-free and pressurized water sprinkler system; Neutral engine start and fail-safe brake system; Vibration free operator platform and low operating noise; Easy-to-monitor instruments (gauges and warning lamps); The hydraulic pump and motors are connected in series to offer the maximum traction and smooth rolling as well as excellent gradeability.", "Roller", "2015-01-01", 119, "5242875402", "Available", 1, "360", "1", "roller1.jpg"),
 (3, "Amazone", "Amazone UX5201 Super with 30 mtr boom , as new , 5200ltr tank with 580ltr fresh water , twin pumps 520ltrs/min , axle suspension , 9 sections with auto shut off , ISOBUS with Amazone joystick , DUS- Boom recirculation , comfort package , boom auto height control , LED lighting package.", "Sprayer", "2015-01-01", 289, "5242875403", "Available", 1, "360", "1", "sprayer1.jpg"),
 (4, "McHale/Fusion", "A2020 model. 22,000 bales. 1,000 speed gear box. 6 bar camless pickup. 650 tyres.", "Bale Wrapper", "2015-01-01", 159, "5242875404", "Available", 1, "360", "1", "wrapper1.jpg"),
 (5, "AManure Spreader", "*6 tonne super capacity
@@ -294,7 +266,8 @@ bale size upto 1.68m", "Round Baler", "2015-01-01", 340, "5242875419", "Availabl
 ;
 
 -- login password: A12345678
+
 INSERT INTO discount (discount_id, days, discount_pricing) VALUES
-(1, 30, 0.06),
+(1, 30, 0.05),
 (2, 180, 0.1),
 (3, 360, 0.15);

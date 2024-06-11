@@ -10,8 +10,8 @@ block content %} {% if session.get('loggedin') %}
   <script>
     $(document).ready(function () {
       var socket = io();
-      var room = "default_room"; // You can change the room based on your logic
-      var receiver_id = 2; // Example receiver ID, replace with actual ID
+      var room = "default_room";
+      var receiver_id = 2;
 
       socket.emit("join", { room: room });
 
