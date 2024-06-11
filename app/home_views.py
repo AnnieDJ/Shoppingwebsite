@@ -26,6 +26,12 @@ def register():
         date_of_birth = request.form.get('date_of_birth')
         password = request.form.get('confirm_password')
         role = request.form.get('role')
+        title = request.form.get('title')
+        first_name = request.form.get('first_name')
+        family_name = request.form.get('family_name')
+        phone_number = request.form.get('phone_number')
+        address = request.form.get('address')
+
         if date_of_birth:
             date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d')
 
@@ -54,9 +60,15 @@ def register():
 
                 cursor.execute(
                     'INSERT INTO user (role, email, date_of_birth, username, password_hash, salt) VALUES (%s, %s, %s, %s, %s, %s)',
-                    (role, email, date_of_birth, username, password, hashed_password))
+                    (role, email, date_of_birth, username, hashed_password, 'ava'))
+                user_id = cursor.lastrowid
+                
+                # Insert into customer table
+                cursor.execute(
+                    'INSERT INTO customer (user_id, title, first_name, family_name, phone_number, address) VALUES (%s, %s, %s, %s, %s, %s)',
+                    (user_id, title, first_name, family_name, phone_number, address))
 
-                conn.commit()  # Make sure to commit the transaction
+                conn.commit()
 
                 flash('Registration successful!', 'success')
                 return redirect(url_for('home.home',msg=msg, modal='none'))  # modal='none' indicates not to open any modal

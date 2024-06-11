@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS equipment (
 
 
 CREATE TABLE IF NOT EXISTS orders (
-    order_id INT auto_increment PRIMARY KEY,
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     store_id INT NOT NULL,
     total_cost DECIMAL(10, 2) NOT NULL,
