@@ -25,6 +25,19 @@ def dashboard():
     return redirect(url_for('home.login'))
 
 
+# Customer receive reminder
+@customer_bp.route('/receive_reminders', methods=['GET'])
+def receive_reminders():
+    if 'loggedin' in session and session['role'] == 'customer':
+        user_id = session['userid']
+        conn, cursor = db_cursor()
+        cursor.execute('SELECT reminder_id, content, created_at FROM reminders WHERE user_id = %s ORDER BY created_at DESC', (user_id,))
+        reminders = cursor.fetchall()
+        conn.close()
+        return jsonify(reminders)
+    return jsonify([])
+
+
 @customer_bp.route('/customer_profile', methods=['GET', 'POST'])
 @login_required
 def customer_profile():

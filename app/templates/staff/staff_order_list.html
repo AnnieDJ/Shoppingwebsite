@@ -28,8 +28,8 @@ block content %}
     <table class="table" style="margin-top: 10px;">
         <thead>
         <tr>
-            <th>Order Id</th>
-            <th>User Id</th>
+            <th>Order ID</th>
+            <th>Customer ID</th>
             <th>Store Name</th>
             <th>Total Cost</th>
             <th>Tax</th>
@@ -54,10 +54,10 @@ block content %}
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Customer ID: {{ order.user_id }}</p>
-                    <p>Customer Name: {{ order.user_info.first_name }} {{ order.user_info.family_name }}</p>
-                    <p>Customer Email: {{ order.user_info.email }}</p>
-                    <p>Customer Date Of Birth: {{ order.user_info.date_of_birth }}</p>
+                    <p>ID: #{{ order.user_id }}</p>
+                    <p>Name: {{ order.user_info.first_name }} {{ order.user_info.family_name }}</p>
+                    <p>Email: {{ order.user_info.email }}</p>
+                    <p>Date Of Birth: {{ order.user_info.date_of_birth }}</p>
                 </div>
                 </div>
                 </div>
@@ -71,8 +71,9 @@ block content %}
             <td>{{ order.status }}</td>
             <td>{{ order.creation_date }}</td>
             <td>
-                <button {{ '' if order.status == 'Pending' else 'disabled' }} onclick="fetch_order({{ order.order_id }})" class="btn btn-primary">Checkout Equipment</button>
-                <button onclick="location.href = '/staff/order_detail/{{ order.order_id }}'" class="btn btn-primary">Order Details</button>
+                <button {{ '' if order.status == 'Pending' else 'disabled' }} onclick="fetch_order({{ order.order_id }})" class="btn btn-primary">Checkout</button>
+                <button onclick="location.href = '/staff/order_detail/{{ order.order_id }}'" class="btn btn-primary">Details</button>
+                <button {{ '' if order.status == 'Pending' else 'disabled' }} onclick="cancelOrder({{ order.order_id }})" class="btn btn-primary">Cancel</button>
             </td>
         </tr>
         {% endfor %}
@@ -116,5 +117,18 @@ const searchButton = () => {
         location.href = '/staff/order_list?' + Object.entries(args).map(([_, y]) => `${Object.entries(y)[0][0]}=${Object.entries(y)[0][1]}`).join('&');
     }
 }
+
+const cancelOrder = async (orderId) => {
+        if (confirm('Are you sure to cancel this order?')) {
+            const res = await fetch(`/staff/order_list/cancel/${orderId}`)
+                .then(res => res.json())
+            if (res.code === 200) {
+                alert('Your order has been canceled!')
+                location.reload()
+            } else {
+                alert('Order failed to cancel! Please try again!')
+            }
+        }
+    }
 </script>
 {% endblock %}
