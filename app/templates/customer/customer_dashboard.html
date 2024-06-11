@@ -24,12 +24,12 @@ block content %} {% if session.get('loggedin') %}
   }
   .card-img-top {
     width: 100%;
-    height: 200px; /* Increased height for better visibility */
+    height: 250px; /* Increased height for better visibility */
     object-fit: cover;
   }
   .card-body {
     flex-grow: 1;
-    padding: 10px; /* Added padding for spacing inside card */
+    padding: 10px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -40,7 +40,7 @@ block content %} {% if session.get('loggedin') %}
     align-items: center;
     width: 100%;
     font-family: "Arial", sans-serif;
-    font-weight: bold; /* Ensures the card title uses full width of its container */
+    font-weight: bold;
   }
 
   .card-title .product-cost {
@@ -72,9 +72,28 @@ block content %} {% if session.get('loggedin') %}
     border-color: #b4bbb5;
   }
 </style>
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="alert alert-info">
+      {% for message in messages %}
+        <p>{{ message }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
 
-Welcome back, {{ session.get('username') }}! <br />Please select a store to
-start browsing available machinery {% endif %}
+<!-- Reminders section -->
+<div id="liveAlertPlaceholder" class="mt-3">
+  <div id="reminder-list" class="list-group">
+      <!-- Reminders will be loaded here -->
+  </div>
+</div>
+
+<div class="welcome" style="margin: 10px">
+  <p>Welcome back, {{ session.get('username') }}!</p>
+  <p>Please select a store to start browsing the available equipment!</p>
+</div>
+
 <div class="container mt-4">
   <div class="row mb-4">
     <div class="col-md-6">
@@ -222,7 +241,7 @@ start browsing available machinery {% endif %}
         product.name
       }">
               <div class="card-body">
-                <h5 class="card-title">${product.name}/${
+                <h5 class="card-title">${product.name} • ${
         product.category
       }</h5><p class="card-text">$${product.cost}</p>
                 
@@ -259,7 +278,7 @@ start browsing available machinery {% endif %}
       ) {
         const cart = JSON.parse(localStorage.getItem("cart"));
         if (cart.includes(product.equipment_id)) {
-          alert("Product already in cart!");
+          alert("Equipment had already been added to your cart!");
           return;
         }
 
@@ -274,13 +293,13 @@ start browsing available machinery {% endif %}
         if (res.data) {
           cart.push(product.equipment_id);
           localStorage.setItem("cart", JSON.stringify(cart));
-          alert("Product added to cart!");
+          alert("Equipment has been added to your cart!");
         } else {
-          alert("Only products from one store can be selected");
+          alert("Please empty your current cart before adding equipment from a different store!");
         }
       } else {
         localStorage.setItem("cart", JSON.stringify([product.equipment_id]));
-        alert("Product added to cart!");
+        alert("Equipment has been added to your cart!");
       }
     });
   }
@@ -348,7 +367,7 @@ start browsing available machinery {% endif %}
       ) {
         const cart = JSON.parse(localStorage.getItem("cart"));
         if (cart.includes(product.equipment_id)) {
-          alert("Product already in cart!");
+          alert("Equipment had been added to your cart!");
           return;
         }
 
@@ -365,11 +384,11 @@ start browsing available machinery {% endif %}
           localStorage.setItem("cart", JSON.stringify(cart));
           alert("Product added to cart!");
         } else {
-          alert("Only products from one store can be selected");
+          alert("Please empty your cart before adding equipment from a different store!");
         }
       } else {
         localStorage.setItem("cart", JSON.stringify([product.equipment_id]));
-        alert("Product added to cart!");
+        alert("Equipment has been added to your cart!");
       }
     });
   });
@@ -416,5 +435,26 @@ start browsing available machinery {% endif %}
   exampleModal.addEventListener("show.bs.modal", (event) => {
     loadMessages(); // Load messages every time the modal is opened
   });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    fetch('{{ url_for('customer.receive_reminders') }}')
+        .then(response => response.json())
+        .then(reminders => {
+            const reminderList = document.getElementById('reminder-list');
+            reminders.forEach(reminder => {
+                const reminderItem = document.createElement('div');
+                reminderItem.classList.add('alert', 'alert-warning', 'alert-dismissible', 'fade', 'show');
+                reminderItem.setAttribute('role', 'alert');
+                reminderItem.innerHTML = `
+                    <span>${reminder.content}</span>
+                    <small>${new Date(reminder.created_at).toLocaleString()}</small>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                reminderList.appendChild(reminderItem);
+            });
+        })
+        .catch(error => console.error('Error fetching reminders:', error));
+});  
 </script>
+{% endif %}
 {% endblock %}

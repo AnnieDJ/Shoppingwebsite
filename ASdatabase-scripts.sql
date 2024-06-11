@@ -155,6 +155,41 @@ CREATE TABLE IF NOT EXISTS news (
 );
 
 
+CREATE TABLE IF NOT EXISTS equipment_repair_history (
+    repair_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    equipment_id INT NOT NULL,
+    store_id INT NOT NULL,
+    status_from ENUM('Available', 'Rented', 'Under Repair', 'Retired') NOT NULL,
+    status_to ENUM('Available', 'Rented', 'Under Repair', 'Retired') NOT NULL,
+    change_date DATE NOT NULL,
+    FOREIGN KEY (equipment_id) REFERENCES equipment(equipment_id),
+    FOREIGN KEY (store_id) REFERENCES stores(store_id)
+);
+
+
+CREATE TABLE IF NOT EXISTS equipment_rental_history (
+    rental_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    equipment_id INT NOT NULL,
+    store_id INT NOT NULL,
+    status_from ENUM('Available', 'Rented', 'Under Repair', 'Retired') NOT NULL,
+    status_to ENUM('Available', 'Rented', 'Under Repair', 'Retired') NOT NULL,
+    change_date DATE NOT NULL,
+    FOREIGN KEY (equipment_id) REFERENCES equipment(equipment_id),
+    FOREIGN KEY (store_id) REFERENCES stores(store_id)
+);
+
+
+CREATE TABLE IF NOT EXISTS reminders (
+    reminder_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    sender_id INT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES user(user_id),
+    FOREIGN KEY (sender_id) REFERENCES user(user_id)
+);
+
+
 -- To be updated -- We will use data from 3-5 stores, each with 1 local manager, 5 staff members, 4 equipment categories with 10 equipments each, additionally with 20 customers, 1 admin and 1 national manager for presentation.
 
 INSERT INTO user (username, email, password_hash, salt, role, date_of_birth) VALUES
@@ -268,6 +303,7 @@ bale size upto 1.68m", "Round Baler", "2015-01-01", 340, "5242875419", "Availabl
 -- login password: A12345678
 
 INSERT INTO discount (discount_id, days, discount_pricing) VALUES
-(1, 30, 0.05),
-(2, 180, 0.1),
-(3, 360, 0.15);
+(1, 0, 0),
+(2, 30, 0.05),
+(3, 180, 0.1),
+(4, 360, 0.15);

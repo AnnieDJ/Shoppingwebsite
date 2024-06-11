@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Daily Checkout List{% endblock %}
+
+{% block content %}
+{% if session.get('loggedin') %}
+<div class="d-flex justify-content-between mb-3" style="margin: 20px">
+    <a href="{{ url_for('staff.dashboard') }}" class="btn back-button">Back</a>
+</div>
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    Equipment To Be Checked Out Today
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Order ID</th>
+                                    <th>Equipment ID</th>
+                                    <th>Equipment Name</th>
+                                    <th>Send Reminder</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if items|length > 0 %}
+                                {% for item in items %}
+                                <tr>
+                                    <td>{{ item['order_id'] }}</td>
+                                    <td>{{ item['equipment_id'] }}</td>
+                                    <td>{{ item['equipment_name'] }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-warning btn-sm" onclick="sendReminder({{ item['order_id'] }}, {{ item['user_id'] }}, '{{ item['equipment_name'] }}', '{{ item['start_time'] }}', this, 'pickup')">Send</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="5">No items starting today.</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+  
+  <script>
+  function sendReminder(orderId, userId, equipmentName, date, button, type) {
+      let message = '';
+      if (type === 'pickup') {
+          message = `A friendly reminder that your rental of equipment ${equipmentName} (Order ID: ${orderId}) is ready for pickup today.`;
+      } else if (type === 'return') {
+          message = `A friendly reminder that your rental of equipment ${equipmentName} (Order ID: ${orderId}) is due for return today. Please ensure it is returned in good condition.`;
+      }
+      fetch('{{ url_for('staff.send_reminder') }}', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ 
+              order_id: orderId, 
+              user_id: userId, 
+              equipment_name: equipmentName, 
+              message: message 
+          })
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.message) {
+              alert(data.message);
+              button.disabled = true;
+              button.innerText = 'Sent';
+          }
+      })
+      .catch(error => console.error('Error:', error));
+  }
+  </script>
+  {% endif %}
+  {% endblock %}

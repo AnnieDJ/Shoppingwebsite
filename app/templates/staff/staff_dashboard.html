@@ -1,9 +1,160 @@
-{% extends "base.html" %} {% block title %}Staff Dashboard{% endblock %} {%
-block content %} {% if session.get('loggedin') %}
+{% extends "base.html" %}
+
+{% block title %}Staff Dashboard{% endblock %}
+
+{% block content %}
+{% if session.get('loggedin') %}
+<style>
+  .fixed-size-card {
+    display: flex;
+    flex-direction: column;
+    height: 700px;
+    border: 1px solid darkgreen;
+    border-radius: 5px;
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .table-responsive {
+    flex: 1;
+     overflow-y: auto;
+  }
+
+  .view-more {
+    margin-top: auto;
+    text-align: right;
+  }
+</style>
 <div class="custom-welcome">Welcome back, {{ session.get('username') }}!</div>
+<div class="container mt-3">
+  <div class="row">
+      <!-- Card for Items with Start Date Today -->
+      <div class="col-md-6 mb-4">
+          <div class="card fixed-size-card">
+              <div class="card-header">
+                  Daily Check Out List
+              </div>
+              <div class="card-body d-flex flex-column">
+                  <h5 class="card-title">Equipment To Be Checked Out Today</h5>
+                  <div class="table-responsive">
+                      <table class="table">
+                          <thead>
+                              <tr>
+                                  <th>Order ID</th>
+                                  <th>Equipment ID</th>
+                                  <th>Equipment Name</th>
+                                  <th>Send Reminder</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% if start_today|length > 0 %}
+                              {% for item in start_today %}
+                              <tr>
+                                  <td>{{ item['order_id'] }}</td>
+                                  <td>{{ item['equipment_id'] }}</td>
+                                  <td>{{ item['equipment_name'] }}</td>
+                                  <td>
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="sendReminder({{ item['order_id'] }}, {{ item['user_id'] }}, '{{ item['equipment_name'] }}', '{{ item['start_time'] }}', this, 'pickup')">Send</button>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              {% else %}
+                              <tr>
+                                  <td colspan="4">No items starting today.</td>
+                              </tr>
+                              {% endif %}
+                          </tbody>
+                      </table>
+                  </div>
+                  <div class="view-more">
+                      <a href="{{ url_for('staff.daily_checkout') }}" class="btn btn-primary">View More</a>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- Card for Items with End Date Today -->
+      <div class="col-md-6">
+          <div class="card fixed-size-card">
+              <div class="card-header">
+                  Daily Check In List
+              </div>
+              <div class="card-body d-flex flex-column">
+                  <h5 class="card-title">Equipment To Be Returned Today</h5>
+                  <div class="table-responsive">
+                      <table class="table">
+                          <thead>
+                              <tr>
+                                  <th>Order ID</th>
+                                  <th>Equipment ID</th>
+                                  <th>Equipment Name</th>
+                                  <th>Send Reminder</th>
+                              </tr>
+                          </thead>
+                          <tbody>
+                              {% if end_today|length > 0 %}
+                              {% for item in end_today %}
+                              <tr>
+                                  <td>{{ item['order_id'] }}</td>
+                                  <td>{{ item['equipment_id'] }}</td>
+                                  <td>{{ item['equipment_name'] }}</td>
+                                  <td>
+                                    <button type="button" class="btn btn-warning btn-sm" onclick="sendReminder({{ item['order_id'] }}, {{ item['user_id'] }}, '{{ item['equipment_name'] }}', '{{ item['end_time'] }}', this, 'return')">Send</button>
+                                </td>
+                              </tr>
+                              {% endfor %}
+                              {% else %}
+                              <tr>
+                                  <td colspan="4">No items ending today.</td>
+                              </tr>
+                              {% endif %}
+                          </tbody>
+                      </table>
+                  </div>
+                  <div class="view-more">
+                      <a href="{{ url_for('staff.daily_return') }}" class="btn btn-primary">View More</a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+<script>
+function sendReminder(orderId, userId, equipmentName, date, button, type) {
+    let message = '';
+    if (type === 'pickup') {
+        message = `A friendly reminder that your rental of equipment ${equipmentName} (Order ID: ${orderId}) is ready for pickup today.`;
+    } else if (type === 'return') {
+        message = `A friendly reminder that your rental of equipment ${equipmentName} (Order ID: ${orderId}) is due for return today.`;
+    }
+    fetch('{{ url_for('staff.send_reminder') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+            order_id: orderId, 
+            user_id: userId, 
+            equipment_name: equipmentName, 
+            message: message 
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.message) {
+            alert(data.message);
+            button.disabled = true;
+            button.innerText = 'Sent';
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+</script>
+
 {% endif %}
-
-
-    {% endblock %}
-  </tbody>
-</table>
+{% endblock %}

@@ -9,7 +9,7 @@
 }
 
 .services-icon {
-  font-size: 40px; /* Adjust the size as needed */
+  font-size: 40px;
 }
 
 .nav {
@@ -18,10 +18,10 @@
   text-align: center;
   top: 0;
   width: 100%;
-  height: 80px; /* 设置固定高度，根据需要调整这个值 */
-  display: flex; /* 使用flex布局 */
-  align-items: center; /* 垂直居中 */
-  justify-content: center; /* 水平居中 */
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .custom-btn {
@@ -48,13 +48,24 @@
   transition: background-color 0.3s, border-color 0.3s;
 }
 
+.back-button {
+  border: 2px solid darkgreen;
+  color: darkgreen;
+  background-color: white;
+}
+
+.back-button:hover {
+  background-color: darkgreen;
+  color: white;
+}
+
 .form-control:focus {
   border-color: darkgreen;
   box-shadow: 0 0 0 0.2rem rgba(74, 139, 50, 0.25);
 }
 
 .logout-container {
-  margin-left: auto; /* Pushes logout to the far right */
+  margin-left: auto;
 }
 
 .navbar-brand {
@@ -67,9 +78,9 @@
   color: white !important;
   padding: 5px 10px !important;
   display: flex;
-  align-items: center; /* Ensures vertical alignment is centered */
+  align-items: center;
   margin-right: auto;
-  font-size: 20px; /* Pushes everything to the left */
+  font-size: 20px;
 }
 
 /* New styles for separators */
@@ -83,25 +94,25 @@
   position: absolute;
   right: 10px;
   top: 50%;
-  transform: translateY(-50%); /* Vertically center the separator */
+  transform: translateY(-50%);
 }
 
 .navbar-nav .nav-item:last-child::after {
   content: "";
 }
 .custom-welcome {
-  font-size: 25px !important; /* Make text bigger */
-  font-weight: bold !important; /* Make text bold */
-  margin-top: 30px; /* Add margin for positioning */
+  font-size: 25px !important;
+  font-weight: bold !important;
+  margin-top: 30px;
   text-align: left;
 }
 
 .nav-top-spacing {
-  margin-bottom: 40px; /* Adjust as needed */
+  margin-bottom: 40px;
 }
 
 .profile-container {
-  margin-left: 250px; /* Adjust based on your sidebar width */
+  margin-left: 250px;
 }
 
 /* Additional styles for improved design */
@@ -176,10 +187,6 @@ table {
 
 .table tbody tr {
   border-bottom: 1px solid white;
-}
-
-.table tbody tr:last-of-type {
-  border-bottom: 2px solid darkgreen;
 }
 
 /* Consistent button styling */
