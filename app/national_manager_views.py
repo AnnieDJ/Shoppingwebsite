@@ -514,6 +514,15 @@ def add_discount():
         flash('Unauthorized to perform this action.', 'danger')
         return redirect(url_for('home.login'))
     
+
+@national_manager_bp.route('/equipment_manage')
+@login_required
+def equipment_manage():
+    conn, cursor = db_cursor()
+    cursor.execute(f"SELECT * FROM equipment")
+    equipment = cursor.fetchall()
+    return render_template('national_manager_equipment_manage.html', equipment=equipment, categories=all_category()) 
+
 @national_manager_bp.route('/reports')
 @login_required
 def reports():
