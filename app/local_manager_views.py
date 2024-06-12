@@ -71,16 +71,16 @@ def view_profile():
             except MySQLError as e:              
                 flash(f"An error occurred: {e}", 'danger')
                                
-                cursor.execute(
+        cursor.execute(
                     'SELECT u.username, u.email, u.password_hash, u.role, l.title, l.first_name, l.family_name, l.phone_number, l.store_id '
                     'FROM user u '
                     'JOIN local_manager l ON u.user_id = l.user_id '
                     'WHERE u.user_id = %s',
                     (session['userid'],)
-                    )
-                data = cursor.fetchone()
+        )
+        data = cursor.fetchone()
                 
-                return render_template('local_manager_profile.html', data=data)    
+    return render_template('local_manager_profile.html', data=data)    
 
  
 ## Local Manager Change Password ##
@@ -555,10 +555,10 @@ def financial_report():
 # Inventory management
 @local_manager_bp.route('/inventory_management')
 def inventory_management():
-    if 'loggedin' in session and session['role'] == 'staff':
+    if 'loggedin' in session and session['role'] == 'local_manager':
         conn, cursor = db_cursor()
         category = []
-        cursor.execute(f'SELECT store_id FROM staff WHERE user_id = {session["userid"]}')
+        cursor.execute(f'SELECT store_id FROM local_manager WHERE user_id = {session["userid"]}')
         store_id = cursor.fetchone()['store_id']
         if store_id:
             cursor.execute(f"""
@@ -575,7 +575,7 @@ def inventory_management():
                         """)
             category = cursor.fetchall()
         cursor.close()
-        return render_template('local_inventory_management.html', category=category)
+        return render_template('local_manager_inventory_management.html', category=category)
     return redirect(url_for('home.login'))
 
 
@@ -855,10 +855,10 @@ def damage_report():
 # Daily Checkout List
 @local_manager_bp.route('/daily_checkout')
 def daily_checkout():
-    if 'loggedin' in session and session['role'] == 'staff':
+    if 'loggedin' in session and session['role'] == 'local_manager':
         today = date.today().isoformat()
         conn, cursor = db_cursor()
-        cursor.execute(f'SELECT store_id FROM staff WHERE user_id = {session["userid"]}')
+        cursor.execute(f'SELECT store_id FROM local_manager WHERE user_id = {session["userid"]}')
         store_id = cursor.fetchone()['store_id']
         
         conn, cursor = db_cursor()
@@ -882,10 +882,10 @@ def daily_checkout():
 # Daily Return List
 @local_manager_bp.route('/daily_return')
 def daily_return():
-    if 'loggedin' in session and session['role'] == 'staff':
+    if 'loggedin' in session and session['role'] == 'local_manager':
         today = date.today().isoformat()
         conn, cursor = db_cursor()
-        cursor.execute(f'SELECT store_id FROM staff WHERE user_id = {session["userid"]}')
+        cursor.execute(f'SELECT store_id FROM local_manager WHERE user_id = {session["userid"]}')
         store_id = cursor.fetchone()['store_id']
         
         conn, cursor = db_cursor()
