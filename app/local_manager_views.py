@@ -1,13 +1,14 @@
+import json, os
+import sys
+import uuid
 from flask import current_app as app
 from mysql.connector import Error as MySQLError
-from flask import Blueprint,render_template, request, redirect, url_for, session, flash, jsonify,Flask
+from flask import Blueprint,render_template, request, redirect, url_for, session, flash, jsonify
 from app import utils
 import re
-from datetime import datetime, date
-from .utils import db_cursor
-from flask_hashing  import Hashing
-from . import hashing
+from datetime import datetime
 from .utils import db_cursor, login_required
+from flask_hashing  import Hashing
 
 
 local_manager_bp = Blueprint('local_manager', __name__, template_folder='templates/local_manager')
@@ -16,83 +17,72 @@ local_manager_bp = Blueprint('local_manager', __name__, template_folder='templat
 # local manager dashboard
 @local_manager_bp.route('/dashboard')
 def dashboard():
-    if 'loggedin' in session and (session ['role'] == 'local_manager' or session['role'] == 'admin'):
+    if 'loggedin' in session and session['role'] == 'local_manager':
         conn, cursor = db_cursor()
-        user_id = session['userid']
-        
-        try:
-            
-            # Fetch the store_id and store name for the logged-in local manager
-            cursor.execute("""
-                SELECT s.store_id, st.store_name
-                FROM local_manager s
-                JOIN stores st ON s.store_id = st.store_id
-                WHERE s.user_id = %s
-            """, (user_id,))
-            store_info = cursor.fetchone()
-            store_name = store_info['store_name'] if store_info else 'Not Assigned'
-
-         
-            
-        except Exception as e:
-            print("An error occurred:", e)
-            flash("A database error occurred. Please try again.")
-            return redirect(url_for('home.login'))
-        finally:
-            cursor.close()
-            conn.close()  
-
-        return render_template('local_manager_dashboard.html', store_name=store_name)
-    else:
-        return redirect(url_for('home.login'))
-    
-    
+        category = []
+        cursor.execute(f'SELECT store_id FROM local_manager WHERE user_id = {session["userid"]}')
+        store_id = cursor.fetchone()['store_id']
+        if store_id:
+            cursor.execute(f"""
+                    SELECT category,
+                        SUM(CASE WHEN status = 'Available' THEN 1 ELSE 0 END) AS AvailableCount,
+                        SUM(CASE WHEN status = 'Rented' THEN 1 ELSE 0 END) AS RentedCount,
+                        SUM(CASE WHEN status = 'Under Repair' THEN 1 ELSE 0 END) AS UnderRepairCount,
+                        SUM(CASE WHEN status = 'Retired' THEN 1 ELSE 0 END) AS RetiredCount
+                    FROM
+                        equipment
+                    WHERE store_id = {store_id}
+                    GROUP BY
+                        category;
+                    """)
+            category = cursor.fetchall()
+        cursor.close()
+        return render_template('local_manager_dashboard.html', category=category)
+    return redirect(url_for('home.login'))
     
 
 ##Local Manager Profile ## 
 @local_manager_bp.route('/local_manager_profile', methods=['GET', 'POST'])
-@login_required
 def view_profile():
-    conn, cursor = db_cursor()
-    if 'userid' not in session:
-        flash("User ID not found in session. Please log in again.", 'danger')
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        title = request.form.get('title')
-        first_name = request.form.get('first_name')
-        family_name = request.form.get('last_name')
-        phone = request.form.get('phone')
-        email = request.form.get('email')
-        store_id = request.form.get('store_id')
-
-        try:
-            cursor.execute(
-                'UPDATE local_manager SET title = %s, first_name = %s, family_name = %s, phone_number = %s, store_id = %s WHERE user_id = %s',
-                (title, first_name, family_name, phone, store_id, session['userid'])
-            )
-            cursor.execute(
-                'UPDATE user SET email = %s WHERE user_id = %s',
-                (email, session['userid'])
-            )
-            flash('Your profile has been successfully updated!', 'success')
-        except MySQLError as e:
-            flash(f"An error occurred: {e}", 'danger')
-
-    cursor.execute(
-        'SELECT u.username, u.email, u.password_hash, u.role, l.title, l.first_name, l.family_name, l.phone_number, l.store_id '
-        'FROM user u '
-        'JOIN local_manager l ON u.user_id = l.user_id '
-        'WHERE u.user_id = %s',
-        (session['userid'],)
-    )
-    data = cursor.fetchone()
-
-    return render_template('local_manager_profile.html', data=data)    
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()
+        if 'userid' not in session:
+            flash("User ID not found in session. Please log in again.", 'danger')
+            return redirect(url_for('login'))
+        
+        if request.method == 'POST':
+            title = request.form.get('title')
+            first_name = request.form.get('first_name')
+            family_name = request.form.get('last_name')
+            phone = request.form.get('phone')
+            email = request.form.get('email')
+            store_id = request.form.get('store_id')
+            
+            try:
+                cursor.execute(
+                    'UPDATE local_manager SET title = %s, first_name = %s, family_name = %s, phone_number = %s, store_id = %s WHERE user_id = %s',
+                    (title, first_name, family_name, phone, store_id, session['userid'])
+                    )
+                cursor.execute(
+                    'UPDATE user SET email = %s WHERE user_id = %s',
+                    (email, session['userid'])
+                    )
+                flash('Your profile has been successfully updated!', 'success')
+            except MySQLError as e:              
+                flash(f"An error occurred: {e}", 'danger')
+                               
+                cursor.execute(
+                    'SELECT u.username, u.email, u.password_hash, u.role, l.title, l.first_name, l.family_name, l.phone_number, l.store_id '
+                    'FROM user u '
+                    'JOIN local_manager l ON u.user_id = l.user_id '
+                    'WHERE u.user_id = %s',
+                    (session['userid'],)
+                    )
+                data = cursor.fetchone()
+                
+                return render_template('local_manager_profile.html', data=data)    
 
  
-
-
 ## Local Manager Change Password ##
 @local_manager_bp.route('/change_password', methods=['POST'])
 @login_required
@@ -127,7 +117,6 @@ def change_password():
         conn.close()
 
     return redirect(url_for('local_manager.local_manager_profile'))
-
 
 
 ## Local Manager View Reports ##
@@ -170,7 +159,6 @@ def view_reports():
         return redirect(url_for('local_manager_dashboard'))
 
 
-
 ## View Report Details ##
 @local_manager_bp.route('/view_report/<int:report_id>', methods=['GET'])
 @login_required
@@ -202,7 +190,6 @@ def view_report(report_id):
         return render_template('local_manager_report_details.html', report=report)
     else:
         return redirect(url_for('local_manager.dashboard'))
-
 
 
 ## View Staff ##
@@ -288,6 +275,7 @@ def update_staff(user_id):
         flash('Unauthorized to perform this action.', 'danger')
         return redirect(url_for('home.login'))
 
+
 @local_manager_bp.route('/delete_staff/<int:user_id>', methods=['POST'])
 @login_required
 def delete_staff(user_id):
@@ -306,11 +294,6 @@ def delete_staff(user_id):
     else:
         flash('Unauthorized to perform this action.', 'danger')
         return redirect(url_for('home.login'))
-
-
-
-
-
 
 
 @local_manager_bp.route('/view_news')
@@ -507,6 +490,7 @@ def add_discount_form():
         return redirect(url_for('home.login'))
 
 
+# Add discount
 @local_manager_bp.route('/add_discount', methods=['POST'])
 @login_required
 def add_discount():
@@ -531,6 +515,8 @@ def add_discount():
         flash('Unauthorized to perform this action.', 'danger')
         return redirect(url_for('home.login'))
 
+
+# View store financial report
 @local_manager_bp.route('/financial_report')
 @login_required
 def financial_report():
@@ -564,3 +550,284 @@ def financial_report():
     else:
         flash('Please log in to view this page.', 'info')
         return redirect(url_for('home.login'))
+
+
+# View equipment details
+@local_manager_bp.route('/equipment/detail')
+def equipment_detail():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        category = request.args.get('category')
+        conn, cursor = db_cursor()
+        cursor.execute(f"SELECT * FROM equipment WHERE category = '{category}'")
+        equipment = cursor.fetchall()
+        cursor.close()
+        return render_template('local_manager_equipment_detail.html', equipment=equipment, categories=all_category())
+    return redirect(url_for('home.login'))
+
+
+# Update equipment details
+@local_manager_bp.route('/equipment/update', methods=['POST'])
+def equipment_update():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        serial_number = request.form['serial_number']
+        Image = request.form['Image']
+        purchase_date = request.form['purchase_date']
+        cost = request.form['cost']
+        category = request.form['category']
+        status = request.form['status']
+        conn, cursor = db_cursor()
+        cursor.execute(F"SELECT status, equipment_id FROM equipment WHERE serial_number = '{serial_number}'")
+        data = cursor.fetchone()
+        old_status = data['status']
+        equipment_id = data['equipment_id']
+        cursor.execute(f"SELECT store_id FROM local_manager WHERE user_id = '{session['userid']}'")
+        store_id = cursor.fetchone()['store_id']
+        if old_status == 'Available' and status == 'Under Repair':
+            cursor.execute(f"INSERT INTO equipment_repair_history (equipment_id, store_id, status_from, status_to, change_date) VALUES ('{equipment_id}', '{store_id}', 'Available', 'Under Repair', '{datetime.strftime(datetime.now(), '%Y-%m-%d')}')")
+            conn.commit()
+        elif old_status == 'Under Repair' and status == 'Available':
+            cursor.execute(f"INSERT INTO equipment_repair_history (equipment_id, store_id, status_from, status_to, change_date) VALUES ('{equipment_id}', '{store_id}', 'Under Repair', 'Available', '{datetime.strftime(datetime.now(), '%Y-%m-%d')}')")
+            conn.commit()
+        cursor.execute(f"UPDATE equipment SET Image = '{Image}', purchase_date = '{purchase_date}', cost = '{cost}', category = '{category}', status = '{status}' WHERE serial_number = '{serial_number}'")
+        conn.commit()
+        cursor.close()
+        return jsonify({
+            "code": 200,
+            "message": "Success",
+            "data": True
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
+
+
+# Add a new equipment
+@local_manager_bp.route('/equipment/add', methods=['POST'])
+def equipment_add():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        serial_number = request.form['serial_number']
+        name = request.form['name']
+        description = request.form['description']
+        Image = request.form['Image']
+        purchase_date = request.form['purchase_date']
+        cost = request.form['cost']
+        category = request.form['category']
+        status = request.form['status']
+        conn, cursor = db_cursor()
+        cursor.execute(f'SELECT store_id FROM local_manager WHERE user_id = {session["userid"]}')
+        store_id = cursor.fetchone()['store_id']
+        cursor.execute(f"INSERT INTO equipment (serial_number, name, description, Image, purchase_date, cost, category, status, maximum_date, minimum_date, store_id) VALUES ('{serial_number}', '{name}', '{description}', '{Image}', '{purchase_date}', '{cost}', '{category}', '{status}', '360', '1', '{store_id}')")
+        conn.commit()
+        cursor.close()
+        return jsonify({
+            "code": 200,
+            "message": "Success",
+            "data": True
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
+
+
+# Upload equipment image
+@local_manager_bp.route('/equipment/upload', methods=['POST'])
+def equipment_upload():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        file = request.files['file']
+        file_name = uuid.uuid1().__str__() + '.' + file.filename.rsplit('.')[1]
+        file.save(os.path.join('app/static', file_name))
+        return jsonify({
+            "code": 200,
+            "message": "Success",
+            "data": file_name
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
+
+
+# View all orders at store
+@local_manager_bp.route('/order_list')
+def order_list():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        status = request.args.get('status')
+        search = request.args.get('search')
+        conn, cursor = db_cursor()
+        cursor.execute(f"SELECT store_id FROM local_manager WHERE user_id = {session['userid']}")
+        store_id = cursor.fetchone()['store_id']
+        if status and search:
+            cursor.execute(f"SELECT * FROM orders WHERE status = '{status}' AND store_id = {store_id} AND order_id = {search} ORDER BY creation_date DESC")
+        elif status:
+            cursor.execute(f"SELECT * FROM orders WHERE status = '{status}' AND store_id = {store_id} ORDER BY creation_date DESC")
+        elif search:
+            cursor.execute(f"SELECT * FROM orders WHERE store_id = {store_id} AND order_id = {search} ORDER BY creation_date DESC")
+        else:
+            cursor.execute(f"SELECT * FROM orders WHERE store_id = {store_id} ORDER BY creation_date DESC")
+        orders = cursor.fetchall()
+        for order in orders:
+            cursor.execute(f"SELECT store_name FROM stores WHERE store_id = {order['store_id']}")
+            order['store_name'] = cursor.fetchone()['store_name']
+            cursor.execute(f"SELECT username, email, date_of_birth, first_name, family_name FROM user JOIN customer ON user.user_id = customer.user_id WHERE user.user_id = {order['user_id']}")
+            order['user_info'] = cursor.fetchone()
+        cursor.close()
+        return render_template('local_manager_order_list.html', orders=orders)
+    return redirect(url_for('home.login'))
+
+
+# View order details
+@local_manager_bp.route('/order_detail/<int:order_id>')
+def order_detail(order_id):
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()
+        cursor.execute(f"SELECT * FROM order_items WHERE order_id = {order_id}")
+        items = cursor.fetchall()
+        for item in items:
+            cursor.execute(f"SELECT name, status, Image FROM equipment WHERE equipment_id = {item['equipment_id']}")
+            data = cursor.fetchone()
+            item['name'] = data['name']
+            item['status'] = data['status']
+            item['Image'] = data['Image']
+        cursor.close()
+        return render_template('local_manager_order_detail.html', items=items, order_id=order_id)
+    return redirect(url_for('home.login'))
+
+
+# Return equipment
+@local_manager_bp.route('/equipment/return', methods=['POST'])
+def return_equipment():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        order_id = request.form['order_id']
+        equipment_id = request.form['equipment_id']
+        conn, cursor = db_cursor()
+        cursor.execute(f"SELECT store_id FROM orders WHERE order_id = {order_id}")
+        store_id = cursor.fetchone()['store_id']
+        cursor.execute(f"UPDATE equipment SET status = 'Available' WHERE equipment_id = {equipment_id}")
+        conn.commit()
+        cursor.execute(f"INSERT INTO equipment_rental_history (equipment_id, store_id, status_from, status_to, change_date) VALUES ({equipment_id}, {store_id}, 'Rented', 'Available', '{datetime.strftime(datetime.now(), '%Y-%m-%d')}')")
+        conn.commit()
+        cursor.execute(f"SELECT equipment_id FROM order_items WHERE order_id = {order_id}")
+        ids = cursor.fetchall()
+        all_return = True
+        for id in ids:
+            cursor.execute(f"SELECT status FROM equipment WHERE equipment_id = {id['equipment_id']}")
+            if cursor.fetchone()['status'] == 'Rented':
+                all_return = False
+                break
+        if all_return:
+            cursor.execute(f"UPDATE orders SET status = 'Completed' WHERE order_id = {order_id}")
+            conn.commit()
+        cursor.close()
+        return jsonify({
+            "code": 200,
+            "message": "Success",
+            "data": True
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
+
+
+@local_manager_bp.route('/fetch_order/<int:order_id>')
+def fetch_order(order_id):
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()
+        cursor.execute(f"UPDATE orders SET status = 'Ongoing' WHERE order_id = {order_id}")
+        conn.commit()
+        cursor.close()
+        return jsonify({
+            "code": 200,
+            "message": "Success",
+            "data": True
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
+
+
+# Cancel and refund order
+@local_manager_bp.route('/refund_order/<int:order_id>')
+def refund_order(order_id):
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()
+        cursor.execute(f"UPDATE orders SET status = 'Canceled' WHERE order_id = {order_id}")
+        conn.commit()
+        cursor.execute(f"UPDATE payments SET payment_status = 'Refunded' WHERE order_id = {order_id}")
+        conn.commit()
+        cursor.close()
+        return jsonify({
+            "code": 200,
+            "message": "Success",
+            "data": True
+        })
+    return jsonify({
+        'code': 401,
+        'message': 'Not Authorized'
+    })
+
+
+# View equipment repair history
+@local_manager_bp.route('/equipment_repair')
+def equipment_repair():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()
+        cursor.execute("SELECT * FROM equipment_repair_history")
+        history = cursor.fetchall()
+        cursor.close()
+        return render_template('local_manager_equipment_repair_history.html', entries=history)
+    return redirect(url_for('auth_bp.login'))
+
+
+# View equipment rental history
+@local_manager_bp.route('/equipment_rent')
+def equipment_rent():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()
+        cursor.execute("SELECT * FROM equipment_rental_history")
+        history = cursor.fetchall()
+        cursor.close()
+        return render_template('local_manager_equipment_rental_history.html', entries=history)
+    return redirect(url_for('auth_bp.login'))
+
+
+# View store damage report
+@local_manager_bp.route('/damage_report')
+def damage_report():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()
+        cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Available' AND status_to = 'Under Repair'")
+        atou = cursor.fetchone()['count(*)']
+        cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Under Repair' AND status_to = 'Available'")
+        utoa = cursor.fetchone()['count(*)']
+        cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Available' AND status_to = 'Rented'")
+        ator = cursor.fetchone()['count(*)']
+        cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Rented' AND status_to = 'Available'")
+        rtoa = cursor.fetchone()['count(*)']
+        cursor.close()
+        repair = atou if atou < utoa else utoa
+        rental = ator if ator < rtoa else rtoa
+
+        try:
+            percent = f"{round(repair / rental * 100, 2)}%"
+        except ZeroDivisionError:
+            percent = '0%'
+
+        report = {
+            'repair': repair,
+            'rental': rental,
+            'percent': percent
+        }
+        return render_template('local_manager_damage_report.html', report=report)
+    return redirect(url_for('auth_bp.login'))
+
+
+def all_category():
+    conn, cursor = db_cursor()
+    cursor.execute("SELECT category FROM equipment GROUP BY category")
+    categories = cursor.fetchall()
+    cursor.close()
+    return categories
