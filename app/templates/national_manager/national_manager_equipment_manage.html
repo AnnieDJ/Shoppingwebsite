@@ -196,7 +196,7 @@
           })
   
   
-          const res = await fetch('/admin/equipment/update', {
+          const res = await fetch('/national_manager/equipment/update', {
               method: 'POST',
               body: formData
           }).then(res => res.json())
@@ -221,7 +221,7 @@
           formData.append("category", document.getElementById("category").value);
           formData.append("status", document.getElementById("status").value);
   
-          const res = await fetch('/admin/equipment/add', {
+          const res = await fetch('/national_manager/equipment/add', {
               method: 'POST',
               body: formData
           }).then(res => res.json());
@@ -239,7 +239,7 @@
           const formData = new FormData();
           formData.append("file", file);
   
-          const res = await fetch('/admin/equipment/upload', {
+          const res = await fetch('/national_manager/equipment/upload', {
               method: 'POST',
               body: formData
           }).then(res => res.json());
@@ -252,7 +252,7 @@
       }
   
       const remove_equipment = async (id) => {
-          const res = await fetch('/admin/equipment/remove/' + id)
+          const res = await fetch('/national_manager/equipment/remove/' + id)
               .then(res => res.json());
   
           if (res.code === 200) {

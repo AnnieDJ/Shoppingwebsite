@@ -659,7 +659,7 @@ def reports():
 
 @admin_bp.route('/equipment_manage')
 @login_required
-def change_date():
+def equipment_manage():
     conn, cursor = db_cursor()
     cursor.execute(f"SELECT * FROM equipment")
     equipment = cursor.fetchall()
