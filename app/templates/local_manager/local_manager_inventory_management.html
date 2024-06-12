@@ -1,9 +1,9 @@
 {% extends "base.html" %} {% block title %}Inventory Management{% endblock %} {%
   block content %}
-  <div class="d-flex justify-content-between mb-3">
-    <a href="{{ url_for('local_manager.dashboard') }}" class="btn back-button">Back</a>
-    <a href="{{ url_for('local_manager.equipment_rent') }}" class="btn back-button">Equipment Rental History</a>
-    <a href="{{ url_for('local_manager.equipment_repair') }}" class="btn back-button">Equipment Repair History</a>
+  <div class="d-flex justify-content-between mb-3" style="margin: 20px">
+    <a href="{{ url_for('local_manager.dashboard') }}" class="btn btn-primary">Back</a>
+    <a href="{{ url_for('local_manager.equipment_rent') }}" class="btn btn-primary">Equipment Rental History</a>
+    <a href="{{ url_for('local_manager.equipment_repair') }}" class="btn btn-primary">Equipment Repair History</a>
   </div>
 
   <div
