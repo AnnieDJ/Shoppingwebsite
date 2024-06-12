@@ -1,11 +1,24 @@
 {% extends "base.html" %} {% block title %}Reports{% endblock %} {%
 block content %}
-<div class="container mt-4">
-  <h2>National Equipment Damage Report</h2>
-  <h3>Equipment repaired: {{ report.repair }} times</h3>
-  <h3>Equipment rented: {{ report.rental }} times</h3>
-  <h3>Damage Rate: {{ report.percent }}</h3>
-  </div>
+<div class="container my-5">
+  <h1 class="h2 mb-4">Equipment Damage Report</h1>
+  <table class="table table-bordered table-hover">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">Equipment Repaired</th>
+        <th scope="col">Equipment Rented</th>
+        <th scope="col">Damage Rate</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>{{ report.repair }} times</td>
+        <td>{{ report.rental }} times</td>
+        <td>{{ report.percent }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
 <div class="container mt-5">
   <h2>Quarterly Sales Report for 2024</h2>

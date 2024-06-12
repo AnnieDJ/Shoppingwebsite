@@ -39,43 +39,43 @@ def receive_reminders():
 
 
 @customer_bp.route('/customer_profile', methods=['GET', 'POST'])
-@login_required
 def customer_profile():
-    msg = []
-    conn, cursor = db_cursor()
-    if 'userid' not in session:
-        msg = ["User ID not found in session. Please log in again.", 'danger']
-        return redirect(url_for('login'))
+    if 'loggedin' in session and session['role'] == 'customer':
+        msg = []
+        conn, cursor = db_cursor()
+        if 'userid' not in session:
+            msg = ["User ID not found in session. Please log in again.", 'danger']
+            return redirect(url_for('login'))
+        
+        if request.method == 'POST':
+            title = request.form.get('title')
+            first_name = request.form.get('first_name')
+            family_name = request.form.get('last_name')
+            phone = request.form.get('phone')
+            email = request.form.get('email')
+            address = request.form.get('address')
+            
+            try:
+                cursor.execute(
+                    'UPDATE customer SET title = %s, first_name = %s, family_name = %s, phone_number = %s, address = %s WHERE user_id = %s',
+                    (title, first_name, family_name, phone, address, session['userid'])
+                    )
+                cursor.execute(
+                    'UPDATE user SET email = %s WHERE user_id = %s',
+                    (email, session['userid'])
+                    )
+                msg = ['Your profile has been successfully updated!', 'success']
+            except MySQLError as e:
+                msg = [f"An error occurred: {e}", 'danger']
 
-    if request.method == 'POST':
-        title = request.form.get('title')
-        first_name = request.form.get('first_name')
-        family_name = request.form.get('last_name')
-        phone = request.form.get('phone')
-        email = request.form.get('email')
-        address = request.form.get('address')
-
-        try:
-            cursor.execute(
-                'UPDATE customer SET title = %s, first_name = %s, family_name = %s, phone_number = %s, address = %s WHERE user_id = %s',
-                (title, first_name, family_name, phone, address, session['userid'])
-            )
-            cursor.execute(
-                'UPDATE user SET email = %s WHERE user_id = %s',
-                (email, session['userid'])
-            )
-            msg = ['Your profile has been successfully updated!', 'success']
-        except MySQLError as e:
-            msg = [f"An error occurred: {e}", 'danger']
-
-    cursor.execute(
-        'SELECT u.username, u.email, u.password_hash, u.role, c.title, c.first_name, c.family_name, c.phone_number, c.address '
-        'FROM user u '
-        'JOIN customer c ON u.user_id = c.user_id '
-        'WHERE u.user_id = %s',
-        (session['userid'],)
-    )
-    data = cursor.fetchone()
+        cursor.execute(
+                    'SELECT u.username, u.email, u.password_hash, u.role, c.title, c.first_name, c.family_name, c.phone_number, c.address '
+                    'FROM user u '
+                    'JOIN customer c ON u.user_id = c.user_id '
+                    'WHERE u.user_id = %s',
+                    (session['userid'],)
+        )
+        data = cursor.fetchone()
 
     return render_template('customer_profile.html', data=data, msg=msg)
 

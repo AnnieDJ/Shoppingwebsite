@@ -519,34 +519,36 @@ def add_discount():
 def reports():
     if 'loggedin' in session:
         conn, cursor = db_cursor()
-        cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Available' AND status_to = 'Under Repair'")
-        atou = cursor.fetchone()['count(*)']
-        cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Under Repair' AND status_to = 'Available'")
-        utoa = cursor.fetchone()['count(*)']
-        cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Available' AND status_to = 'Rented'")
-        ator = cursor.fetchone()['count(*)']
-        cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Rented' AND status_to = 'Available'")
-        rtoa = cursor.fetchone()['count(*)']
-        repair = atou if atou < utoa else utoa
-        rental = ator if ator < rtoa else rtoa
+        report = {'repair': 0, 'rental': 0, 'percent': '0%'}
+
         try:
-            percent = f"{round(repair / rental * 100, 2)}%"
-        except ZeroDivisionError:
-            percent = '0%'
+            cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Available' AND status_to = 'Under Repair'")
+            atou = cursor.fetchone()['count(*)']
+            cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Under Repair' AND status_to = 'Available'")
+            utoa = cursor.fetchone()['count(*)']
+            cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Available' AND status_to = 'Rented'")
+            ator = cursor.fetchone()['count(*)']
+            cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Rented' AND status_to = 'Available'")
+            rtoa = cursor.fetchone()['count(*)']
+            
+            repair = min(atou, utoa)
+            rental = min(ator, rtoa)
             report = {
                 'repair': repair,
                 'rental': rental,
-                'percent': percent
-                }
-        
+                'percent': f"{round(repair / rental * 100, 2)}%" if rental != 0 else '0%'
+            }
+        except Exception as e:
+            flash(f"Error in retrieving repair and rental data: {str(e)}", 'danger')
+
         try:
             cursor.execute("""
                 SELECT
                   CASE
                     WHEN MONTH(creation_date) BETWEEN 1 AND 3 THEN 'January-March'
-                    WHEN MONTH(creation_date) BETWEEN 1 AND 6 THEN 'April-June'
-                    WHEN MONTH(creation_date) BETWEEN 1 AND 9 THEN 'Junly-September'
-                    WHEN MONTH(creation_date) BETWEEN 1 AND 12 THEN 'October-December'
+                    WHEN MONTH(creation_date) BETWEEN 4 AND 6 THEN 'April-June'
+                    WHEN MONTH(creation_date) BETWEEN 7 AND 9 THEN 'July-September'
+                    WHEN MONTH(creation_date) BETWEEN 10 AND 12 THEN 'October-December'
                   END AS quarter,
                   SUM(total_cost) AS total_sales
                 FROM orders
