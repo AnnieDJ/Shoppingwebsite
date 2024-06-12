@@ -72,9 +72,10 @@ def send_reminder():
 @staff_bp.route('/staff_profile', methods=['GET', 'POST'])
 @login_required
 def view_profile():
+    msg = []
     conn, cursor = db_cursor()
     if 'userid' not in session:
-        flash("User ID not found in session. Please log in again.", 'danger')
+        msg = ["User ID not found in session. Please log in again.", 'danger']
         return redirect(url_for('login'))
 
     if request.method == 'POST':
@@ -94,9 +95,9 @@ def view_profile():
                 'UPDATE user SET email = %s WHERE user_id = %s',
                 (email, session['userid'])
             )
-            flash('Your profile has been successfully updated!', 'success')
+            msg = ['Your profile has been successfully updated!', 'success']
         except MySQLError as e:
-            flash(f"An error occurred: {e}", 'danger')
+            msg = [f"An error occurred: {e}", 'danger']
 
     cursor.execute(
         'SELECT u.username, u.email, u.password_hash, u.role, s.title, s.first_name, s.family_name, s.phone_number, s.store_id '
@@ -107,7 +108,7 @@ def view_profile():
     )
     data = cursor.fetchone()
 
-    return render_template('staff_profile.html', data=data)    
+    return render_template('staff_profile.html', data=data, msg=msg)    
 
 
 ## Staff Change Password ##

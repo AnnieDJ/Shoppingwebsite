@@ -41,9 +41,10 @@ def receive_reminders():
 @customer_bp.route('/customer_profile', methods=['GET', 'POST'])
 @login_required
 def customer_profile():
+    msg = []
     conn, cursor = db_cursor()
     if 'userid' not in session:
-        flash("User ID not found in session. Please log in again.", 'danger')
+        msg = ["User ID not found in session. Please log in again.", 'danger']
         return redirect(url_for('login'))
 
     if request.method == 'POST':
@@ -63,9 +64,9 @@ def customer_profile():
                 'UPDATE user SET email = %s WHERE user_id = %s',
                 (email, session['userid'])
             )
-            flash('Your profile has been successfully updated!', 'success')
+            msg = ['Your profile has been successfully updated!', 'success']
         except MySQLError as e:
-            flash(f"An error occurred: {e}", 'danger')
+            msg = [f"An error occurred: {e}", 'danger']
 
     cursor.execute(
         'SELECT u.username, u.email, u.password_hash, u.role, c.title, c.first_name, c.family_name, c.phone_number, c.address '
@@ -76,7 +77,7 @@ def customer_profile():
     )
     data = cursor.fetchone()
 
-    return render_template('customer_profile.html', data=data)
+    return render_template('customer_profile.html', data=data, msg=msg)
 
 
 # allow customer to change password
@@ -258,6 +259,7 @@ def payment():
         for item in order_items:
             cursor.execute(f"INSERT INTO order_items (order_id, equipment_id, quantity, price, start_time, end_time) VALUES ('{order_id}', '{item['equipment_id']}', '{item['quantity']}', '{item['price']}', '{item['start_time']}', '{item['end_time']}')")
             cursor.execute(f"UPDATE equipment SET status = 'Rented' WHERE equipment_id = '{item['equipment_id']}'")
+            cursor.execute(f"INSERT INTO equipment_rental_history (equipment_id, store_id, status_from, status_to, change_date) VALUES ('{item['equipment_id']}', '{order['store_id']}', 'Available', 'Rented', '{datetime.strftime(datetime.now(), '%Y-%m-%d')}')")
             conn.commit()
         cursor.execute(f"INSERT INTO payments (order_id, user_id, payment_type, payment_status, amount, payment_date) VALUES ('{order_id}', '{session['userid']}', '{payment['payment_type']}', '{payment['payment_status']}', '{payment['amount']}', '{payment['payment_date']}')")
         conn.commit()

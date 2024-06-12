@@ -601,11 +601,31 @@ def add_discount():
         flash('Unauthorized to perform this action.', 'danger')
         return redirect(url_for('home.login'))
 
-@admin_bp.route('/financial_report')
+@admin_bp.route('/reports')
 @login_required
-def financial_report():
+def reports():
     if 'loggedin' in session:
         conn, cursor = db_cursor()
+        cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Available' AND status_to = 'Under Repair'")
+        atou = cursor.fetchone()['count(*)']
+        cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Under Repair' AND status_to = 'Available'")
+        utoa = cursor.fetchone()['count(*)']
+        cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Available' AND status_to = 'Rented'")
+        ator = cursor.fetchone()['count(*)']
+        cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Rented' AND status_to = 'Available'")
+        rtoa = cursor.fetchone()['count(*)']
+        repair = atou if atou < utoa else utoa
+        rental = ator if ator < rtoa else rtoa
+        try:
+            percent = f"{round(repair / rental * 100, 2)}%"
+        except ZeroDivisionError:
+            percent = '0%'
+            report = {
+                'repair': repair,
+                'rental': rental,
+                'percent': percent
+                }
+        
         try:
             cursor.execute("""
                 SELECT
@@ -629,7 +649,7 @@ def financial_report():
             cursor.close()
             conn.close()
 
-        return render_template('national_manager_financial_report.html', data=data)
+        return render_template('admin_reports.html', data=data, report=report)
     else:
         flash('Please log in to view this page.', 'info')
         return redirect(url_for('home.login'))
@@ -642,6 +662,120 @@ def change_date():
     cursor.execute(f"SELECT * FROM equipment")
     equipment = cursor.fetchall()
     return render_template('admin_inventory_management.html', equipment=equipment, categories=all_category())
+
+
+@admin_bp.route('/category')
+@login_required
+def category():
+    conn, cursor = db_cursor()
+    cursor.execute(f"SELECT * FROM category")
+    categories = cursor.fetchall()
+    return render_template('admin_category.html', categories=categories)
+
+
+@admin_bp.route('/order_list')
+@login_required
+def order_list():
+    status = request.args.get('status')
+    search = request.args.get('search')
+    conn, cursor = db_cursor()
+    if status and search:
+        cursor.execute(
+            f"SELECT * FROM orders WHERE status = '{status}' AND order_id = {search} ORDER BY creation_date DESC")
+    elif status:
+        cursor.execute(
+            f"SELECT * FROM orders WHERE status = '{status}' ORDER BY creation_date DESC")
+    elif search:
+        cursor.execute(
+            f"SELECT * FROM orders WHERE order_id = {search} ORDER BY creation_date DESC")
+    else:
+        cursor.execute(f"SELECT * FROM orders ORDER BY creation_date DESC")
+    orders = cursor.fetchall()
+    for order in orders:
+        cursor.execute(f"SELECT store_name FROM stores WHERE store_id = {order['store_id']}")
+        order['store_name'] = cursor.fetchone()['store_name']
+        cursor.execute(
+            f"SELECT username, email, date_of_birth, first_name, family_name FROM user JOIN customer ON user.user_id = customer.user_id WHERE user.user_id = {order['user_id']}")
+        order['user_info'] = cursor.fetchone()
+    cursor.close()
+    return render_template('admin_order_list.html', orders=orders)
+
+
+@admin_bp.route('/order_detail/<int:order_id>')
+@login_required
+def order_detail(order_id):
+    conn, cursor = db_cursor()
+    cursor.execute(f"SELECT * FROM order_items WHERE order_id = {order_id}")
+    items = cursor.fetchall()
+    for item in items:
+        cursor.execute(f"SELECT name, status, Image FROM equipment WHERE equipment_id = {item['equipment_id']}")
+        data = cursor.fetchone()
+        item['name'] = data['name']
+        item['status'] = data['status']
+        item['Image'] = data['Image']
+    cursor.close()
+    return render_template('admin_order_detail.html', items=items, order_id=order_id)
+
+
+@admin_bp.route('/fetch_order/<int:order_id>')
+@login_required
+def fetch_order(order_id):
+    conn, cursor = db_cursor()
+    cursor.execute(f"UPDATE orders SET status = 'Ongoing' WHERE order_id = {order_id}")
+    conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
+
+
+@admin_bp.route('/refund_order/<int:order_id>')
+@login_required
+def refund_order(order_id):
+    conn, cursor = db_cursor()
+    cursor.execute(f"UPDATE orders SET status = 'Canceled' WHERE order_id = {order_id}")
+    conn.commit()
+    cursor.execute(f"UPDATE payments SET payment_status = 'Refunded' WHERE order_id = {order_id}")
+    conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
+
+
+@admin_bp.route('/equipment/return', methods=['POST'])
+@login_required
+def return_equipment():
+    order_id = request.form['order_id']
+    equipment_id = request.form['equipment_id']
+    conn, cursor = db_cursor()
+    cursor.execute(f"SELECT store_id FROM orders WHERE order_id = {order_id}")
+    store_id = cursor.fetchone()['store_id']
+    cursor.execute(f"UPDATE equipment SET status = 'Available' WHERE equipment_id = {equipment_id}")
+    conn.commit()
+    cursor.execute(f"INSERT INTO equipment_rental_history (equipment_id, store_id, status_from, status_to, change_date) VALUES ({equipment_id}, {store_id}, 'Rented', 'Available', '{datetime.strftime(datetime.now(), '%Y-%m-%d')}')")
+    conn.commit()
+    cursor.execute(f"SELECT equipment_id FROM order_items WHERE order_id = {order_id}")
+    ids = cursor.fetchall()
+    all_return = True
+    for id in ids:
+        cursor.execute(f"SELECT status FROM equipment WHERE equipment_id = {id['equipment_id']}")
+        if cursor.fetchone()['status'] == 'Rented':
+            all_return = False
+            break
+    if all_return:
+        cursor.execute(f"UPDATE orders SET status = 'Completed' WHERE order_id = {order_id}")
+        conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
 
 
 @admin_bp.route('/equipment/upload', methods=['POST'])
@@ -726,6 +860,60 @@ def equipment_remove(serial_number):
         "message": "Success",
         "data": True
     })
+
+
+@admin_bp.route('/category/add', methods=['POST'])
+@login_required
+def category_add():
+    conn, cursor = db_cursor()
+    category = request.form['category']
+    image = request.form['image']
+    cursor.execute(f"INSERT INTO category (category, image) VALUES ('{category}', '{image}')")
+    conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
+
+
+@admin_bp.route('/category/update', methods=['POST'])
+@login_required
+def category_update():
+    conn, cursor = db_cursor()
+    category_id = request.form['category_id']
+    category = request.form['category']
+    image = request.form['image']
+    cursor.execute(f"UPDATE category SET category = '{category}', image = '{image}' WHERE category_id = '{category_id}'")
+    conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
+
+
+@admin_bp.route('/category/remove/<int:category_id>')
+@login_required
+def category_remove(category_id):
+    conn, cursor = db_cursor()
+    try:
+        cursor.execute(f"DELETE FROM category WHERE category_id = '{category_id}'")
+        conn.commit()
+        cursor.close()
+        return jsonify({
+            "code": 200,
+            "message": "Success",
+            "data": True
+        })
+    except Exception:
+        return jsonify({
+            "code": 403,
+            "message": "Fail",
+            "data": False
+        })
 
 
 def all_category():

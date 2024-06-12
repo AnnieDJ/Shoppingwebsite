@@ -1,11 +1,12 @@
-{% extends "base.html" %} {% block title %}Financial Report{% endblock %} {%
+{% extends "base.html" %} {% block title %}Reports{% endblock %} {%
   block content %}
   <div class="container mt-4">
     <h2>Store Equipment Damage Report</h2>
-    <h3>repair: {{ report.repair }}</h3>
-    <h3>rental: {{ report.rental }}</h3>
-    <h3>percent: {{ report.percent }}</h3>
+    <h3>Equipment repaired: {{ report.repair }} times</h3>
+    <h3>Equipment rented: {{ report.rental }} times</h3>
+    <h3>Damage Rate: {{ report.percent }}</h3>
   </div>
+
   <div class="container mt-5">
     <h2>Quarterly Sales Report for 2024</h2>
     <canvas id="salesChart" width="800" height="400"></canvas>
