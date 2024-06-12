@@ -400,6 +400,7 @@ def view_news():
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('home.login'))
 
+
 @admin_bp.route('/edit_news/<int:news_id>', methods=['GET'])
 @login_required
 def edit_news(news_id):
@@ -416,6 +417,7 @@ def edit_news(news_id):
     else:
         flash('Unauthorized access.', 'danger')
         return redirect(url_for('home.login'))
+
 
 @admin_bp.route('/update_news/<int:news_id>', methods=['POST'])
 @login_required
@@ -440,6 +442,7 @@ def update_news(news_id):
         flash('Unauthorized to perform this action.', 'danger')
         return redirect(url_for('home.login'))
 
+
 @admin_bp.route('/delete_news/<int:news_id>', methods=['POST'])
 @login_required
 def delete_news(news_id):
@@ -459,9 +462,6 @@ def delete_news(news_id):
         flash('Unauthorized to perform this action.', 'danger')
         return redirect(url_for('home.login'))
 
-
-
-from datetime import datetime
 
 @admin_bp.route('/add_news', methods=['GET'])
 @login_required

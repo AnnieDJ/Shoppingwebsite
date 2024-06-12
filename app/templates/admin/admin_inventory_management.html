@@ -3,7 +3,7 @@
   <div style="padding: 20px;">
   
   <div>
-      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">add</button>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add A New Equipment</button>
   
       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
           <div class="modal-dialog">
@@ -79,8 +79,8 @@
           <th>Cost</th>
           <th>Category</th>
           <th>Status</th>
-          <th>Minimum Date</th>
-          <th>Maximum Date</th>
+          <th>Minimum Hiring Period</th>
+          <th>Maximum Hiring Period</th>
           <th>Update</th>
       </tr>
       </thead>
@@ -195,8 +195,8 @@
                       break;
                   case "BUTTON":
                       entry.innerHTML = `
-                          <button class="btn btn-primary" onclick="editInfo(${serial_number})">edit</button>
-                          <button class="btn btn-danger" onclick="remove_equipment(${serial_number})">del</button>
+                          <button class="btn btn-primary" onclick="editInfo(${serial_number})">Edit</button>
+                          <button class="btn btn-danger" onclick="remove_equipment(${serial_number})">Delete</button>
                       `
                       break;
                   default:

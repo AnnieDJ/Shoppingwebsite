@@ -149,7 +149,7 @@ block content %}
                     }
                     break;
                 case "BUTTON":
-                    entry.innerHTML = `<button class="btn btn-primary" onclick="saveInfo(${serial_number})">save</button>`
+                    entry.innerHTML = `<button class="btn btn-primary" onclick="saveInfo(${serial_number})">Save</button>`
                     break;
                 default:
                     const value = entry.textContent;
@@ -189,10 +189,10 @@ block content %}
         }).then(res => res.json())
 
         if (res.code === 200) {
-            alert("modify success");
+            alert("Equipment details have been updated!");
         } else {
             location.reload();
-            alert("modify failed");
+            alert("Equipment details failed to update. Please try again!");
         }
     }
 
