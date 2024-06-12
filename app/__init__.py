@@ -18,11 +18,9 @@ def create_app():
     app.config['DB_NAME'] = 'agrihire'
     app.secret_key = 'the first secret key for ava'
 
-    # Initialize Redis connection
     redis_conn = redis.Redis(host='localhost', port=6379, db=0)
     redis_conn.flushall()
 
-    # Register blueprints
     app.register_blueprint(home_bp, url_prefix='/')
     app.register_blueprint(customer_bp, url_prefix='/customer')
     app.register_blueprint(staff_bp, url_prefix='/staff')
@@ -55,6 +53,7 @@ def create_app():
         except Exception as e:
             print(f"Unexpected error: {e}")
             return jsonify({"error": "Unexpected error occurred"}), 500
+
 
         return jsonify(messages)
 

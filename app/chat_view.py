@@ -10,8 +10,10 @@ from . import hashing
 from .utils import db_cursor, login_required
 from .utils import db_cursor
 
+
 chat_bp = Blueprint('chat', __name__, template_folder='templates/chat')
-# Assuming you have a chat blueprint setup
+
+
 @chat_bp.route('/chat')
 def index():
     username = session.get('username', 'Guest')  

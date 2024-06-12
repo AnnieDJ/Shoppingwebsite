@@ -47,60 +47,6 @@ def dashboard():
 
         return render_template('staff_dashboard.html', start_today=start_today, end_today=end_today)
     return redirect(url_for('home.login'))
-  
-
-# Daily Checkout List
-@staff_bp.route('/daily_checkout')
-def daily_checkout():
-    if 'loggedin' in session and session['role'] == 'staff':
-        today = date.today().isoformat()
-        conn, cursor = db_cursor()
-        cursor.execute(f'SELECT store_id FROM staff WHERE user_id = {session["userid"]}')
-        store_id = cursor.fetchone()['store_id']
-        
-        conn, cursor = db_cursor()
-        cursor.execute('''
-                       SELECT oi.order_id, oi.equipment_id, e.name as equipment_name, oi.start_time, o.user_id
-                       FROM order_items oi
-                       JOIN equipment e ON oi.equipment_id = e.equipment_id
-                       JOIN orders o ON oi.order_id = o.order_id
-                       JOIN user u ON o.user_id = u.user_id
-                       WHERE oi.start_time = %s AND e.store_id = %s AND o.status = 'Pending'
-                       ''', (today, store_id))
-        items = cursor.fetchall()
-        
-        cursor.close()
-        conn.close()
-
-        return render_template('staff_daily_checkout_list.html', items=items)
-    return redirect(url_for('home.login'))
-
-
-# Daily Return List
-@staff_bp.route('/daily_return')
-def daily_return():
-    if 'loggedin' in session and session['role'] == 'staff':
-        today = date.today().isoformat()
-        conn, cursor = db_cursor()
-        cursor.execute(f'SELECT store_id FROM staff WHERE user_id = {session["userid"]}')
-        store_id = cursor.fetchone()['store_id']
-        
-        conn, cursor = db_cursor()
-        cursor.execute('''
-                       SELECT oi.order_id, oi.equipment_id, e.name as equipment_name, oi.start_time, o.user_id
-                       FROM order_items oi
-                       JOIN equipment e ON oi.equipment_id = e.equipment_id
-                       JOIN orders o ON oi.order_id = o.order_id
-                       JOIN user u ON o.user_id = u.user_id
-                       WHERE oi.end_time = %s AND e.store_id = %s AND o.status = 'Ongoing'
-                       ''', (today, store_id))
-        items = cursor.fetchall()
-        
-        cursor.close()
-        conn.close()
-
-        return render_template('staff_daily_return_list.html', items=items)
-    return redirect(url_for('home.login'))
 
 
 # Send reminder
