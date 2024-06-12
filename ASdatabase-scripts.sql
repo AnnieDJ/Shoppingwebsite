@@ -66,20 +66,27 @@ CREATE TABLE IF NOT EXISTS admin_national_manager (
 );
 
 
+CREATE TABLE IF NOT EXISTS category (
+  category_id INT AUTO_INCREMENT PRIMARY KEY,
+  category VARCHAR(255) UNIQUE,
+  image VARCHAR(255)
+);
+
 CREATE TABLE IF NOT EXISTS equipment (
-    equipment_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    name VARCHAR(255) NOT NULL,
-    description TEXT,
-    category VARCHAR(255),
-    purchase_date DATE,
-    cost DECIMAL(10, 2),
-    serial_number VARCHAR(255) UNIQUE NOT NULL,
-    status ENUM('Available', 'Rented', 'Under Repair', 'Retired') NOT NULL,
-    store_id INT NOT NULL,
-    maximum_date INT,
-    minimum_date INT,
-    Image VARCHAR(255),
-    FOREIGN KEY (store_id) REFERENCES stores(store_id)
+  equipment_id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  category VARCHAR(255),
+  purchase_date DATE,
+  cost DECIMAL(10, 2),
+  serial_number VARCHAR(255) UNIQUE NOT NULL,
+  status ENUM('Available', 'Rented', 'Under Repair', 'Retired') NOT NULL,
+  store_id INT NOT NULL,
+  maximum_date INT,
+  minimum_date INT,
+  Image VARCHAR(255),
+  FOREIGN KEY (store_id) REFERENCES stores(store_id),
+  FOREIGN KEY (category) REFERENCES category(category)
 );
 
 
@@ -307,3 +314,6 @@ INSERT INTO discount (discount_id, days, discount_pricing) VALUES
 (2, 30, 0.05),
 (3, 180, 0.1),
 (4, 360, 0.15);
+
+
+
