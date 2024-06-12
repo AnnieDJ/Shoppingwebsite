@@ -644,3 +644,4 @@ INSERT INTO news (title, content, publish_date, creator_id, store_id) VALUES
 ('New Spreader Technology', 'Discover the latest advancements in Spreader technology. Our Rolleston store has new models in stock.', '2024-06-03', 4, 2),
 ('Staff Training Program', 'We have initiated a comprehensive training program for all staff members to enhance service quality.', '2024-06-04', 5, NULL)
 ;
+
