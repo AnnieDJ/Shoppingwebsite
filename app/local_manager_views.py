@@ -531,10 +531,10 @@ def financial_report():
             cursor.execute(f"""
                 SELECT
                   CASE
-                    WHEN MONTH(creation_date) BETWEEN 1 AND 3 THEN 'Q1'
-                    WHEN MONTH(creation_date) BETWEEN 1 AND 6 THEN 'Q2'
-                    WHEN MONTH(creation_date) BETWEEN 1 AND 9 THEN 'Q3'
-                    WHEN MONTH(creation_date) BETWEEN 1 AND 12 THEN 'Q4'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 3 THEN 'January-March'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 6 THEN 'April-June'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 9 THEN 'Junly-September'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 12 THEN 'October-December'
                   END AS quarter,
                   SUM(total_cost) AS total_sales
                 FROM orders
@@ -805,55 +805,24 @@ def refund_order(order_id):
 # View equipment repair history
 @local_manager_bp.route('/equipment_repair')
 def equipment_repair():
-    if 'loggedin' in session and session['role'] == 'local_manager':
-        conn, cursor = db_cursor()
-        cursor.execute("SELECT * FROM equipment_repair_history")
-        history = cursor.fetchall()
-        cursor.close()
-        return render_template('local_manager_equipment_repair_history.html', entries=history)
+    if 'loggedin' in session and session['role'] == 'staff':
+        # conn, cursor = db_cursor()
+        # cursor.execute("SELECT * FROM equipment WHERE status = 'Damaged'")
+        # equipments = cursor.fetchall()
+        # cursor.close()
+        return render_template('local_manager_equipment_repair.html')
     return redirect(url_for('auth_bp.login'))
 
 
 # View equipment rental history
 @local_manager_bp.route('/equipment_rent')
 def equipment_rent():
-    if 'loggedin' in session and session['role'] == 'local_manager':
-        conn, cursor = db_cursor()
-        cursor.execute("SELECT * FROM equipment_rental_history")
-        history = cursor.fetchall()
-        cursor.close()
-        return render_template('local_manager_equipment_rental_history.html', entries=history)
-    return redirect(url_for('auth_bp.login'))
-
-
-# View store damage report
-@local_manager_bp.route('/damage_report')
-def damage_report():
-    if 'loggedin' in session and session['role'] == 'local_manager':
-        conn, cursor = db_cursor()
-        cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Available' AND status_to = 'Under Repair'")
-        atou = cursor.fetchone()['count(*)']
-        cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Under Repair' AND status_to = 'Available'")
-        utoa = cursor.fetchone()['count(*)']
-        cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Available' AND status_to = 'Rented'")
-        ator = cursor.fetchone()['count(*)']
-        cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Rented' AND status_to = 'Available'")
-        rtoa = cursor.fetchone()['count(*)']
-        cursor.close()
-        repair = atou if atou < utoa else utoa
-        rental = ator if ator < rtoa else rtoa
-
-        try:
-            percent = f"{round(repair / rental * 100, 2)}%"
-        except ZeroDivisionError:
-            percent = '0%'
-
-        report = {
-            'repair': repair,
-            'rental': rental,
-            'percent': percent
-        }
-        return render_template('local_manager_damage_report.html', report=report)
+    if 'loggedin' in session and session['role'] == 'staff':
+        # conn, cursor = db_cursor()
+        # cursor.execute("SELECT * FROM equipment WHERE status = 'Damaged'")
+        # equipments = cursor.fetchall()
+        # cursor.close()
+        return render_template('local_manager_equipment_rent.html')
     return redirect(url_for('auth_bp.login'))
 
 
@@ -928,6 +897,36 @@ def send_reminder():
     conn.close()
 
     return jsonify({'message': 'Reminder sent successfully.'}), 200
+
+
+@local_manager_bp.route('/damage_report')
+def damage_report():
+    if 'loggedin' in session and session['role'] == 'local_manager':
+        conn, cursor = db_cursor()
+        cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Available' AND status_to = 'Under Repair'")
+        atou = cursor.fetchone()['count(*)']
+        cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Under Repair' AND status_to = 'Available'")
+        utoa = cursor.fetchone()['count(*)']
+        cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Available' AND status_to = 'Rented'")
+        ator = cursor.fetchone()['count(*)']
+        cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Rented' AND status_to = 'Available'")
+        rtoa = cursor.fetchone()['count(*)']
+        cursor.close()
+        repair = atou if atou < utoa else utoa
+        rental = ator if ator < rtoa else rtoa
+
+        try:
+            percent = f"{round(repair / rental * 100, 2)}%"
+        except ZeroDivisionError:
+            percent = '0%'
+
+        report = {
+            'repair': repair,
+            'rental': rental,
+            'percent': percent
+        }
+        return render_template('local_manager_damage_report.html', report=report)
+    return redirect(url_for('auth_bp.login'))
 
 
 def all_category():

@@ -438,30 +438,6 @@ def cancel_order(order_id):
     })
 
 
-# View equipment repair history
-@staff_bp.route('/equipment_repair')
-def equipment_repair():
-    if 'loggedin' in session and session['role'] == 'staff':
-        # conn, cursor = db_cursor()
-        # cursor.execute("SELECT * FROM equipment WHERE status = 'Damaged'")
-        # equipments = cursor.fetchall()
-        # cursor.close()
-        return render_template('staff_equipment_repair.html')
-    return redirect(url_for('auth_bp.login'))
-
-
-# View equipment rental history
-@staff_bp.route('/equipment_rent')
-def equipment_rent():
-    if 'loggedin' in session and session['role'] == 'staff':
-        # conn, cursor = db_cursor()
-        # cursor.execute("SELECT * FROM equipment WHERE status = 'Damaged'")
-        # equipments = cursor.fetchall()
-        # cursor.close()
-        return render_template('staff_equipment_rent.html')
-    return redirect(url_for('auth_bp.login'))
-
-
 # View all equipment category
 def all_category():
     conn, cursor = db_cursor()
