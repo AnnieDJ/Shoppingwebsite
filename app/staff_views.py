@@ -312,7 +312,7 @@ def equipment_upload():
     })
 
 
-# View all orders
+# View all orders at store
 @staff_bp.route('/order_list')
 def order_list():
     if 'loggedin' in session and session['role'] == 'staff':
@@ -438,7 +438,7 @@ def cancel_order(order_id):
     })
 
 
-# Equipment repair history
+# View equipment repair history
 @staff_bp.route('/equipment_repair')
 def equipment_repair():
     if 'loggedin' in session and session['role'] == 'staff':
@@ -450,7 +450,7 @@ def equipment_repair():
     return redirect(url_for('auth_bp.login'))
 
 
-# Equipment rental history
+# View equipment rental history
 @staff_bp.route('/equipment_rent')
 def equipment_rent():
     if 'loggedin' in session and session['role'] == 'staff':

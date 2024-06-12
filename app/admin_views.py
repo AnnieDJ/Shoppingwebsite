@@ -1,6 +1,7 @@
+import uuid, os
 from flask import current_app as app
 from mysql.connector import Error as MySQLError
-from flask import Blueprint,render_template, request, redirect, url_for, session, flash
+from flask import Blueprint,render_template, request, redirect, url_for, session, flash, jsonify
 import re
 from . import hashing
 from .utils import db_cursor, login_required
@@ -632,3 +633,104 @@ def financial_report():
     else:
         flash('Please log in to view this page.', 'info')
         return redirect(url_for('home.login'))
+    
+
+@admin_bp.route('/equipment_manage')
+@login_required
+def change_date():
+    conn, cursor = db_cursor()
+    cursor.execute(f"SELECT * FROM equipment")
+    equipment = cursor.fetchall()
+    return render_template('admin_inventory_management.html', equipment=equipment, categories=all_category())
+
+
+@admin_bp.route('/equipment/upload', methods=['POST'])
+def equipment_upload():
+    file = request.files['file']
+    file_name = uuid.uuid1().__str__() + '.' + file.filename.rsplit('.')[1]
+    file.save(os.path.join('app/static', file_name))
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": file_name
+    })
+
+
+@admin_bp.route('/equipment/add', methods=['POST'])
+def equipment_add():
+    serial_number = request.form['serial_number']
+    store_id = request.form['store_id']
+    name = request.form['name']
+    description = request.form['description']
+    Image = request.form['Image']
+    purchase_date = request.form['purchase_date']
+    cost = request.form['cost']
+    category = request.form['category']
+    status = request.form['status']
+    conn, cursor = db_cursor()
+    cursor.execute(f"INSERT INTO equipment (serial_number, name, description, Image, purchase_date, cost, category, status, maximum_date, minimum_date, store_id) VALUES ('{serial_number}', '{name}', '{description}', '{Image}', '{purchase_date}', '{cost}', '{category}', '{status}', '360', '1', '{store_id}')")
+    conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
+
+
+@admin_bp.route('/equipment/update', methods=['POST'])
+def equipment_update():
+    serial_number = request.form['serial_number']
+    Image = request.form['Image']
+    purchase_date = request.form['purchase_date']
+    cost = request.form['cost']
+    category = request.form['category']
+    status = request.form['status']
+    minimum_date = request.form['minimum_date']
+    maximum_date = request.form['maximum_date']
+    store_id = request.form['store_id']
+    conn, cursor = db_cursor()
+    cursor.execute(F"SELECT status, equipment_id FROM equipment WHERE serial_number = '{serial_number}'")
+    data = cursor.fetchone()
+    old_status = data['status']
+    equipment_id = data['equipment_id']
+    if old_status == 'Available' and status == 'Under Repair':
+        cursor.execute(f"INSERT INTO equipment_repair_history (equipment_id, store_id, status_from, status_to, change_date) VALUES ('{equipment_id}', '{store_id}', 'Available', 'Under Repair', '{datetime.strftime(datetime.now(), '%Y-%m-%d')}')")
+        conn.commit()
+    elif old_status == 'Under Repair' and status == 'Available':
+        cursor.execute(f"INSERT INTO equipment_repair_history (equipment_id, store_id, status_from, status_to, change_date) VALUES ('{equipment_id}', '{store_id}', 'Under Repair', 'Available', '{datetime.strftime(datetime.now(), '%Y-%m-%d')}')")
+        conn.commit()
+    cursor.execute(f"UPDATE equipment SET Image = '{Image}', purchase_date = '{purchase_date}', cost = '{cost}', category = '{category}', status = '{status}', minimum_date = '{minimum_date}', maximum_date = '{maximum_date}' WHERE serial_number = '{serial_number}'")
+    conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
+
+
+@admin_bp.route('/equipment/remove/<int:serial_number>')
+def equipment_remove(serial_number):
+    conn, cursor = db_cursor()
+    cursor.execute(f"SELECT equipment_id FROM equipment WHERE serial_number = '{serial_number}'")
+    equipment_id = cursor.fetchone()['equipment_id']
+    cursor.execute(f"DELETE FROM equipment_rental_history WHERE equipment_id = '{equipment_id}'")
+    cursor.execute(f"DELETE FROM equipment_repair_history WHERE equipment_id = '{equipment_id}'")
+    cursor.execute(f"DELETE FROM order_items WHERE equipment_id = '{equipment_id}'")
+    cursor.execute(f"DELETE FROM equipment WHERE serial_number = '{serial_number}'")
+    conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
+
+
+def all_category():
+    conn, cursor = db_cursor()
+    cursor.execute("SELECT category FROM equipment GROUP BY category")
+    categories = cursor.fetchall()
+    cursor.close()
+    return categories

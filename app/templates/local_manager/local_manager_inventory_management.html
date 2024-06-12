@@ -1,0 +1,42 @@
+{% extends "base.html" %} {% block title %}Inventory Management{% endblock %} {%
+  block content %}
+  <div class="d-flex justify-content-between mb-3">
+    <a href="{{ url_for('local_manager.dashboard') }}" class="btn back-button">Back</a>
+    <a href="{{ url_for('local_manager.equipment_rent') }}" class="btn back-button">Equipment Rental History</a>
+    <a href="{{ url_for('local_manager.equipment_repair') }}" class="btn back-button">Equipment Repair History</a>
+  </div>
+
+  <div
+    style="
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-gap: 1rem;
+    "
+  >
+    {% for entry in category %}
+    <div class="card" style="width: 18rem">
+      <img
+        src="{{ url_for('static', filename= entry.category|lower + '.jpg') }}"
+        class="card-img-top"
+        alt="..."
+      />
+      <div class="card-body">
+        <h5 class="card-title">{{ entry.category }}</h5>
+        <ul class="card-text" style="list-style: none; padding: 10px 10px 10px 0">
+          <li>Available: {{ entry.AvailableCount }}</li>
+          <li>Rented: {{ entry.RentedCount }}</li>
+          <li>Under Repair: {{ entry.UnderRepairCount }}</li>
+          <li>Retired: {{ entry.RetiredCount }}</li>
+        </ul>
+        <a
+          href="/local_manager/equipment/detail?category={{ entry.category }}"
+          class="btn btn-primary"
+          >View Details</a
+        >
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endblock %}
+  

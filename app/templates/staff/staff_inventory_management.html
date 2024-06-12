@@ -1,5 +1,10 @@
 {% extends "base.html" %} {% block title %}Inventory Management{% endblock %} {%
 block content %}
+<div class="d-flex justify-content-between mb-3">
+  <a href="{{ url_for('staff.dashboard') }}" class="btn back-button">Back</a>
+  <a href="{{ url_for('staff.equipment_rent') }}" class="btn back-button">Equipment Rental History</a>
+  <a href="{{ url_for('staff.equipment_repair') }}" class="btn back-button">Equipment Repair History</a>
+</div>
 
 <div
   style="
