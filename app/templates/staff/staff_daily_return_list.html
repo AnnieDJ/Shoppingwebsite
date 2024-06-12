@@ -5,7 +5,7 @@
 {% block content %}
 {% if session.get('loggedin') %}
 <div class="d-flex justify-content-between mb-3" style="margin: 20px">
-  <a href="{{ url_for('local_manager.dashboard') }}" class="btn back-button">Back</a>
+  <a href="{{ url_for('staff.dashboard') }}" class="btn back-button">Back</a>
 </div>
 <div class="container mt-3">
   <div class="row">
@@ -59,7 +59,7 @@ function sendReminder(orderId, userId, equipmentName, date, button, type) {
     } else if (type === 'return') {
         message = `A friendly reminder that your rental of equipment ${equipmentName} (Order ID: ${orderId}) is due for return today. Please ensure it is returned in good condition.`;
     }
-    fetch('{{ url_for('local_manager.send_reminder') }}', {
+    fetch('{{ url_for('staff.send_reminder') }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
