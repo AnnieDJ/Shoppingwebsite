@@ -1,5 +1,8 @@
 {% extends "base.html" %} {% block title %}Equipment Repair Record{% endblock %} {%
   block content %}
+  <div class="d-flex justify-content-between mb-3" style="margin: 20px">
+    <a href="{{ url_for('staff.inventory_management') }}" class="btn back-button">Back</a>
+  </div>
   <div class="container mt-4">
       <table class="table">
       <thead>

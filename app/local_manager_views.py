@@ -552,6 +552,33 @@ def financial_report():
         return redirect(url_for('home.login'))
 
 
+# Inventory management
+@local_manager_bp.route('/inventory_management')
+def inventory_management():
+    if 'loggedin' in session and session['role'] == 'staff':
+        conn, cursor = db_cursor()
+        category = []
+        cursor.execute(f'SELECT store_id FROM staff WHERE user_id = {session["userid"]}')
+        store_id = cursor.fetchone()['store_id']
+        if store_id:
+            cursor.execute(f"""
+                        SELECT category,
+                            SUM(CASE WHEN status = 'Available' THEN 1 ELSE 0 END) AS AvailableCount,
+                            SUM(CASE WHEN status = 'Rented' THEN 1 ELSE 0 END) AS RentedCount,
+                            SUM(CASE WHEN status = 'Under Repair' THEN 1 ELSE 0 END) AS UnderRepairCount,
+                            SUM(CASE WHEN status = 'Retired' THEN 1 ELSE 0 END) AS RetiredCount
+                        FROM
+                            equipment
+                        WHERE store_id = {store_id}
+                        GROUP BY
+                            category;
+                        """)
+            category = cursor.fetchall()
+        cursor.close()
+        return render_template('local_inventory_management.html', category=category)
+    return redirect(url_for('home.login'))
+
+
 # View equipment details
 @local_manager_bp.route('/equipment/detail')
 def equipment_detail():
@@ -823,6 +850,79 @@ def damage_report():
         }
         return render_template('local_manager_damage_report.html', report=report)
     return redirect(url_for('auth_bp.login'))
+
+
+# Daily Checkout List
+@local_manager_bp.route('/daily_checkout')
+def daily_checkout():
+    if 'loggedin' in session and session['role'] == 'staff':
+        today = date.today().isoformat()
+        conn, cursor = db_cursor()
+        cursor.execute(f'SELECT store_id FROM staff WHERE user_id = {session["userid"]}')
+        store_id = cursor.fetchone()['store_id']
+        
+        conn, cursor = db_cursor()
+        cursor.execute('''
+                       SELECT oi.order_id, oi.equipment_id, e.name as equipment_name, oi.start_time, o.user_id
+                       FROM order_items oi
+                       JOIN equipment e ON oi.equipment_id = e.equipment_id
+                       JOIN orders o ON oi.order_id = o.order_id
+                       JOIN user u ON o.user_id = u.user_id
+                       WHERE oi.start_time = %s AND e.store_id = %s AND o.status = 'Pending'
+                       ''', (today, store_id))
+        items = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+
+        return render_template('local_manager_daily_checkout_list.html', items=items)
+    return redirect(url_for('home.login'))
+
+
+# Daily Return List
+@local_manager_bp.route('/daily_return')
+def daily_return():
+    if 'loggedin' in session and session['role'] == 'staff':
+        today = date.today().isoformat()
+        conn, cursor = db_cursor()
+        cursor.execute(f'SELECT store_id FROM staff WHERE user_id = {session["userid"]}')
+        store_id = cursor.fetchone()['store_id']
+        
+        conn, cursor = db_cursor()
+        cursor.execute('''
+                       SELECT oi.order_id, oi.equipment_id, e.name as equipment_name, oi.start_time, o.user_id
+                       FROM order_items oi
+                       JOIN equipment e ON oi.equipment_id = e.equipment_id
+                       JOIN orders o ON oi.order_id = o.order_id
+                       JOIN user u ON o.user_id = u.user_id
+                       WHERE oi.end_time = %s AND e.store_id = %s AND o.status = 'Ongoing'
+                       ''', (today, store_id))
+        items = cursor.fetchall()
+        
+        cursor.close()
+        conn.close()
+
+        return render_template('local_manager_daily_return_list.html', items=items)
+    return redirect(url_for('home.login'))
+
+
+# Send reminder
+@local_manager_bp.route('/send_reminder', methods=['POST'])
+def send_reminder():
+    data = request.json
+    order_id = data.get('order_id')
+    user_id = data.get('user_id')
+    equipment_name = data.get('equipment_name')
+    message = data.get('message')
+    sender_id = session['userid']
+
+    content = message
+
+    conn, cursor = db_cursor()
+    cursor.execute('INSERT INTO reminders (user_id, sender_id, content) VALUES (%s, %s, %s)', (user_id, sender_id, content))
+    conn.close()
+
+    return jsonify({'message': 'Reminder sent successfully.'}), 200
 
 
 def all_category():
