@@ -6,7 +6,7 @@ from mysql.connector import Error as MySQLError
 from flask import Blueprint,render_template, request, redirect, url_for, session, flash, jsonify
 from app import utils
 import re
-from datetime import datetime
+from datetime import datetime, date
 from .utils import db_cursor, login_required
 from flask_hashing  import Hashing
 
@@ -18,26 +18,31 @@ local_manager_bp = Blueprint('local_manager', __name__, template_folder='templat
 @local_manager_bp.route('/dashboard')
 def dashboard():
     if 'loggedin' in session and session['role'] == 'local_manager':
+        today = date.today().isoformat()
         conn, cursor = db_cursor()
-        category = []
         cursor.execute(f'SELECT store_id FROM local_manager WHERE user_id = {session["userid"]}')
         store_id = cursor.fetchone()['store_id']
-        if store_id:
-            cursor.execute(f"""
-                    SELECT category,
-                        SUM(CASE WHEN status = 'Available' THEN 1 ELSE 0 END) AS AvailableCount,
-                        SUM(CASE WHEN status = 'Rented' THEN 1 ELSE 0 END) AS RentedCount,
-                        SUM(CASE WHEN status = 'Under Repair' THEN 1 ELSE 0 END) AS UnderRepairCount,
-                        SUM(CASE WHEN status = 'Retired' THEN 1 ELSE 0 END) AS RetiredCount
-                    FROM
-                        equipment
-                    WHERE store_id = {store_id}
-                    GROUP BY
-                        category;
-                    """)
-            category = cursor.fetchall()
-        cursor.close()
-        return render_template('local_manager_dashboard.html', category=category)
+        cursor.execute('''
+                       SELECT oi.order_id, oi.equipment_id, e.name as equipment_name, oi.start_time, o.user_id
+                       FROM order_items oi
+                       JOIN equipment e ON oi.equipment_id = e.equipment_id
+                       JOIN orders o ON oi.order_id = o.order_id
+                       JOIN user u ON o.user_id = u.user_id
+                       WHERE oi.start_time = %s AND e.store_id = %s AND o.status = 'Pending'
+                       ''', (today, store_id))
+        start_today = cursor.fetchall()
+            
+        cursor.execute('''
+                       SELECT oi.order_id, oi.equipment_id, e.name as equipment_name, oi.end_time, u.user_id
+                       FROM order_items oi
+                       JOIN equipment e ON oi.equipment_id = e.equipment_id
+                       JOIN orders o ON oi.order_id = o.order_id
+                       JOIN user u ON o.user_id = u.user_id
+                       WHERE oi.end_time = %s AND e.store_id = %s AND o.status = 'Ongoing'
+                       ''', (today, store_id))
+        end_today = cursor.fetchall()
+        conn.close()
+        return render_template('local_manager_dashboard.html', start_today=start_today, end_today=end_today)
     return redirect(url_for('home.login'))
     
 

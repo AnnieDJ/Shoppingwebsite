@@ -11,7 +11,7 @@ from .utils import db_cursor
 from flask_hashing import Hashing
 from . import hashing
 from .utils import db_cursor, login_required
-from .utils import db_cursor
+
 
 staff_bp = Blueprint('staff', __name__, template_folder='templates/staff')
 
