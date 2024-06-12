@@ -537,7 +537,7 @@ def financial_report():
     if 'loggedin' in session:
         conn, cursor = db_cursor()
         try:
-            cursor.execute("""
+            cursor.execute(f"""
                 SELECT
                   CASE
                     WHEN MONTH(creation_date) BETWEEN 1 AND 3 THEN 'Q1'
@@ -547,7 +547,8 @@ def financial_report():
                   END AS quarter,
                   SUM(total_cost) AS total_sales
                 FROM orders
-                WHERE status = 'Completed' AND YEAR(creation_date) = 2024
+                WHERE status = 'Completed' AND YEAR(creation_date) = 2024 AND 
+                store_id = (SELECT store_id FROM local_manager WHERE user_id = {session['userid']})
                 GROUP BY quarter
             """)
             results = cursor.fetchall()
