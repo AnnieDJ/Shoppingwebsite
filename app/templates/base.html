@@ -35,7 +35,6 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <style>
       .content-container {
         padding-left: 20px;
@@ -200,35 +199,8 @@
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('chat.index') }}">Chat</a>
             </li>
-<<<<<<< HEAD
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('local_manager.financial_report') }}">Reports</a>
-=======
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="reportDropdown"
-                role="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                Report
-              </a>
-              <div class="dropdown-menu" aria-labelledby="reportDropdown">
-                <a
-                  class="dropdown-item"
-                  href="{{ url_for('local_manager.damage_report') }}"
-                  >Damage Report</a
-                >
-                <a
-                  class="dropdown-item"
-                  href="{{ url_for('local_manager.financial_report') }}"
-                  >Financial Report</a
-                >
-              </div>
->>>>>>> 14129a6039cd8568979ca09ca5e32a7d21002386
+              <a class="nav-link" href="{{ url_for('local_manager.report') }}">Reports</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('local_manager.view_staff') }}">Staff</a>
@@ -262,6 +234,12 @@
               >
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="/national_manager/equipment_manage">Inventory</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/national_manager/order_list">Orders</a>
+          </li>
+            <li class="nav-item">
               <a
                 class="nav-link"
                 href="{{ url_for('national_manager.view_news') }}"
@@ -278,7 +256,7 @@
             <li class="nav-item">
               <a
                 class="nav-link"
-                href="{{ url_for('national_manager.financial_report') }}"
+                href="{{ url_for('national_manager.reports') }}"
                 >Financial Report</a
               >
             </li>
@@ -302,6 +280,13 @@
             <li class="nav-item">
               <a class="nav-link" href="/admin/equipment_manage">Inventory</a>
             </li>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/admin/category">Category</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="/admin/order_list">Orders</a>
+          </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('chat.index') }}">Chat</a>
             </li>
@@ -316,8 +301,8 @@
               >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('admin.financial_report') }}"
-                >Financial Report</a
+              <a class="nav-link" href="{{ url_for('admin.reports') }}"
+                >Reports</a
               >
             </li>
             <li class="nav-item">

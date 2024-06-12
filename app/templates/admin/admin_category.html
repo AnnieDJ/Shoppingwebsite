@@ -1,0 +1,177 @@
+{% extends "base.html" %} {% block title %}Admin Category Management{% endblock %} {%
+  block content %}
+  <div class="container mt-4">
+  <div>
+      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Add a New Category</button>
+  
+      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog">
+          <div class="modal-content">
+          <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add A New Category</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <form>
+              <div class="mb-3">
+                <label for="category" class="col-form-label">Category:</label>
+                <input type="text" class="form-control" id="category">
+              </div>
+              <div class="mb-3">
+                <label for="image" class="col-form-label">Image:</label>
+                <input type="file" onchange="category_upload(this)" accept="image/*" class="form-control" id="image">
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button data-bs-dismiss="modal" onclick="add()" type="button" class="btn btn-primary">Confirm</button>
+          </div>
+          </div>
+          </div>
+       </div>
+  </div>
+  <table class="table">
+      <thead>
+      <tr>
+          <th>Category ID</th>
+          <th>Category</th>
+          <th>Image</th>
+          <th>Update</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for category in categories %}
+      <tr id="{{ category.category_id }}">
+          <td data-type="CATEGORYID">{{ category.category_id }}</td>
+          <td data-type="CATEGORY" data-name="category">{{ category.category }}</td>
+          <td data-type="IMG">
+              <img alt="{{ category.category }}" style="width: 50px; height: 50px;" src="/static/{{ category.image }}">
+          </td>
+          <td data-type="BUTTON">
+              <button onclick="editInfo({{ category.category_id }})" class="btn btn-warning">Edit</button>
+              <button onclick="remove_category({{ category.category_id }})" class="btn btn-danger">Delete</button>
+          </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+  </table>
+  </div>
+  
+  <script>
+      const editInfo = (category_id) => {
+          const children = document.getElementById(category_id).children;
+          Array.from(children).forEach(entry => {
+              switch (entry.dataset.type) {
+                  case "CATEGORYID":
+                      break;
+                  case "IMG":
+                      const src = entry.children[0].src.replace(location.origin + '/static/', '');
+                      entry.innerHTML = `<input onchange="category_upload(this)" data-src="${src}" accept="image/*" type="file">`;
+                      break;
+                  case "BUTTON":
+                      entry.innerHTML = `
+                          <button class="btn btn-warning" onclick="saveInfo(${category_id})">Save</button>
+                          <button class="btn btn-danger" onclick="remove_category(${category_id})">Delete</button>
+                      `
+                      break;
+                  default:
+                      const value = entry.textContent;
+                      entry.innerHTML = `<input type="text" value="${value}">`;
+                      break;
+              }
+          })
+      }
+  
+      const saveInfo = async (category_id) => {
+          const formData = new FormData();
+          const children = document.getElementById(category_id).children;
+          Array.from(children).forEach(entry => {
+              switch (entry.dataset.type) {
+                  case "CATEGORYID":
+                      formData.append("category_id", category_id);
+                      break;
+                  case "IMG":
+                      const src = entry.children[0].dataset.src;
+                      formData.append("image", src)
+                      entry.innerHTML = `<img style="width: 50px; height: 50px;" src="/static/${src}">`;
+                      break;
+                  case "BUTTON":
+                      entry.innerHTML = `
+                          <button class="btn btn-warning" onclick="editInfo(${category_id})">Edit</button>
+                          <button class="btn btn-danger" onclick="remove_category(${category_id})">Delete</button>
+                      `
+                      break;
+                  default:
+                      const value = entry.children[0].value;
+                      formData.append(entry.dataset.name, value);
+                      entry.innerHTML = value;
+                      break;
+              }
+          })
+  
+          const res = await fetch('/admin/category/update', {
+              method: 'POST',
+              body: formData
+          }).then(res => res.json())
+  
+          if (res.code === 200) {
+              alert("Category has been updated!");
+          } else {
+              location.reload();
+              alert("Failed to update category. Please try again!");
+          }
+      }
+  
+      const add = async () => {
+          const formData = new FormData();
+          formData.append("category", document.getElementById("category").value);
+          formData.append("image", document.getElementById("image").dataset.src);
+  
+          const res = await fetch('/admin/category/add', {
+              method: 'POST',
+              body: formData
+          }).then(res => res.json());
+  
+          if (res.code === 200) {
+              alert("A New Category has been added!");
+              location.reload();
+          } else {
+              alert("Failed to add a new category. Please try again!");
+          }
+      }
+  
+      const category_upload = async (that) => {
+          const file = that.files[0];
+          const formData = new FormData();
+          formData.append("file", file);
+  
+          const res = await fetch('/admin/equipment/upload', {
+              method: 'POST',
+              body: formData
+          }).then(res => res.json());
+  
+          if (res.code === 200) {
+              that.dataset.src = res.data;
+          } else {
+              alert("Failed to upload image. Please try again!");
+          }
+      }
+  
+      const remove_category = async (id) => {
+          if (confirm('Are you sure you want to delete this category?')) {
+              const res = await fetch('/admin/category/remove/' + id)
+              .then(res => res.json());
+  
+              if (res.code === 200) {
+                  alert("The category has been removed.");
+                  location.reload();
+              } else {
+                  alert("Failed to remove category. Please try again!");
+              }
+          }
+      }
+  </script>
+  {% endblock %}
+  
+  

@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}Customer Profile{% endblock %}
 {% block content %}
-<div id="liveAlertPlaceholder"></div>
-
 <div class="container">
   <div class="row p-3">
     <div class="col-md-8">
@@ -103,20 +101,20 @@
 
 <script>
   // Prompting message
-  const alertPlaceholder = document.getElementById("liveAlertPlaceholder");
+  const alertPlaceholder = document.querySelector("#alertPlaceholder");
   const alert = (message, type) => {
     const wrapper = document.createElement("div");
-    wrapper.innerHTML = [
-      `<div class="alert alert-${type} alert-dismissible" role="alert">`,
-      `   <div>${message}</div>`,
-      '   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>',
-      "</div>",
-    ].join("");
+    wrapper.innerHTML = `
+      <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+        <div>${message}</div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    `
     alertPlaceholder.append(wrapper);
   };
-  let msg = "{{ msg }}";
+  let msg = JSON.parse("{{ msg }}".replaceAll('&#39;', '"'));
   if (msg !== "") {
-    alert(msg, "success");
+    alert(msg[0], msg[1]);
   }
 
   // Gets the form validation style

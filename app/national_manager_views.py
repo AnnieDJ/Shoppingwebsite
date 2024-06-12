@@ -24,9 +24,10 @@ def dashboard():
 @national_manager_bp.route('/national_manager_profile', methods=['GET', 'POST'])
 @login_required
 def national_manager_profile():
+    msg = []
     conn, cursor = db_cursor()
     if 'userid' not in session:
-        flash("User ID not found in session. Please log in again.", 'danger')
+        msg = ["User ID not found in session. Please log in again.", 'danger']
         return redirect(url_for('login'))
 
     if request.method == 'POST':
@@ -45,9 +46,9 @@ def national_manager_profile():
                 'UPDATE user SET email = %s WHERE user_id = %s',
                 (email, session['userid'])
             )
-            flash('Your profile has been successfully updated!', 'success')
+            msg = ['Your profile has been successfully updated!', 'success']
         except MySQLError as e:
-            flash(f"An error occurred: {e}", 'danger')
+            msg = [f"An error occurred: {e}", 'danger']
 
     cursor.execute(
         'SELECT u.username, u.email, u.password_hash, u.role, a.title, a.first_name, a.family_name, a.phone_number '
@@ -58,7 +59,7 @@ def national_manager_profile():
     )
     data = cursor.fetchone()
 
-    return render_template('national_manager_profile.html', data=data)
+    return render_template('national_manager_profile.html', data=data, msg=msg)
 
 
 # allow national manager to change password
@@ -513,11 +514,31 @@ def add_discount():
         flash('Unauthorized to perform this action.', 'danger')
         return redirect(url_for('home.login'))
     
-@national_manager_bp.route('/financial_report')
+@national_manager_bp.route('/reports')
 @login_required
-def financial_report():
+def reports():
     if 'loggedin' in session:
         conn, cursor = db_cursor()
+        cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Available' AND status_to = 'Under Repair'")
+        atou = cursor.fetchone()['count(*)']
+        cursor.execute("SELECT count(*) FROM equipment_repair_history WHERE status_from = 'Under Repair' AND status_to = 'Available'")
+        utoa = cursor.fetchone()['count(*)']
+        cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Available' AND status_to = 'Rented'")
+        ator = cursor.fetchone()['count(*)']
+        cursor.execute("SELECT count(*) FROM equipment_rental_history WHERE status_from = 'Rented' AND status_to = 'Available'")
+        rtoa = cursor.fetchone()['count(*)']
+        repair = atou if atou < utoa else utoa
+        rental = ator if ator < rtoa else rtoa
+        try:
+            percent = f"{round(repair / rental * 100, 2)}%"
+        except ZeroDivisionError:
+            percent = '0%'
+            report = {
+                'repair': repair,
+                'rental': rental,
+                'percent': percent
+                }
+        
         try:
             cursor.execute("""
                 SELECT
@@ -525,7 +546,7 @@ def financial_report():
                     WHEN MONTH(creation_date) BETWEEN 1 AND 3 THEN 'January-March'
                     WHEN MONTH(creation_date) BETWEEN 1 AND 6 THEN 'April-June'
                     WHEN MONTH(creation_date) BETWEEN 1 AND 9 THEN 'Junly-September'
-                    WHEN MONTH(creation_date) BETWEEN 1 AND 12 THEN 'Oct-December'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 12 THEN 'October-December'
                   END AS quarter,
                   SUM(total_cost) AS total_sales
                 FROM orders
@@ -541,7 +562,203 @@ def financial_report():
             cursor.close()
             conn.close()
 
-        return render_template('national_manager_financial_report.html', data=data)
+        return render_template('national_manager_reports.html', data=data, report=report)
     else:
         flash('Please log in to view this page.', 'info')
         return redirect(url_for('home.login'))
+    
+
+@national_manager_bp.route('/order_list')
+@login_required
+def order_list():
+    status = request.args.get('status')
+    search = request.args.get('search')
+    conn, cursor = db_cursor()
+    if status and search:
+        cursor.execute(
+            f"SELECT * FROM orders WHERE status = '{status}' AND order_id = {search} ORDER BY creation_date DESC")
+    elif status:
+        cursor.execute(
+            f"SELECT * FROM orders WHERE status = '{status}' ORDER BY creation_date DESC")
+    elif search:
+        cursor.execute(
+            f"SELECT * FROM orders WHERE order_id = {search} ORDER BY creation_date DESC")
+    else:
+        cursor.execute(f"SELECT * FROM orders ORDER BY creation_date DESC")
+    orders = cursor.fetchall()
+    for order in orders:
+        cursor.execute(f"SELECT store_name FROM stores WHERE store_id = {order['store_id']}")
+        order['store_name'] = cursor.fetchone()['store_name']
+        cursor.execute(
+            f"SELECT username, email, date_of_birth, first_name, family_name FROM user JOIN customer ON user.user_id = customer.user_id WHERE user.user_id = {order['user_id']}")
+        order['user_info'] = cursor.fetchone()
+    cursor.close()
+    return render_template('national_manager_order_list.html', orders=orders)
+
+
+@national_manager_bp.route('/order_detail/<int:order_id>')
+@login_required
+def order_detail(order_id):
+    conn, cursor = db_cursor()
+    cursor.execute(f"SELECT * FROM order_items WHERE order_id = {order_id}")
+    items = cursor.fetchall()
+    for item in items:
+        cursor.execute(f"SELECT name, status, Image FROM equipment WHERE equipment_id = {item['equipment_id']}")
+        data = cursor.fetchone()
+        item['name'] = data['name']
+        item['status'] = data['status']
+        item['Image'] = data['Image']
+    cursor.close()
+    return render_template('national_manager_order_detail.html', items=items, order_id=order_id)
+
+
+@national_manager_bp.route('/fetch_order/<int:order_id>')
+@login_required
+def fetch_order(order_id):
+    conn, cursor = db_cursor()
+    cursor.execute(f"UPDATE orders SET status = 'Ongoing' WHERE order_id = {order_id}")
+    conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
+
+
+@national_manager_bp.route('/refund_order/<int:order_id>')
+@login_required
+def refund_order(order_id):
+    conn, cursor = db_cursor()
+    cursor.execute(f"UPDATE orders SET status = 'Canceled' WHERE order_id = {order_id}")
+    conn.commit()
+    cursor.execute(f"UPDATE payments SET payment_status = 'Refunded' WHERE order_id = {order_id}")
+    conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
+
+
+@national_manager_bp.route('/equipment/return', methods=['POST'])
+@login_required
+def return_equipment():
+    order_id = request.form['order_id']
+    equipment_id = request.form['equipment_id']
+    conn, cursor = db_cursor()
+    cursor.execute(f"SELECT store_id FROM orders WHERE order_id = {order_id}")
+    store_id = cursor.fetchone()['store_id']
+    cursor.execute(f"UPDATE equipment SET status = 'Available' WHERE equipment_id = {equipment_id}")
+    conn.commit()
+    cursor.execute(f"INSERT INTO equipment_rental_history (equipment_id, store_id, status_from, status_to, change_date) VALUES ({equipment_id}, {store_id}, 'Rented', 'Available', '{datetime.strftime(datetime.now(), '%Y-%m-%d')}')")
+    conn.commit()
+    cursor.execute(f"SELECT equipment_id FROM order_items WHERE order_id = {order_id}")
+    ids = cursor.fetchall()
+    all_return = True
+    for id in ids:
+        cursor.execute(f"SELECT status FROM equipment WHERE equipment_id = {id['equipment_id']}")
+        if cursor.fetchone()['status'] == 'Rented':
+            all_return = False
+            break
+    if all_return:
+        cursor.execute(f"UPDATE orders SET status = 'Completed' WHERE order_id = {order_id}")
+        conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
+
+
+@national_manager_bp.route('/equipment/upload', methods=['POST'])
+def equipment_upload():
+    file = request.files['file']
+    file_name = uuid.uuid1().__str__() + '.' + file.filename.rsplit('.')[1]
+    file.save(os.path.join('app/static', file_name))
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": file_name
+    })
+
+
+@national_manager_bp.route('/equipment/add', methods=['POST'])
+def equipment_add():
+    serial_number = request.form['serial_number']
+    store_id = request.form['store_id']
+    name = request.form['name']
+    description = request.form['description']
+    Image = request.form['Image']
+    purchase_date = request.form['purchase_date']
+    cost = request.form['cost']
+    category = request.form['category']
+    status = request.form['status']
+    conn, cursor = db_cursor()
+    cursor.execute(f"INSERT INTO equipment (serial_number, name, description, Image, purchase_date, cost, category, status, store_id) VALUES ('{serial_number}', '{name}', '{description}', '{Image}', '{purchase_date}', '{cost}', '{category}', '{status}', '{store_id}')")
+    conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
+
+
+@national_manager_bp.route('/equipment/update', methods=['POST'])
+def equipment_update():
+    serial_number = request.form['serial_number']
+    Image = request.form['Image']
+    purchase_date = request.form['purchase_date']
+    cost = request.form['cost']
+    category = request.form['category']
+    status = request.form['status']
+    store_id = request.form['store_id']
+    conn, cursor = db_cursor()
+    cursor.execute(F"SELECT status, equipment_id FROM equipment WHERE serial_number = '{serial_number}'")
+    data = cursor.fetchone()
+    old_status = data['status']
+    equipment_id = data['equipment_id']
+    if old_status == 'Available' and status == 'Under Repair':
+        cursor.execute(f"INSERT INTO equipment_repair_history (equipment_id, store_id, status_from, status_to, change_date) VALUES ('{equipment_id}', '{store_id}', 'Available', 'Under Repair', '{datetime.strftime(datetime.now(), '%Y-%m-%d')}')")
+        conn.commit()
+    elif old_status == 'Under Repair' and status == 'Available':
+        cursor.execute(f"INSERT INTO equipment_repair_history (equipment_id, store_id, status_from, status_to, change_date) VALUES ('{equipment_id}', '{store_id}', 'Under Repair', 'Available', '{datetime.strftime(datetime.now(), '%Y-%m-%d')}')")
+        conn.commit()
+    cursor.execute(f"UPDATE equipment SET Image = '{Image}', purchase_date = '{purchase_date}', cost = '{cost}', category = '{category}', status = '{status}' WHERE serial_number = '{serial_number}'")
+    conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
+
+
+@national_manager_bp.route('/equipment/remove/<int:serial_number>')
+def equipment_remove(serial_number):
+    conn, cursor = db_cursor()
+    cursor.execute(f"SELECT equipment_id FROM equipment WHERE serial_number = '{serial_number}'")
+    equipment_id = cursor.fetchone()['equipment_id']
+    cursor.execute(f"DELETE FROM equipment_rental_history WHERE equipment_id = '{equipment_id}'")
+    cursor.execute(f"DELETE FROM equipment_repair_history WHERE equipment_id = '{equipment_id}'")
+    cursor.execute(f"DELETE FROM order_items WHERE equipment_id = '{equipment_id}'")
+    cursor.execute(f"DELETE FROM equipment WHERE serial_number = '{serial_number}'")
+    conn.commit()
+    cursor.close()
+    return jsonify({
+        "code": 200,
+        "message": "Success",
+        "data": True
+    })
+
+
+def all_category():
+    conn, cursor = db_cursor()
+    cursor.execute("SELECT category FROM equipment GROUP BY category")
+    categories = cursor.fetchall()
+    cursor.close()
+    return categories
+
