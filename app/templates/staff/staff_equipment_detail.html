@@ -217,10 +217,10 @@ block content %}
         }).then(res => res.json());
 
         if (res.code === 200) {
-            alert("Add equipment success");
+            alert("A new equipment has been added!");
             location.reload();
         } else {
-            alert("Add equipment failed");
+            alert("Failed to add an equipment. Please try again!");
         }
     }
 
