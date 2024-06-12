@@ -610,10 +610,10 @@ def financial_report():
             cursor.execute("""
                 SELECT
                   CASE
-                    WHEN MONTH(creation_date) BETWEEN 1 AND 3 THEN 'Q1'
-                    WHEN MONTH(creation_date) BETWEEN 1 AND 6 THEN 'Q2'
-                    WHEN MONTH(creation_date) BETWEEN 1 AND 9 THEN 'Q3'
-                    WHEN MONTH(creation_date) BETWEEN 1 AND 12 THEN 'Q4'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 3 THEN 'January-March'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 6 THEN 'April-June'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 9 THEN 'Junly-September'
+                    WHEN MONTH(creation_date) BETWEEN 1 AND 12 THEN 'October-December'
                   END AS quarter,
                   SUM(total_cost) AS total_sales
                 FROM orders
