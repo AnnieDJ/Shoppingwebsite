@@ -551,7 +551,7 @@ def financial_report():
             cursor.close()
             conn.close()
 
-        return render_template('local_manager_financial_report.html', data=data)
+        return render_template('local_manager_report.html', data=data)
     else:
         flash('Please log in to view this page.', 'info')
         return redirect(url_for('home.login'))
@@ -802,84 +802,6 @@ def refund_order(order_id):
     })
 
 
-# View equipment repair history
-@local_manager_bp.route('/equipment_repair')
-def equipment_repair():
-    if 'loggedin' in session and session['role'] == 'staff':
-        # conn, cursor = db_cursor()
-        # cursor.execute("SELECT * FROM equipment WHERE status = 'Damaged'")
-        # equipments = cursor.fetchall()
-        # cursor.close()
-        return render_template('local_manager_equipment_repair.html')
-    return redirect(url_for('auth_bp.login'))
-
-
-# View equipment rental history
-@local_manager_bp.route('/equipment_rent')
-def equipment_rent():
-    if 'loggedin' in session and session['role'] == 'staff':
-        # conn, cursor = db_cursor()
-        # cursor.execute("SELECT * FROM equipment WHERE status = 'Damaged'")
-        # equipments = cursor.fetchall()
-        # cursor.close()
-        return render_template('local_manager_equipment_rent.html')
-    return redirect(url_for('auth_bp.login'))
-
-
-# Daily Checkout List
-@local_manager_bp.route('/daily_checkout')
-def daily_checkout():
-    if 'loggedin' in session and session['role'] == 'local_manager':
-        today = date.today().isoformat()
-        conn, cursor = db_cursor()
-        cursor.execute(f'SELECT store_id FROM local_manager WHERE user_id = {session["userid"]}')
-        store_id = cursor.fetchone()['store_id']
-        
-        conn, cursor = db_cursor()
-        cursor.execute('''
-                       SELECT oi.order_id, oi.equipment_id, e.name as equipment_name, oi.start_time, o.user_id
-                       FROM order_items oi
-                       JOIN equipment e ON oi.equipment_id = e.equipment_id
-                       JOIN orders o ON oi.order_id = o.order_id
-                       JOIN user u ON o.user_id = u.user_id
-                       WHERE oi.start_time = %s AND e.store_id = %s AND o.status = 'Pending'
-                       ''', (today, store_id))
-        items = cursor.fetchall()
-        
-        cursor.close()
-        conn.close()
-
-        return render_template('local_manager_daily_checkout_list.html', items=items)
-    return redirect(url_for('home.login'))
-
-
-# Daily Return List
-@local_manager_bp.route('/daily_return')
-def daily_return():
-    if 'loggedin' in session and session['role'] == 'local_manager':
-        today = date.today().isoformat()
-        conn, cursor = db_cursor()
-        cursor.execute(f'SELECT store_id FROM local_manager WHERE user_id = {session["userid"]}')
-        store_id = cursor.fetchone()['store_id']
-        
-        conn, cursor = db_cursor()
-        cursor.execute('''
-                       SELECT oi.order_id, oi.equipment_id, e.name as equipment_name, oi.start_time, o.user_id
-                       FROM order_items oi
-                       JOIN equipment e ON oi.equipment_id = e.equipment_id
-                       JOIN orders o ON oi.order_id = o.order_id
-                       JOIN user u ON o.user_id = u.user_id
-                       WHERE oi.end_time = %s AND e.store_id = %s AND o.status = 'Ongoing'
-                       ''', (today, store_id))
-        items = cursor.fetchall()
-        
-        cursor.close()
-        conn.close()
-
-        return render_template('local_manager_daily_return_list.html', items=items)
-    return redirect(url_for('home.login'))
-
-
 # Send reminder
 @local_manager_bp.route('/send_reminder', methods=['POST'])
 def send_reminder():
@@ -925,7 +847,7 @@ def damage_report():
             'rental': rental,
             'percent': percent
         }
-        return render_template('local_manager_damage_report.html', report=report)
+        return render_template('local_manager_report.html', report=report)
     return redirect(url_for('auth_bp.login'))
 
 

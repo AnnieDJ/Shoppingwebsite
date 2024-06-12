@@ -116,6 +116,10 @@ block content %}
                     const src = entry.children[0].src.replace(location.origin + '/static/', '');
                     entry.innerHTML = `<input onchange="equipment_upload(this)" data-src="${src}" accept="image/*" type="file">`;
                     break;
+                case "COST":
+                    const cost = entry.textContent;
+                    entry.innerHTML = `<input type="number" value="${cost}">`;
+                    break;    
                 case "CATEGORY":
                     const category = entry.textContent;
                     entry.innerHTML = `

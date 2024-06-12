@@ -178,14 +178,8 @@
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('chat.index') }}">Chat</a>
             </li>
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Report
-              </a>
-              <div class="dropdown-menu" aria-labelledby="reportDropdown">
-                <a class="dropdown-item" href="{{ url_for('local_manager.damage_report') }}">Damage Report</a>
-                <a class="dropdown-item" href="{{ url_for('local_manager.financial_report') }}">Financial Report</a>
-              </div>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('local_manager.financial_report') }}">Reports</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('local_manager.view_staff') }}">Staff</a>

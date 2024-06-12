@@ -8,11 +8,10 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  // 全局作用域中声明sendMessage函数
   function sendMessage() {
     var messageInput = document.getElementById("message");
     var message = messageInput.value;
-    messageInput.value = ""; // Clear input after getting the value
+    messageInput.value = "";
 
     $.ajax({
       type: "POST",
@@ -39,10 +38,10 @@
       url: "/get_messages",
       success: function (messages) {
         var messagesUl = document.getElementById("messages");
-        messagesUl.innerHTML = ""; // Clear previous messages
+        messagesUl.innerHTML = "";
         messages.forEach(function (msg) {
           var item = document.createElement("li");
-          item.textContent = `${msg.role}-${msg.username}: ${msg.message}`; // 确保使用正确的字段
+          item.textContent = `${msg.role}-${msg.username}: ${msg.message}`;
           messagesUl.appendChild(item);
         });
         window.scrollTo(0, document.body.scrollHeight);
