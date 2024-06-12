@@ -151,7 +151,7 @@
               <a class="nav-link" href="{{ url_for('staff.inventory_management') }}">Inventory</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/staff/order_list">Order</a>
+              <a class="nav-link" href="/staff/order_list">Orders</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('chat.index') }}">Chat</a>
@@ -172,16 +172,19 @@
               <a class="nav-link" href="{{ url_for('local_manager.inventory_management') }}">Inventory</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="/local_manager/order_list">Order</a>
+              <a class="nav-link" href="/local_manager/order_list">Orders</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('chat.index') }}">Chat</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('local_manager.damage_report') }}">Damage Report</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('local_manager.financial_report') }}">Financial Report</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Report
+              </a>
+              <div class="dropdown-menu" aria-labelledby="reportDropdown">
+                <a class="dropdown-item" href="{{ url_for('local_manager.damage_report') }}">Damage Report</a>
+                <a class="dropdown-item" href="{{ url_for('local_manager.financial_report') }}">Financial Report</a>
+              </div>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('local_manager.view_discount') }}">Discount</a>
