@@ -143,16 +143,26 @@
             <!-- Staff -->
             {% elif session.get('role') == 'staff' %}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('staff.dashboard') }}">Dashboard</a>
+              <a class="nav-link" href="{{ url_for('staff.dashboard') }}"
+                >Dashboard</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('staff.view_profile') }}">Profile</a>
+              <a class="nav-link" href="{{ url_for('staff.view_profile') }}"
+                >Profile</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('staff.inventory_management') }}">Inventory</a>
+              <a
+                class="nav-link"
+                href="{{ url_for('staff.inventory_management') }}"
+                >Inventory</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('staff.order_list') }}">Orders</a>
+              <a class="nav-link" href="{{ url_for('staff.order_list') }}"
+                >Orders</a
+              >
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('chat.index') }}">Chat</a>
@@ -164,13 +174,25 @@
             <!-- Local Manager -->
             {% elif session.get('role') == 'local_manager' %}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('local_manager.dashboard') }}">Dashboard</a>
+              <a
+                class="nav-link"
+                href="{{ url_for('local_manager.dashboard') }}"
+                >Dashboard</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('local_manager.view_profile') }}">Profile</a>
+              <a
+                class="nav-link"
+                href="{{ url_for('local_manager.view_profile') }}"
+                >Profile</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('local_manager.inventory_management') }}">Inventory</a>
+              <a
+                class="nav-link"
+                href="{{ url_for('local_manager.inventory_management') }}"
+                >Inventory</a
+              >
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/local_manager/order_list">Orders</a>
@@ -179,12 +201,28 @@
               <a class="nav-link" href="{{ url_for('chat.index') }}">Chat</a>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="reportDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="reportDropdown"
+                role="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
                 Report
               </a>
               <div class="dropdown-menu" aria-labelledby="reportDropdown">
-                <a class="dropdown-item" href="{{ url_for('local_manager.damage_report') }}">Damage Report</a>
-                <a class="dropdown-item" href="{{ url_for('local_manager.financial_report') }}">Financial Report</a>
+                <a
+                  class="dropdown-item"
+                  href="{{ url_for('local_manager.damage_report') }}"
+                  >Damage Report</a
+                >
+                <a
+                  class="dropdown-item"
+                  href="{{ url_for('local_manager.financial_report') }}"
+                  >Financial Report</a
+                >
               </div>
             </li>
             <li class="nav-item">
@@ -192,11 +230,12 @@
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ url_for('local_manager.view_discount') }}">Discount</a>
-            </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('local_manager.view_news') }}">News</a>
-            </li>
-            
+              <a
+                class="nav-link"
+                href="{{ url_for('local_manager.view_news') }}"
+                >News</a
+              >
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
             </li>
@@ -204,20 +243,41 @@
             <!-- National Manager -->
             {% elif session.get('role') == 'national_manager' %}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('national_manager.dashboard') }}">Dashboard</a>
+              <a
+                class="nav-link"
+                href="{{ url_for('national_manager.dashboard') }}"
+                >Dashboard</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('national_manager.national_manager_profile') }}">Profile</a>
+              <a
+                class="nav-link"
+                href="{{ url_for('national_manager.national_manager_profile') }}"
+                >Profile</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('national_manager.view_news') }}">News</a>
+              <a
+                class="nav-link"
+                href="{{ url_for('national_manager.view_news') }}"
+                >News</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('national_manager.view_discount') }}">Discount</a>
+              <a
+                class="nav-link"
+                href="{{ url_for('national_manager.view_discount') }}"
+                >Discount</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('national_manager.financial_report') }}">Financial Report</a>
+              <a
+                class="nav-link"
+                href="{{ url_for('national_manager.financial_report') }}"
+                >Financial Report</a
+              >
             </li>
+
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
             </li>
@@ -225,10 +285,14 @@
             <!-- Admin -->
             {% elif session.get('role') == 'admin' %}
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('admin.dashboard') }}">Dashboard</a>
+              <a class="nav-link" href="{{ url_for('admin.dashboard') }}"
+                >Dashboard</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('admin.admin_profile') }}">Profile</a>
+              <a class="nav-link" href="{{ url_for('admin.admin_profile') }}"
+                >Profile</a
+              >
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/admin/equipment_manage">Inventory</a>
@@ -237,13 +301,19 @@
               <a class="nav-link" href="{{ url_for('chat.index') }}">Chat</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('admin.view_news') }}">News</a>
+              <a class="nav-link" href="{{ url_for('admin.view_news') }}"
+                >News</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('admin.view_discount') }}">Discount</a>
+              <a class="nav-link" href="{{ url_for('admin.view_discount') }}"
+                >Discount</a
+              >
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{{ url_for('admin.financial_report') }}">Financial Report</a>
+              <a class="nav-link" href="{{ url_for('admin.financial_report') }}"
+                >Financial Report</a
+              >
             </li>
             <li class="nav-item">
               <a class="nav-link" href="/logout">Logout</a>
