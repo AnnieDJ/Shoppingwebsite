@@ -1,4 +1,4 @@
-from flask import Flask, jsonify,request,session
+from flask import Flask, jsonify, request, session
 from .home_views import home_bp
 from .customer_views import customer_bp
 from .staff_views import staff_bp
@@ -20,6 +20,7 @@ def create_app():
 
     redis_conn = redis.Redis(host='localhost', port=6379, db=0)
     redis_conn.flushall()
+
     app.register_blueprint(home_bp, url_prefix='/')
     app.register_blueprint(customer_bp, url_prefix='/customer')
     app.register_blueprint(staff_bp, url_prefix='/staff')
@@ -27,10 +28,6 @@ def create_app():
     app.register_blueprint(national_manager_bp, url_prefix='/national_manager')
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(chat_bp, url_prefix='/chat')
-    app.secret_key = 'the first secret key for ava'
-    messages = []  
-
-    redis_conn = redis.Redis(host='localhost', port=6379, db=0)  
 
     @app.route('/send_message', methods=['POST'])
     def send_message():
@@ -40,7 +37,7 @@ def create_app():
             'role': session.get('role', 'NoRole'),
             'message': data['message']
         }
-        redis_conn.lpush('chat_messages', json.dumps(message_info))  
+        redis_conn.lpush('chat_messages', json.dumps(message_info))
         return jsonify({"status": "Message sent"})
 
     @app.route('/get_messages', methods=['GET'])
@@ -57,7 +54,7 @@ def create_app():
             print(f"Unexpected error: {e}")
             return jsonify({"error": "Unexpected error occurred"}), 500
 
-        return jsonify(messages)
 
+        return jsonify(messages)
 
     return app
