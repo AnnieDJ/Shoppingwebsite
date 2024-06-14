@@ -300,13 +300,7 @@ INSERT INTO customer (user_id, title, first_name, family_name, phone_number, add
 ;
 
 
-INSERT INTO category (category, image) VALUES
-('Tractor', 'Tractor.jpg'),
-('Wrapper', 'Wrapper.jpg'),
-('Spreader', 'Spreader.jpg'),
-('Excavator', 'Excavator.jpg');
-
-
+-- Records of equipment
 INSERT INTO equipment (equipment_id, name, description, category, purchase_date, cost, serial_number, status, store_id, maximum_date, minimum_date, Image) VALUES
 (1, "Deutz Fahr", "This 2019 Deutz Fahr 6185 RC shift professional series tractor has only done 2,670 hours and is in great condition and ready to go to work . 50kph front suspension, front linkage and pto, this tractor is a serious contracting machine and with the loader would add incredible versitility to any fleet.", "Tractor", "2015-01-01", 369, "5242875401", "Available", 1, "360", "1", "tractor1.jpg"),
 (3, "Amazone", "Amazone UX5201 Super with 30 mtr boom , as new , 5200ltr tank with 580ltr fresh water , twin pumps 520ltrs/min , axle suspension , 9 sections with auto shut off , ISOBUS with Amazone joystick , DUS- Boom recirculation , comfort package , boom auto height control , LED lighting package.", "Spreader", "2015-01-01", 289, "5242875403", "Available", 1, "360", "1", "Spreader1.jpg"),
@@ -418,225 +412,6 @@ bale size upto 1.68m", "Spreader", "2015-01-01", 340, "5242875419", "Available",
 (80, "Agco RoGator 1300", "Dynamic Spreader designed for large-scale and high-precision chemical applications in modern farming.", "Spreader", "2015-01-01", 370, "5242875480", "Available", 3, "360", "1", "good9.png");
 
 
-INSERT INTO orders (user_id, store_id, total_cost, tax, discount, final_price, status, creation_date) VALUES
-(22, 1, 100, 15, 0, 115, 'Pending', '2024-05-20'),
-(23, 1, 120, 18, 0, 138, 'Pending', '2024-05-21'),
-(24, 1, 130, 19.5, 0, 149.5, 'Pending', '2024-05-22'),
-(25, 1, 140, 21, 0, 161, 'Pending', '2024-05-23'),
-(25, 1, 150, 22.5, 0, 172.5, 'Pending', '2024-05-24'),
-(26, 1, 160, 24, 0, 184, 'Pending', '2024-05-25'),
-(27, 1, 170, 25.5, 0, 195.5, 'Pending', '2024-05-26'),
-(28, 1, 180, 27, 0, 207, 'Pending', '2024-05-27'),
-(29, 1, 190, 28.5, 0, 218.5, 'Pending', '2024-05-28'),
-(30, 1, 200, 30, 0, 230, 'Pending', '2024-05-29'),
-(31, 1, 110, 16.5, 0, 126.5, 'Pending', '2024-05-30'),
-(32, 1, 120, 18, 0, 138, 'Pending', '2024-05-31'),
-(33, 1, 130, 19.5, 0, 149.5, 'Pending', '2024-06-01'),
-(34, 1, 140, 21, 0, 161, 'Pending', '2024-06-02'),
-(22, 1, 150, 22.5, 0, 172.5, 'Ongoing', '2024-06-03'),
-(36, 1, 160, 24, 0, 184, 'Ongoing', '2024-06-04'),
-(37, 1, 170, 25.5, 0, 195.5, 'Ongoing', '2024-06-05'),
-(38, 1, 180, 27, 0, 207, 'Ongoing', '2024-06-06'),
-(39, 1, 190, 28.5, 0, 218.5, 'Ongoing', '2024-06-07'),
-(40, 1, 200, 30, 0, 230, 'Ongoing', '2024-06-08'),
-(21, 1, 210, 31.5, 0, 241.5, 'Ongoing', '2024-06-09'),
-(22, 1, 220, 33, 0, 253, 'Ongoing', '2024-06-10'),
-(23, 1, 230, 34.5, 0, 264.5, 'Ongoing', '2024-06-11'),
-(24, 1, 240, 36, 0, 276, 'Ongoing', '2024-06-12'),
-(25, 1, 250, 37.5, 0, 287.5, 'Ongoing', '2024-06-13'),
-(26, 1, 260, 39, 0, 299, 'Ongoing', '2024-06-14'),
-(27, 1, 270, 40.5, 0, 310.5, 'Ongoing', '2024-06-15'),
-(22, 1, 280, 42, 0, 322, 'Completed', '2024-06-16'),
-(29, 1, 290, 43.5, 0, 333.5, 'Completed', '2024-06-17'),
-(30, 1, 300, 45, 0, 345, 'Completed', '2024-06-18'),
-(22, 2, 105, 15.75, 0, 120.75, 'Pending', '2024-05-20'),
-(23, 2, 110, 16.5, 0, 126.5, 'Pending', '2024-05-21'),
-(24, 2, 115, 17.25, 0, 132.25, 'Pending', '2024-05-22'),
-(25, 2, 120, 18, 0, 138, 'Pending', '2024-05-23'),
-(26, 2, 125, 18.75, 0, 143.75, 'Pending', '2024-05-24'),
-(27, 2, 130, 19.5, 0, 149.5, 'Pending', '2024-05-25'),
-(28, 2, 135, 20.25, 0, 155.25, 'Pending', '2024-05-26'),
-(29, 2, 140, 21, 0, 161, 'Pending', '2024-05-27'),
-(30, 2, 145, 21.75, 0, 166.75, 'Pending', '2024-05-28'),
-(31, 2, 150, 22.5, 0, 172.5, 'Pending', '2024-05-29'),
-(32, 2, 155, 23.25, 0, 178.25, 'Ongoing', '2024-06-03'),
-(33, 2, 160, 24, 0, 184, 'Ongoing', '2024-06-04'),
-(34, 2, 165, 24.75, 0, 189.75, 'Ongoing', '2024-06-05'),
-(35, 2, 170, 25.5, 0, 195.5, 'Ongoing', '2024-06-06'),
-(36, 2, 175, 26.25, 0, 201.25, 'Ongoing', '2024-06-07'),
-(37, 2, 180, 27, 0, 207, 'Completed', '2024-06-08'),
-(38, 2, 185, 27.75, 0, 212.75, 'Completed', '2024-06-09'),
-(39, 2, 190, 28.5, 0, 218.5, 'Completed', '2024-06-10'),
-(40, 2, 195, 29.25, 0, 224.25, 'Completed', '2024-06-11'),
-(21, 2, 200, 30, 0, 230, 'Completed', '2024-06-12'),
-(22, 3, 205, 30.75, 0, 235.75, 'Pending', '2024-05-20'),
-(23, 3, 210, 31.5, 0, 241.5, 'Pending', '2024-05-21'),
-(24, 3, 215, 32.25, 0, 247.25, 'Pending', '2024-05-22'),
-(25, 3, 220, 33, 0, 253, 'Pending', '2024-05-23'),
-(26, 3, 225, 33.75, 0, 258.75, 'Pending', '2024-05-24'),
-(27, 3, 230, 34.5, 0, 264.5, 'Pending', '2024-05-25'),
-(28, 3, 235, 35.25, 0, 270.25, 'Pending', '2024-05-26'),
-(29, 3, 240, 36, 0, 276, 'Pending', '2024-05-27'),
-(30, 3, 245, 36.75, 0, 281.75, 'Pending', '2024-05-28'),
-(31, 3, 250, 37.5, 0, 287.5, 'Pending', '2024-05-29'),
-(32, 3, 255, 38.25, 0, 293.25, 'Ongoing', '2024-06-03'),
-(33, 3, 260, 39, 0, 299, 'Ongoing', '2024-06-04'),
-(34, 3, 265, 39.75, 0, 304.75, 'Ongoing', '2024-06-05'),
-(35, 3, 270, 40.5, 0, 310.5, 'Ongoing', '2024-06-06'),
-(36, 3, 275, 41.25, 0, 316.25, 'Ongoing', '2024-06-07'),
-(37, 3, 280, 42, 0, 322, 'Completed', '2024-06-08'),
-(38, 3, 285, 42.75, 0, 327.75, 'Completed', '2024-06-09'),
-(39, 3, 290, 43.5, 0, 333.5, 'Completed', '2024-06-10'),
-(40, 3, 295, 44.25, 0, 339.25, 'Completed', '2024-06-11'),
-(21, 3, 300, 45, 0, 345, 'Completed', '2024-06-12')
-;
-
-
-INSERT INTO order_items (order_id, equipment_id, quantity, price, start_time, end_time) VALUES
-(1, 1, 1, 100, '2024-06-13', '2024-06-15'),
-(2, 3, 1, 120, '2024-06-13', '2024-06-16'),
-(3, 5, 1, 130, '2024-06-13', '2024-06-17'),
-(4, 7, 1, 140, '2024-06-13', '2024-06-18'),
-(5, 9, 1, 150, '2024-06-13', '2024-06-19'),
-(6, 11, 1, 160, '2024-06-13', '2024-06-20'),
-(7, 13, 1, 170, '2024-06-13', '2024-06-21'),
-(8, 15, 1, 180, '2024-06-13', '2024-06-22'),
-(9, 17, 1, 190, '2024-06-13', '2024-06-23'),
-(15, 19, 1, 200, '2024-06-13', '2024-06-24'),
-(16, 21, 1, 210, '2024-06-10', '2024-06-13'),
-(17, 23, 1, 220, '2024-06-09', '2024-06-13'),
-(18, 25, 1, 230, '2024-06-08', '2024-06-13'),
-(19, 27, 1, 240, '2024-06-07', '2024-06-13'),
-(20, 29, 1, 250, '2024-06-06', '2024-06-13'),
-(21, 31, 1, 260, '2024-06-05', '2024-06-13'),
-(22, 33, 1, 270, '2024-06-04', '2024-06-13'),
-(23, 35, 1, 280, '2024-06-03', '2024-06-13'),
-(24, 37, 1, 290, '2024-06-02', '2024-06-13'),
-(25, 39, 1, 300, '2024-06-01', '2024-06-13'),
-(31, 41, 1, 105, '2024-05-20', '2024-05-27'),
-(32, 42, 1, 110, '2024-05-21', '2024-05-28'),
-(33, 43, 1, 115, '2024-05-22', '2024-05-29'),
-(34, 44, 1, 120, '2024-05-23', '2024-05-30'),
-(35, 45, 1, 125, '2024-05-24', '2024-05-31'),
-(36, 46, 1, 130, '2024-05-25', '2024-06-01'),
-(37, 47, 1, 135, '2024-05-26', '2024-06-02'),
-(38, 48, 1, 140, '2024-05-27', '2024-06-03'),
-(39, 49, 1, 145, '2024-05-28', '2024-06-04'),
-(40, 50, 1, 150, '2024-05-29', '2024-06-05'),
-(41, 51, 1, 155, '2024-06-03', '2024-06-10'),
-(42, 52, 1, 160, '2024-06-04', '2024-06-11'),
-(43, 53, 1, 165, '2024-06-05', '2024-06-12'),
-(44, 54, 1, 170, '2024-06-06', '2024-06-13'),
-(45, 55, 1, 175, '2024-06-07', '2024-06-14'),
-(46, 56, 1, 180, '2024-06-08', '2024-06-15'),
-(47, 57, 1, 185, '2024-06-09', '2024-06-16'),
-(48, 58, 1, 190, '2024-06-10', '2024-06-17'),
-(49, 59, 1, 195, '2024-06-11', '2024-06-18'),
-(50, 60, 1, 200, '2024-06-12', '2024-06-19'),
-(51, 61, 1, 105, '2024-05-20', '2024-05-27'),
-(52, 62, 1, 110, '2024-05-21', '2024-05-28'),
-(53, 63, 1, 115, '2024-05-22', '2024-05-29'),
-(54, 64, 1, 120, '2024-05-23', '2024-05-30'),
-(55, 65, 1, 125, '2024-05-24', '2024-05-31'),
-(56, 66, 1, 130, '2024-05-25', '2024-06-01'),
-(57, 67, 1, 135, '2024-05-26', '2024-06-02'),
-(58, 68, 1, 140, '2024-05-27', '2024-06-03'),
-(59, 69, 1, 145, '2024-05-28', '2024-06-04'),
-(60, 70, 1, 150, '2024-05-29', '2024-06-05'),
-(61, 71, 1, 155, '2024-06-03', '2024-06-10'),
-(62, 72, 1, 160, '2024-06-04', '2024-06-11'),
-(63, 73, 1, 165, '2024-06-05', '2024-06-12'),
-(64, 74, 1, 170, '2024-06-06', '2024-06-13'),
-(65, 75, 1, 175, '2024-06-07', '2024-06-14'),
-(66, 76, 1, 180, '2024-06-08', '2024-06-15'),
-(67, 77, 1, 185, '2024-06-09', '2024-06-16'),
-(68, 78, 1, 190, '2024-06-10', '2024-06-17'),
-(69, 79, 1, 195, '2024-06-11', '2024-06-18'),
-(70, 80, 1, 200, '2024-06-12', '2024-06-19')
-;
-
-
-INSERT INTO payments (order_id, user_id, payment_type, payment_status, amount, payment_date) VALUES
-(1, 22, 'Credit Card', 'Processed', 120.75, '2024-05-20'),
-(2, 23, 'Credit Card', 'Processed', 126.5, '2024-05-21'),
-(3, 24, 'Credit Card', 'Processed', 132.25, '2024-05-22'),
-(4, 25, 'Credit Card', 'Processed', 138, '2024-05-23'),
-(5, 26, 'Credit Card', 'Processed', 143.75, '2024-05-24'),
-(6, 27, 'Credit Card', 'Processed', 149.5, '2024-05-25'),
-(7, 28, 'Credit Card', 'Processed', 155.25, '2024-05-26'),
-(8, 29, 'Credit Card', 'Processed', 161, '2024-05-27'),
-(9, 30, 'Credit Card', 'Processed', 166.75, '2024-05-28'),
-(10, 31, 'Credit Card', 'Processed', 172.5, '2024-05-29'),
-(11, 32, 'Credit Card', 'Processed', 178.25, '2024-06-03'),
-(12, 33, 'Credit Card', 'Processed', 184, '2024-06-04'),
-(13, 34, 'Credit Card', 'Processed', 189.75, '2024-06-05'),
-(14, 35, 'Credit Card', 'Processed', 195.5, '2024-06-06'),
-(15, 36, 'Credit Card', 'Processed', 201.25, '2024-06-07'),
-(16, 37, 'Credit Card', 'Processed', 207, '2024-06-08'),
-(17, 38, 'Credit Card', 'Processed', 212.75, '2024-06-09'),
-(18, 39, 'Credit Card', 'Processed', 218.5, '2024-06-10'),
-(19, 40, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(20, 22, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(21, 23, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(22, 24, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(23, 25, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(24, 26, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(25, 27, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(26, 28, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(27, 29, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(28, 30, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(29, 31, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(30, 32, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(31, 33, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(32, 34, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(33, 35, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(34, 36, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(35, 37, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(36, 38, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(37, 39, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(38, 40, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(39, 21, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(40, 22, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(41, 23, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(42, 24, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(43, 25, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(44, 26, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(45, 27, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(46, 28, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(47, 29, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(48, 30, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(49, 31, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(50, 32, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(51, 33, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(52, 34, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(53, 35, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(54, 36, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(55, 37, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(56, 38, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(57, 39, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(58, 40, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(59, 21, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(60, 22, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(61, 23, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(62, 24, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(63, 25, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(64, 26, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(65, 27, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(66, 28, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(67, 29, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(68, 30, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(69, 31, 'Credit Card', 'Processed', 224.25, '2024-06-11'),
-(70, 32, 'Credit Card', 'Processed', 224.25, '2024-06-11')
-;
-
-
-
-INSERT INTO discount (discount_id, days, discount_pricing) VALUES
-(1, 0, 0),
-(2, 30, 0.05),
-(3, 180, 0.1),
-(4, 360, 0.15);
-
 
 INSERT INTO news (title, content, publish_date, creator_id, store_id) VALUES
 ('New Tractor Models Available', 'We are excited to announce the arrival of the latest tractor models. Visit our store to see them in action!', '2024-06-01', 1, 1),
@@ -644,4 +419,69 @@ INSERT INTO news (title, content, publish_date, creator_id, store_id) VALUES
 ('New Spreader Technology', 'Discover the latest advancements in Spreader technology. Our Rolleston store has new models in stock.', '2024-06-03', 4, 2),
 ('Staff Training Program', 'We have initiated a comprehensive training program for all staff members to enhance service quality.', '2024-06-04', 5, NULL)
 ;
+
+-- Records of discount
+INSERT INTO discount (discount_id, days, discount_pricing) VALUES
+(1, 0, 0),
+(2, 30, 0.05),
+(3, 180, 0.1),
+(4, 360, 0.15);
+
+-- Records of category
+INSERT INTO category (category, image) VALUES
+('Tractor', 'Tractor.jpg'),
+('Wrapper', 'Wrapper.jpg'),
+('Spreader', 'Spreader.jpg'),
+('Excavator', 'Excavator.jpg');
+
+-- Records of orders
+INSERT INTO `orders` VALUES ('7', '3', '1', '4335.00', '0.15', '0.15', '4237.46', 'Completed', '2024-01-11');
+INSERT INTO `orders` VALUES ('8', '3', '2', '1080.00', '0.15', '0.15', '1055.70', 'Completed', '2024-02-14');
+INSERT INTO `orders` VALUES ('9', '3', '3', '6510.00', '0.15', '0.15', '6363.52', 'Completed', '2024-03-14');
+INSERT INTO `orders` VALUES ('10', '3', '1', '3420.00', '0.15', '0.15', '3343.05', 'Completed', '2024-03-14');
+INSERT INTO `orders` VALUES ('11', '3', '1', '7749.00', '0.15', '0.15', '7574.65', 'Completed', '2024-05-14');
+INSERT INTO `orders` VALUES ('12', '3', '2', '6380.00', '0.15', '0.15', '6236.45', 'Completed', '2024-05-14');
+INSERT INTO `orders` VALUES ('13', '3', '1', '289.00', '0.15', '0.15', '282.50', 'Completed', '2024-06-14');
+
+-- Records of order_items
+INSERT INTO `order_items` VALUES ('11', '7', '11', '15', '289.00', '2024-01-11', '2024-02-29');
+INSERT INTO `order_items` VALUES ('12', '8', '16', '4', '270.00', '2024-02-14', '2024-02-18');
+INSERT INTO `order_items` VALUES ('13', '9', '20', '21', '310.00', '2024-03-14', '2024-04-05');
+INSERT INTO `order_items` VALUES ('14', '10', '13', '19', '180.00', '2024-03-14', '2024-04-03');
+INSERT INTO `order_items` VALUES ('15', '11', '1', '21', '369.00', '2024-05-14', '2024-06-05');
+INSERT INTO `order_items` VALUES ('16', '12', '17', '22', '290.00', '2024-05-14', '2024-06-06');
+INSERT INTO `order_items` VALUES ('17', '13', '15', '1', '289.00', '2024-06-14', '2024-06-15');
+
+-- Records of payments
+INSERT INTO `payments` VALUES ('7', '7', '3', 'Credit Card', 'Processed', '15.00', '2024-01-11');
+INSERT INTO `payments` VALUES ('8', '8', '3', 'Credit Card', 'Processed', '4.00', '2024-02-14');
+INSERT INTO `payments` VALUES ('9', '9', '3', 'Credit Card', 'Processed', '21.00', '2024-03-14');
+INSERT INTO `payments` VALUES ('10', '10', '3', 'Credit Card', 'Processed', '19.00', '2024-03-14');
+INSERT INTO `payments` VALUES ('11', '11', '3', 'Credit Card', 'Processed', '21.00', '2024-05-14');
+INSERT INTO `payments` VALUES ('12', '12', '3', 'Credit Card', 'Processed', '22.00', '2024-05-14');
+INSERT INTO `payments` VALUES ('13', '13', '3', 'Credit Card', 'Processed', '1.00', '2024-06-14');
+
+-- Records of equipment rental history
+INSERT INTO `equipment_rental_history` VALUES ('11', '11', '1', 'Available', 'Rented', '2024-01-11');
+INSERT INTO `equipment_rental_history` VALUES ('12', '16', '2', 'Available', 'Rented', '2024-02-14');
+INSERT INTO `equipment_rental_history` VALUES ('13', '20', '3', 'Available', 'Rented', '2024-03-14');
+INSERT INTO `equipment_rental_history` VALUES ('14', '13', '1', 'Available', 'Rented', '2024-03-14');
+INSERT INTO `equipment_rental_history` VALUES ('15', '1', '1', 'Available', 'Rented', '2024-05-14');
+INSERT INTO `equipment_rental_history` VALUES ('16', '17', '2', 'Available', 'Rented', '2024-05-14');
+INSERT INTO `equipment_rental_history` VALUES ('17', '15', '1', 'Available', 'Rented', '2024-06-14');
+
+-- Records of equipment repair history
+INSERT INTO equipment_repair_history (equipment_id, store_id, status_from, status_to, change_date)
+VALUES
+(1, 1, 'Available', 'Under Repair', '2024-06-01'),
+(1, 1, 'Under Repair', 'Available', '2024-06-03'),
+(2, 1, 'Available', 'Under Repair', '2024-06-05'),
+(2, 1, 'Under Repair', 'Available', '2024-06-07'),
+(3, 1, 'Available', 'Under Repair', '2024-06-09'),
+(3, 1, 'Under Repair', 'Available', '2024-06-11'),
+(4, 1, 'Available', 'Under Repair', '2024-06-13'),
+(4, 1, 'Under Repair', 'Available', '2024-06-15')
+;
+
+
 
