@@ -13,12 +13,19 @@ def create_app():
     app = Flask(__name__)
     app.config['UPLOAD_FOLDER'] = 'app/static'
     app.config['DB_USER'] = 'root'
-    app.config['DB_PASSWORD'] = 'Aa123456'
+    app.config['DB_PASSWORD'] = 'root1234'
     app.config['DB_HOST'] = 'localhost'
-    app.config['DB_NAME'] = 'as'
+    app.config['DB_NAME'] = 'Agrihire'
     app.secret_key = 'the first secret key for ava'
 
-    redis_conn = redis.Redis(host='localhost', port=6379, db=0)
+    #redis_conn = redis.Redis(host='localhost', port=6379, db=0)
+    redis_conn = redis.Redis(
+    host='redis-17600.c291.ap-southeast-2-1.ec2.redns.redis-cloud.com',
+    port=17600,
+    password='ZoBvg2l0bUQYzD5yFjm67O0jKPs3rdb8',
+    ssl=False,
+    ssl_cert_reqs=None  # This can temporarily disable certificate verification, for testing purposes only
+)
     redis_conn.flushall()
 
     app.register_blueprint(home_bp, url_prefix='/')
