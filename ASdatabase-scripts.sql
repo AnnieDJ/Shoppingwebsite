@@ -299,7 +299,12 @@ INSERT INTO customer (user_id, title, first_name, family_name, phone_number, add
 (40, "Miss", "Zoe", "Bird", "0254525411", "11 milkfarm street, greengrass, Canterbury")
 ;
 
-
+-- Records of category
+INSERT INTO category (category, image) VALUES
+('Tractor', 'Tractor.jpg'),
+('Wrapper', 'Wrapper.jpg'),
+('Spreader', 'Spreader.jpg'),
+('Excavator', 'Excavator.jpg');
 -- Records of equipment
 INSERT INTO equipment (equipment_id, name, description, category, purchase_date, cost, serial_number, status, store_id, maximum_date, minimum_date, Image) VALUES
 (1, "Deutz Fahr", "This 2019 Deutz Fahr 6185 RC shift professional series tractor has only done 2,670 hours and is in great condition and ready to go to work . 50kph front suspension, front linkage and pto, this tractor is a serious contracting machine and with the loader would add incredible versitility to any fleet.", "Tractor", "2015-01-01", 369, "5242875401", "Available", 1, "360", "1", "tractor1.jpg"),
@@ -413,28 +418,8 @@ bale size upto 1.68m", "Spreader", "2015-01-01", 340, "5242875419", "Available",
 
 
 
-INSERT INTO news (title, content, publish_date, creator_id, store_id) VALUES
-('New Tractor Models Available', 'We are excited to announce the arrival of the latest tractor models. Visit our store to see them in action!', '2024-06-01', 1, 1),
-('Store Renovation Completed', 'The renovation of our Lincoln store is now complete. Come and check out the new look and improved facilities!', '2024-06-02', 3, 1),
-('New Spreader Technology', 'Discover the latest advancements in Spreader technology. Our Rolleston store has new models in stock.', '2024-06-03', 4, 2),
-('Staff Training Program', 'We have initiated a comprehensive training program for all staff members to enhance service quality.', '2024-06-04', 5, NULL)
-;
 
--- Records of discount
-INSERT INTO discount (discount_id, days, discount_pricing) VALUES
-(1, 0, 0),
-(2, 30, 0.05),
-(3, 180, 0.1),
-(4, 360, 0.15);
 
--- Records of category
-INSERT INTO category (category, image) VALUES
-('Tractor', 'Tractor.jpg'),
-('Wrapper', 'Wrapper.jpg'),
-('Spreader', 'Spreader.jpg'),
-('Excavator', 'Excavator.jpg');
-
--- Records of orders
 INSERT INTO `orders` VALUES ('7', '3', '1', '4335.00', '0.15', '0.15', '4237.46', 'Completed', '2024-01-11');
 INSERT INTO `orders` VALUES ('8', '3', '2', '1080.00', '0.15', '0.15', '1055.70', 'Completed', '2024-02-14');
 INSERT INTO `orders` VALUES ('9', '3', '3', '6510.00', '0.15', '0.15', '6363.52', 'Completed', '2024-03-14');
@@ -452,16 +437,9 @@ INSERT INTO `order_items` VALUES ('15', '11', '1', '21', '369.00', '2024-05-14',
 INSERT INTO `order_items` VALUES ('16', '12', '17', '22', '290.00', '2024-05-14', '2024-06-06');
 INSERT INTO `order_items` VALUES ('17', '13', '15', '1', '289.00', '2024-06-14', '2024-06-15');
 
--- Records of payments
-INSERT INTO `payments` VALUES ('7', '7', '3', 'Credit Card', 'Processed', '15.00', '2024-01-11');
-INSERT INTO `payments` VALUES ('8', '8', '3', 'Credit Card', 'Processed', '4.00', '2024-02-14');
-INSERT INTO `payments` VALUES ('9', '9', '3', 'Credit Card', 'Processed', '21.00', '2024-03-14');
-INSERT INTO `payments` VALUES ('10', '10', '3', 'Credit Card', 'Processed', '19.00', '2024-03-14');
-INSERT INTO `payments` VALUES ('11', '11', '3', 'Credit Card', 'Processed', '21.00', '2024-05-14');
-INSERT INTO `payments` VALUES ('12', '12', '3', 'Credit Card', 'Processed', '22.00', '2024-05-14');
-INSERT INTO `payments` VALUES ('13', '13', '3', 'Credit Card', 'Processed', '1.00', '2024-06-14');
 
--- Records of equipment rental history
+
+
 INSERT INTO `equipment_rental_history` VALUES ('11', '11', '1', 'Available', 'Rented', '2024-01-11');
 INSERT INTO `equipment_rental_history` VALUES ('12', '16', '2', 'Available', 'Rented', '2024-02-14');
 INSERT INTO `equipment_rental_history` VALUES ('13', '20', '3', 'Available', 'Rented', '2024-03-14');
@@ -480,8 +458,37 @@ VALUES
 (3, 1, 'Available', 'Under Repair', '2024-06-09'),
 (3, 1, 'Under Repair', 'Available', '2024-06-11'),
 (4, 1, 'Available', 'Under Repair', '2024-06-13'),
-(4, 1, 'Under Repair', 'Available', '2024-06-15')
+(4, 1, 'Under Repair', 'Available', '2024-06-15');
+-- Records of discount
+INSERT INTO discount (discount_id, days, discount_pricing) VALUES
+(1, 0, 0),
+(2, 30, 0.05),
+(3, 180, 0.1),
+(4, 360, 0.15);
+
+
+
+
+-- Records of orders
+
+-- Records of payments
+INSERT INTO `payments` VALUES ('7', '7', '3', 'Credit Card', 'Processed', '15.00', '2024-01-11');
+INSERT INTO `payments` VALUES ('8', '8', '3', 'Credit Card', 'Processed', '4.00', '2024-02-14');
+INSERT INTO `payments` VALUES ('9', '9', '3', 'Credit Card', 'Processed', '21.00', '2024-03-14');
+INSERT INTO `payments` VALUES ('10', '10', '3', 'Credit Card', 'Processed', '19.00', '2024-03-14');
+INSERT INTO `payments` VALUES ('11', '11', '3', 'Credit Card', 'Processed', '21.00', '2024-05-14');
+INSERT INTO `payments` VALUES ('12', '12', '3', 'Credit Card', 'Processed', '22.00', '2024-05-14');
+INSERT INTO `payments` VALUES ('13', '13', '3', 'Credit Card', 'Processed', '1.00', '2024-06-14');
+
+-- Records of equipment rental history
+
+
+
+
+
+INSERT INTO news (title, content, publish_date, creator_id, store_id) VALUES
+('New Tractor Models Available', 'We are excited to announce the arrival of the latest tractor models. Visit our store to see them in action!', '2024-06-01', 1, 1),
+('Store Renovation Completed', 'The renovation of our Lincoln store is now complete. Come and check out the new look and improved facilities!', '2024-06-02', 3, 1),
+('New Spreader Technology', 'Discover the latest advancements in Spreader technology. Our Rolleston store has new models in stock.', '2024-06-03', 4, 2),
+('Staff Training Program', 'We have initiated a comprehensive training program for all staff members to enhance service quality.', '2024-06-04', 5, NULL)
 ;
-
-
-
