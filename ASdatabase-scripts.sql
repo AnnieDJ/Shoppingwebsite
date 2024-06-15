@@ -453,8 +453,8 @@ INSERT INTO equipment_repair_history (equipment_id, store_id, status_from, statu
 VALUES
 (1, 1, 'Available', 'Under Repair', '2024-06-01'),
 (1, 1, 'Under Repair', 'Available', '2024-06-03'),
-(2, 1, 'Available', 'Under Repair', '2024-06-05'),
-(2, 1, 'Under Repair', 'Available', '2024-06-07'),
+(6, 1, 'Available', 'Under Repair', '2024-06-05'),
+(6, 1, 'Under Repair', 'Available', '2024-06-07'),
 (3, 1, 'Available', 'Under Repair', '2024-06-09'),
 (3, 1, 'Under Repair', 'Available', '2024-06-11'),
 (4, 1, 'Available', 'Under Repair', '2024-06-13'),
